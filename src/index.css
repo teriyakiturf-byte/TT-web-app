@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-800 antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-stone-100 p-5;
+  }
+  .btn-primary {
+    @apply bg-lawn-700 hover:bg-lawn-800 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-earth-100 hover:bg-earth-200 text-earth-800 font-semibold px-5 py-2.5 rounded-xl transition-colors duration-150;
+  }
+  .input {
+    @apply w-full border border-stone-200 rounded-xl px-4 py-2.5 text-stone-800 bg-white focus:outline-none focus:ring-2 focus:ring-lawn-400 focus:border-transparent transition;
+  }
+  .label {
+    @apply block text-sm font-semibold text-stone-600 mb-1.5;
+  }
+  .section-title {
+    @apply text-lg font-bold text-lawn-900 flex items-center gap-2 mb-4;
+  }
+  .tip-warning {
+    @apply bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-xl text-amber-900 text-sm;
+  }
+  .tip-info {
+    @apply bg-sky-50 border-l-4 border-sky-500 p-3 rounded-r-xl text-sky-900 text-sm;
+  }
+  .tip-success {
+    @apply bg-lawn-50 border-l-4 border-lawn-500 p-3 rounded-r-xl text-lawn-900 text-sm;
+  }
+}
