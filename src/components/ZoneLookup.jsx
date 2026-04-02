@@ -3,9 +3,9 @@ import { MapPin, Loader2, Info } from 'lucide-react'
 import { ZONE_GROUPS, getZoneGroup } from '../utils/calendarData.js'
 
 const ZONE_COLORS = {
-  north:      'bg-sky-50 border-sky-300 text-sky-900',
-  transition: 'bg-amber-50 border-amber-300 text-amber-900',
-  south:      'bg-red-50 border-red-300 text-red-900',
+  north:      'bg-tt-light-lime border-tt-lime text-tt-forest',
+  transition: 'bg-tt-light-orange border-tt-orange/60 text-tt-charcoal',
+  south:      'bg-[#fff0ea] border-tt-orange text-tt-charcoal',
 }
 
 export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange }) {
@@ -43,7 +43,7 @@ export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange })
   return (
     <div className="card">
       <h2 className="section-title">
-        <MapPin className="w-5 h-5 text-lawn-600" />
+        <MapPin className="w-5 h-5 text-tt-orange" />
         Location & Growing Zone
       </h2>
 
@@ -64,21 +64,21 @@ export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange })
       </form>
 
       {error && (
-        <p className="text-red-600 text-sm flex items-center gap-1.5 mb-2">
+        <p className="text-tt-orange text-sm flex items-center gap-1.5 mb-2 font-semibold">
           <Info className="w-4 h-4 flex-shrink-0" /> {error}
         </p>
       )}
 
       {zone && zoneInfo && (
-        <div className={`rounded-xl border px-4 py-3 ${ZONE_COLORS[zoneGroup]}`}>
+        <div className={`rounded-xl border-2 px-4 py-3 ${ZONE_COLORS[zoneGroup]}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Your USDA Zone</p>
+              <p className="text-xs font-bold uppercase tracking-widest opacity-60">Your USDA Zone</p>
               <p className="text-3xl font-extrabold leading-tight mt-0.5">{zone}</p>
               <p className="text-sm font-semibold mt-0.5">{zoneInfo.label}</p>
             </div>
-            <div className="text-right text-xs opacity-80">
-              <p className="font-semibold">ZIP: {zipCode}</p>
+            <div className="text-right text-xs opacity-70">
+              <p className="font-bold">ZIP: {zipCode}</p>
               <p className="mt-1">{zoneInfo.grasses}</p>
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange })
       )}
 
       {!zone && (
-        <p className="text-stone-400 text-sm text-center py-2">
+        <p className="text-tt-charcoal/40 text-sm text-center py-2">
           Enter your ZIP code to personalize your lawn care plan.
         </p>
       )}

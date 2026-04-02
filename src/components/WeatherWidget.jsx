@@ -21,7 +21,6 @@ function kelvinToF(k) {
   return Math.round((k - 273.15) * 9/5 + 32)
 }
 
-// Group OWM 3-hour forecast into daily summaries
 function groupForecastByDay(list) {
   const days = {}
   for (const item of list) {
@@ -87,13 +86,13 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
     <div className="card">
       <div className="flex items-center justify-between mb-4">
         <h2 className="section-title mb-0">
-          <Cloud className="w-5 h-5 text-sky-500" />
+          <Cloud className="w-5 h-5 text-tt-lime" />
           Live Weather
         </h2>
         <div className="flex gap-2">
           <button
             onClick={() => setShowKeyInput(v => !v)}
-            className="text-stone-400 hover:text-stone-600 transition-colors p-1"
+            className="text-tt-charcoal/30 hover:text-tt-charcoal/60 transition-colors p-1"
             title={showKeyInput ? 'Hide API key' : 'Set API key'}
           >
             {showKeyInput ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -102,7 +101,7 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
             <button
               onClick={() => fetchWeather(apiKey, zipCode)}
               disabled={loading}
-              className="text-stone-400 hover:text-sky-600 transition-colors p-1"
+              className="text-tt-charcoal/30 hover:text-tt-lime transition-colors p-1"
               title="Refresh weather"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -113,9 +112,9 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
 
       {/* API Key input */}
       {showKeyInput && (
-        <form onSubmit={handleSaveKey} className="mb-4 p-3 bg-sky-50 rounded-xl border border-sky-200">
-          <label className="label text-sky-800">OpenWeatherMap API Key</label>
-          <p className="text-xs text-sky-700 mb-2">
+        <form onSubmit={handleSaveKey} className="mb-4 p-3 bg-tt-light-lime rounded-xl border border-tt-lime/40">
+          <label className="label text-tt-forest">OpenWeatherMap API Key</label>
+          <p className="text-xs text-tt-forest/70 mb-2">
             Free key at <span className="font-mono">openweathermap.org</span>. Stored locally only.
           </p>
           <div className="flex gap-2">
@@ -132,24 +131,24 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
       )}
 
       {error && (
-        <p className="text-red-600 text-sm mb-3 p-2 bg-red-50 rounded-lg">{error}</p>
+        <p className="text-tt-orange text-sm mb-3 p-2 bg-tt-light-orange rounded-lg font-semibold">{error}</p>
       )}
 
       {!apiKey && !showKeyInput && (
-        <p className="text-stone-400 text-sm text-center py-4">
+        <p className="text-tt-charcoal/40 text-sm text-center py-4">
           Add your OpenWeatherMap API key to enable live weather.
         </p>
       )}
 
       {!zipCode && apiKey && (
-        <p className="text-stone-400 text-sm text-center py-4">
+        <p className="text-tt-charcoal/40 text-sm text-center py-4">
           Enter a ZIP code on the left to load weather data.
         </p>
       )}
 
       {loading && (
-        <div className="flex items-center justify-center py-8 gap-2 text-stone-400">
-          <Loader2 className="w-5 h-5 animate-spin" />
+        <div className="flex items-center justify-center py-8 gap-2 text-tt-charcoal/40">
+          <Loader2 className="w-5 h-5 animate-spin text-tt-lime" />
           <span>Loading weather…</span>
         </div>
       )}
@@ -157,27 +156,27 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
       {current && !loading && (
         <>
           {/* Current conditions */}
-          <div className="flex items-center gap-4 mb-5 p-4 bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl border border-sky-100">
+          <div className="flex items-center gap-4 mb-5 p-4 bg-gradient-to-br from-tt-light-lime to-tt-light-lime/60 rounded-xl border border-tt-lime/30">
             <div className="text-5xl">{getIcon(current.weather[0]?.icon)}</div>
             <div className="flex-1">
               <div className="flex items-end gap-1">
-                <span className="text-4xl font-extrabold text-stone-800">{tempF}°</span>
-                <span className="text-stone-400 text-sm mb-1.5">F</span>
+                <span className="text-4xl font-extrabold text-tt-charcoal">{tempF}°</span>
+                <span className="text-tt-charcoal/40 text-sm mb-1.5">F</span>
               </div>
-              <p className="text-stone-600 font-medium capitalize">{current.weather[0]?.description}</p>
-              <p className="text-stone-400 text-xs mt-0.5">{current.name}</p>
+              <p className="text-tt-charcoal font-semibold capitalize">{current.weather[0]?.description}</p>
+              <p className="text-tt-charcoal/50 text-xs mt-0.5">{current.name}</p>
             </div>
             <div className="text-right text-sm space-y-1">
-              <div className="flex items-center gap-1 text-stone-500 justify-end">
+              <div className="flex items-center gap-1 text-tt-charcoal/60 justify-end">
                 <Thermometer className="w-3.5 h-3.5" /> Feels {feelsF}°F
               </div>
-              <div className="flex items-center gap-1 text-sky-600 justify-end">
+              <div className="flex items-center gap-1 text-tt-forest justify-end font-semibold">
                 <Droplets className="w-3.5 h-3.5" /> {current.main.humidity}%
               </div>
-              <div className="flex items-center gap-1 text-stone-500 justify-end">
+              <div className="flex items-center gap-1 text-tt-charcoal/60 justify-end">
                 <Wind className="w-3.5 h-3.5" /> {Math.round(current.wind.speed)} mph
               </div>
-              <div className="flex items-center gap-1 text-amber-500 justify-end">
+              <div className="flex items-center gap-1 text-tt-orange justify-end font-semibold">
                 <Sun className="w-3.5 h-3.5" /> UV {current.uvi ?? '—'}
               </div>
             </div>
@@ -186,16 +185,16 @@ export default function WeatherWidget({ apiKey, onApiKeyChange, zipCode, weather
           {/* 7-day forecast */}
           {forecast.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">7-Day Forecast</p>
+              <p className="text-xs font-bold text-tt-charcoal/40 uppercase tracking-wider mb-2">7-Day Forecast</p>
               <div className="grid grid-cols-7 gap-1">
                 {forecast.map(day => (
-                  <div key={day.key} className="flex flex-col items-center gap-0.5 bg-stone-50 rounded-lg py-2 px-1">
-                    <span className="text-xs font-semibold text-stone-500">{day.key.split(',')[0]}</span>
+                  <div key={day.key} className="flex flex-col items-center gap-0.5 bg-tt-cream rounded-lg py-2 px-1 border border-tt-lime/20">
+                    <span className="text-xs font-bold text-tt-charcoal/50">{day.key.split(',')[0]}</span>
                     <span className="text-xl leading-tight">{getIcon(day.icon)}</span>
-                    <span className="text-xs font-bold text-stone-700">{day.high}°</span>
-                    <span className="text-xs text-stone-400">{day.low}°</span>
+                    <span className="text-xs font-extrabold text-tt-charcoal">{day.high}°</span>
+                    <span className="text-xs text-tt-charcoal/40">{day.low}°</span>
                     {day.rain > 0 && (
-                      <span className="text-xs text-sky-500 font-medium">{day.rain.toFixed(1)}"</span>
+                      <span className="text-xs text-tt-forest font-bold">{day.rain.toFixed(1)}"</span>
                     )}
                   </div>
                 ))}
