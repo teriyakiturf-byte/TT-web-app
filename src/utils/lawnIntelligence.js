@@ -2,16 +2,16 @@ import { getZoneGroup } from './calendarData.js'
 
 const SEASONS = {
   north: {
-    spring: [2, 3, 4],   // Mar–May
-    summer: [5, 6, 7],   // Jun–Aug
-    fall:   [8, 9, 10],  // Sep–Nov
-    winter: [11, 0, 1],  // Dec–Feb
+    spring: [2, 3, 4],
+    summer: [5, 6, 7],
+    fall:   [8, 9, 10],
+    winter: [11, 0, 1],
   },
   transition: {
-    spring: [1, 2, 3],
-    summer: [4, 5, 6, 7],
+    spring: [2, 3, 4],
+    summer: [5, 6, 7],
     fall:   [8, 9, 10],
-    winter: [11, 0],
+    winter: [11, 0, 1],
   },
   south: {
     spring: [1, 2, 3],
@@ -29,23 +29,30 @@ function getSeason(zoneGroup, monthIndex) {
   return 'winter'
 }
 
-/**
- * Check if rain is forecast within the next N hours based on OWM forecast data.
- * OWM /forecast returns 3-hour intervals, each with `dt` (unix timestamp).
- */
 function rainExpectedWithinHours(forecastList, hours) {
   if (!forecastList || forecastList.length === 0) return false
   const cutoff = Date.now() / 1000 + hours * 3600
   return forecastList.some(item =>
-    item.dt <= cutoff && (item.rain?.['3h'] > 0 || item.weather?.[0]?.main === 'Rain' || item.weather?.[0]?.main === 'Drizzle' || item.weather?.[0]?.main === 'Thunderstorm')
+    item.dt <= cutoff && (
+      item.rain?.['3h'] > 0 ||
+      ['Rain', 'Drizzle', 'Thunderstorm'].includes(item.weather?.[0]?.main)
+    )
   )
+}
+
+function rainAmountNext48h(forecastList) {
+  if (!forecastList || forecastList.length === 0) return 0
+  const cutoff = Date.now() / 1000 + 48 * 3600
+  return forecastList
+    .filter(item => item.dt <= cutoff)
+    .reduce((sum, item) => sum + (item.rain?.['3h'] ?? 0), 0)
 }
 
 /**
  * Generate lawn care tips based on current conditions.
- * @param {{ current: object, forecast: object[] }} weather - OWM API data
- * @param {string} zone - USDA zone string like "7b"
- * @param {number} monthIndex - 0-based month (new Date().getMonth())
+ * @param {{ current: object, forecast: { list: object[] } }} weather - OWM API data
+ * @param {string} zone - USDA zone string e.g. "6a"
+ * @param {number} monthIndex - 0-based month
  * @returns {{ type: 'warning'|'info'|'success', icon: string, title: string, body: string }[]}
  */
 export function generateTips(weather, zone, monthIndex) {
@@ -53,185 +60,273 @@ export function generateTips(weather, zone, monthIndex) {
   const zoneGroup = getZoneGroup(zone)
   const season = getSeason(zoneGroup || 'north', monthIndex)
 
-  const current = weather?.current
+  const current     = weather?.current
   const forecastList = weather?.forecast?.list ?? []
 
-  const temp = current?.main?.temp ?? null          // °F
-  const humidity = current?.main?.humidity ?? null  // %
-  const windSpeed = current?.wind?.speed ?? null    // mph
+  const temp       = current?.main?.temp     ?? null  // already °F from WeatherWidget
+  const tempF      = temp !== null ? Math.round(temp) : null
+  const humidity   = current?.main?.humidity ?? null  // %
+  const windSpeed  = current?.wind?.speed    ?? null  // mph
   const weatherMain = current?.weather?.[0]?.main ?? ''
+  const rainNext48  = rainAmountNext48h(forecastList)
 
-  // ── Weather-based rules ──────────────────────────────────────────────────
+  // ─── WEATHER-BASED ────────────────────────────────────────────────────────
 
   if (rainExpectedWithinHours(forecastList, 24)) {
     tips.push({
-      type: 'warning',
-      icon: '🌧️',
-      title: "Hold off on mowing",
-      body: "Rain is forecast within the next 24 hours. Mowing wet grass tears blades and spreads disease. Wait until the lawn dries.",
-    })
-    tips.push({
-      type: 'info',
-      icon: '🚫',
-      title: "Skip chemical applications",
-      body: "Rain will wash herbicides and fertilizers off the lawn before absorption. Wait for a dry window of at least 24–48 hours.",
+      type: 'warning', icon: '🌧️',
+      title: 'Hold off on mowing',
+      body: 'Rain is forecast within 24 hours. Mowing wet grass tears blades and spreads disease. Wait until the lawn has fully dried.',
     })
   }
 
-  if (temp !== null && temp > 90) {
+  if (rainNext48 > 0.5) {
     tips.push({
-      type: 'warning',
-      icon: '🌡️',
-      title: "Heat stress alert",
-      body: `It's ${Math.round(temp)} °F—water deeply in the early morning (5–9 AM) to reduce evaporation. Cool-season grasses may wilt; this is normal and usually recovers overnight.`,
+      type: 'warning', icon: '🚫',
+      title: 'Skip fertilizer & herbicides today',
+      body: 'More than 0.5" of rain is expected in the next 48 hours. Applications now will wash into storm drains before absorbing. Wait for a dry window.',
+    })
+  } else if (rainExpectedWithinHours(forecastList, 24)) {
+    tips.push({
+      type: 'info', icon: '🚫',
+      title: 'Hold chemical applications',
+      body: 'Rain expected shortly — herbicides and fertilizers won\'t absorb properly. Wait for a dry 24–48 hour window.',
     })
   }
 
-  if (temp !== null && temp < 40) {
+  if (tempF !== null && tempF > 95) {
     tips.push({
-      type: 'warning',
-      icon: '❄️',
-      title: "Too cold to fertilize",
-      body: "Soil temperatures are likely below 50 °F—roots won't absorb nutrients effectively. Wait for consistently warmer conditions before applying fertilizer.",
+      type: 'warning', icon: '🌡️',
+      title: 'Extreme heat — water now',
+      body: `It's ${tempF}°F. Cool-season grasses enter stress above 90°F. Water deeply this morning (5–9 AM) and raise mowing height to 4" to shade the soil. Do NOT apply nitrogen fertilizer in this heat.`,
+    })
+  } else if (tempF !== null && tempF > 90) {
+    tips.push({
+      type: 'warning', icon: '☀️',
+      title: 'Heat stress alert',
+      body: `At ${tempF}°F, cool-season grasses are stressed. Water deeply in early morning only. Raise mowing height to 3.5–4" — taller grass shades roots and retains moisture.`,
+    })
+  }
+
+  if (tempF !== null && tempF < 34) {
+    tips.push({
+      type: 'warning', icon: '❄️',
+      title: 'Frost — stay off the lawn',
+      body: 'Temperature is at or below freezing. Walking on frost-covered grass crushes cell walls and creates dead spots visible in spring. Keep all traffic off the turf.',
+    })
+  } else if (tempF !== null && tempF < 40) {
+    tips.push({
+      type: 'warning', icon: '🥶',
+      title: 'Too cold to fertilize',
+      body: 'Soil temperatures are likely below 50°F — roots won\'t absorb nutrients. Hold all nitrogen applications until soil warms consistently above 50°F.',
     })
   }
 
   if (windSpeed !== null && windSpeed > 15) {
     tips.push({
-      type: 'warning',
-      icon: '💨',
-      title: "Avoid spraying today",
-      body: `Wind is at ${Math.round(windSpeed)} mph. Herbicide, fungicide, and liquid fertilizer sprays will drift off-target in these conditions. Wait for winds below 10 mph.`,
+      type: 'warning', icon: '💨',
+      title: 'Too windy to spray',
+      body: `Wind is ${Math.round(windSpeed)} mph. Herbicide, fungicide, and liquid fertilizer drift off-target above 10 mph. Wait for calm conditions — early morning is usually the calmest window.`,
+    })
+  } else if (windSpeed !== null && windSpeed > 10) {
+    tips.push({
+      type: 'info', icon: '🌬️',
+      title: 'Spray caution — winds elevated',
+      body: `Wind is ${Math.round(windSpeed)} mph. Avoid broadcast liquid applications — spot treatments only until winds drop below 10 mph.`,
     })
   }
 
-  if (humidity !== null && humidity < 25 && temp !== null && temp > 75) {
+  if (humidity !== null && humidity < 25 && tempF !== null && tempF > 75) {
     tips.push({
-      type: 'warning',
-      icon: '🏜️',
-      title: "Low humidity – drought watch",
-      body: "Very low humidity combined with heat rapidly dries out turf. Check soil moisture at 3-inch depth; if dry, water immediately even if it's not your scheduled day.",
+      type: 'warning', icon: '🏜️',
+      title: 'Low humidity drought watch',
+      body: 'Very low humidity + heat is rapidly desiccating turf. Check soil moisture at 3 inches; if dry, water immediately even if it\'s not your scheduled day.',
     })
   }
 
   if (weatherMain === 'Thunderstorm') {
     tips.push({
-      type: 'warning',
-      icon: '⛈️',
-      title: "Thunderstorm nearby",
-      body: "Stay indoors and postpone all lawn work. After the storm, wait until turf drains (12–24 hours) before mowing.",
+      type: 'warning', icon: '⛈️',
+      title: 'Thunderstorm nearby',
+      body: 'Stay indoors and postpone all lawn work. After the storm, wait 12–24 hours for turf to drain before mowing.',
     })
   }
 
-  if (temp !== null && temp >= 45 && temp <= 65 && humidity !== null && humidity > 70 && rainExpectedWithinHours(forecastList, 48)) {
+  // Brown patch: hot days + high humid nights
+  if (tempF !== null && tempF > 85 && humidity !== null && humidity > 80 && season === 'summer') {
     tips.push({
-      type: 'info',
-      icon: '🍄',
-      title: "Fungal disease conditions",
-      body: "Cool, wet, humid weather is ideal for lawn fungus (brown patch, dollar spot). Avoid evening watering and mow regularly to improve air circulation.",
+      type: 'warning', icon: '🍄',
+      title: 'Brown patch conditions',
+      body: 'Hot days + high humidity create ideal brown patch and dollar spot conditions. Switch to early morning watering only, avoid high-N feeding, and consider a preventive fungicide (azoxystrobin or propiconazole).',
     })
   }
 
-  // ── Season-based rules ───────────────────────────────────────────────────
-
-  if (season === 'spring' && monthIndex >= 2 && monthIndex <= 3) {
-    if (!rainExpectedWithinHours(forecastList, 24)) {
-      tips.push({
-        type: 'info',
-        icon: '🌱',
-        title: "Pre-emergent window open",
-        body: "Spring conditions are active. If you haven't applied pre-emergent herbicide yet, check your soil temperature—apply when it reaches 50 °F at 2-inch depth to stop crabgrass.",
-      })
-    }
+  // Pythium blight emergency
+  if (tempF !== null && tempF > 90 && humidity !== null && humidity > 90) {
+    tips.push({
+      type: 'warning', icon: '🚨',
+      title: 'Pythium blight risk — act fast',
+      body: 'Extreme heat + humidity creates Pythium blight conditions — a disease that can destroy your lawn in 24–48 hours. Watch for greasy, water-soaked patches that rapidly turn tan. Apply fungicide (mefenoxam) immediately if spotted.',
+    })
   }
 
+  // Dollar spot: cool moist spring/fall
+  if (tempF !== null && tempF >= 60 && tempF <= 80 && humidity !== null && humidity > 75 && season !== 'summer' && season !== 'winter') {
+    tips.push({
+      type: 'info', icon: '⚪',
+      title: 'Dollar spot watch',
+      body: 'Cool, moist conditions favor dollar spot — look for silver-dollar-sized bleached spots with cottony mycelium in the morning. A light nitrogen application and morning-only irrigation are your best defenses.',
+    })
+  }
+
+  // Evening watering reminder in warm months
+  if (tempF !== null && tempF > 55 && season !== 'winter') {
+    tips.push({
+      type: 'info', icon: '🌅',
+      title: 'Water early morning — not evenings',
+      body: 'Evening irrigation leaves blades wet overnight — the leading trigger for brown patch, dollar spot, and red thread. Set your irrigation controller to run 5–9 AM so turf dries by midday.',
+    })
+  }
+
+  // ─── SEASON-BASED ─────────────────────────────────────────────────────────
+
+  // Pre-emergent spring window
+  if (season === 'spring' && monthIndex >= 2 && monthIndex <= 4 && !rainExpectedWithinHours(forecastList, 24)) {
+    tips.push({
+      type: 'info', icon: '🛡️',
+      title: 'Pre-emergent window — check soil temp',
+      body: 'Apply granular pre-emergent when soil at 2" depth reaches 50°F (forsythia in full bloom is a natural indicator). Do not overseed for 8–12 weeks after most pre-emergent products. Dimension (dithiopyr) offers more flexibility if you need to overseed sooner.',
+    })
+  }
+
+  // Summer mowing height
   if (season === 'summer') {
     tips.push({
-      type: 'info',
-      icon: '✂️',
-      title: "Raise your mowing height",
-      body: "In summer heat, taller grass (3.5–4 inches for cool-season, 1.5–2 inches for warm-season) shades the soil, retains moisture, and outcompetes weeds.",
+      type: 'info', icon: '✂️',
+      title: 'Raise mowing height for summer',
+      body: 'Taller grass shades soil, retains moisture, and outcompetes weeds. Cool-season: 3.5–4". Bermuda: stay at normal height. St. Augustine: 3–4". Never remove more than 1/3 of the blade in a single cut — violations stress the plant and open it to disease.',
     })
   }
 
-  if (season === 'fall' && monthIndex >= 8 && monthIndex <= 9) {
+  // Grub treatment window
+  if (monthIndex >= 5 && monthIndex <= 6) {
     tips.push({
-      type: 'success',
-      icon: '🌾',
-      title: "Prime time: aerate & overseed",
-      body: `Fall is the best season for lawn renovation${zoneGroup === 'north' || zoneGroup === 'transition' ? ' for cool-season grasses' : ''}. Core aerate first, then overseed for best results.`,
+      type: 'info', icon: '🐛',
+      title: 'Grub preventive window open',
+      body: 'June–early July is the optimal window for preventive grub control. Chlorantraniliprole (Acelepryn) is the safest option with a 3-month window. Imidacloprid (Merit) must be applied before eggs hatch. Water in with 0.5" of irrigation immediately after.',
     })
   }
 
+  // Fall aerate & overseed (north/transition)
+  if (season === 'fall' && monthIndex >= 7 && monthIndex <= 9 && (zoneGroup === 'north' || zoneGroup === 'transition')) {
+    tips.push({
+      type: 'success', icon: '🌾',
+      title: 'Prime window: aerate & overseed',
+      body: 'Late August–October is the most important season for cool-season lawn renovation. Core aerate first (2 passes on clay soils), then overseed immediately — aeration holes provide 40–60% better germination than broadcast seeding. This combination is the single highest-impact thing you can do for your lawn.',
+    })
+  }
+
+  // Winterizer fertilizer — October (north/transition)
+  if (monthIndex === 9 && (zoneGroup === 'north' || zoneGroup === 'transition')) {
+    tips.push({
+      type: 'success', icon: '🌱',
+      title: 'Apply winterizer fertilizer this month',
+      body: 'October is the highest-value fertilizer application of the year for cool-season lawns. Use a high-potassium blend (24-0-12 or 22-0-11) — it stores carbohydrates in roots for winter survival and produces the earliest, darkest spring green-up.',
+    })
+  }
+
+  // Fertilizer blackout reminder (transition zone winter)
+  if (zoneGroup === 'transition' && (monthIndex === 10 || monthIndex === 11 || monthIndex === 0 || monthIndex === 1)) {
+    tips.push({
+      type: 'warning', icon: '⚖️',
+      title: 'Check local fertilizer blackout dates',
+      body: 'Many municipalities restrict winter applications. Johnson County, KS prohibits fertilizer Nov 1–Mar 1. Maryland bans applications Oct 16–Mar 1. Check your local ordinances before applying — violations carry fines.',
+    })
+  }
+
+  // Leaf cleanup — Oct/Nov
   if (monthIndex === 9 || monthIndex === 10) {
     tips.push({
-      type: 'info',
-      icon: '🍂',
-      title: "Keep leaves off the lawn",
-      body: "A thick mat of fallen leaves blocks sunlight and promotes snow mold and fungal disease. Mulch-mow light leaf fall; rake heavy accumulations weekly.",
+      type: 'info', icon: '🍂',
+      title: 'Keep leaves off the lawn',
+      body: 'A matted leaf layer blocks sunlight and traps moisture, killing grass within 2–3 weeks and promoting snow mold. Mulch-mow light coverage; bag or compost heavy accumulations weekly. Don\'t let any area stay buried for more than 7 days.',
     })
   }
 
+  // Winter protection
   if (season === 'winter') {
     tips.push({
-      type: 'info',
-      icon: '🥶',
-      title: "Protect dormant turf",
-      body: "Avoid all foot traffic on frozen or frost-covered grass—crushed cells create dead spots visible in spring. Keep paths clear with mats or pavers.",
+      type: 'info', icon: '🥶',
+      title: 'Protect dormant turf',
+      body: 'Avoid foot traffic on frozen or frost-covered grass — crushed cells create dead spots in spring. Keep paths clear with stepping stones or temporary mats. Avoid piling snow from plowing/shoveling on lawn areas.',
     })
   }
 
-  // ── Zone-specific rules ──────────────────────────────────────────────────
+  // ─── ZONE-SPECIFIC ────────────────────────────────────────────────────────
 
+  // Scalp warm-season spring green-up
+  if (zoneGroup === 'south' && season === 'spring' && monthIndex >= 2 && monthIndex <= 3) {
+    tips.push({
+      type: 'info', icon: '🌿',
+      title: 'Scalp warm-season grass now',
+      body: 'Once 50% of your Bermuda or Zoysia shows green, scalp it to 0.5–1" to remove dead gray material. Do this once per year — it accelerates green-up by 2–3 weeks by letting sunlight reach the soil. Bag clippings; don\'t scalp cool-season grasses.',
+    })
+  }
+
+  // Cool-season summer dormancy (north)
   if (zoneGroup === 'north' && season === 'summer') {
     tips.push({
-      type: 'info',
-      icon: '💧',
-      title: "Cool-season summer watering",
-      body: "Kentucky Blue, Fescue, and Ryegrass go semi-dormant in high heat. If short on water, apply 0.5 inch/week for managed dormancy rather than irregular watering which stresses the plant further.",
+      type: 'info', icon: '💧',
+      title: 'Cool-season dormancy is normal',
+      body: 'Kentucky Blue, Fescue, and Ryegrass naturally slow or brown in summer heat. If water is restricted, apply 0.5"/week for managed dormancy — consistency is key. Irregular watering stresses the plant more than sustained dormancy. Turf fully recovers when cool weather returns.',
     })
   }
 
-  if (zoneGroup === 'south' && season === 'fall' && monthIndex === 9) {
+  // Ryegrass overseeding window (south fall)
+  if (zoneGroup === 'south' && monthIndex >= 9 && monthIndex <= 10) {
     tips.push({
-      type: 'success',
-      icon: '🌿',
-      title: "Ryegrass overseeding time",
-      body: "Late September–October is the window to overseed Bermuda or Zoysia with annual ryegrass for winter color. Apply 8–10 lbs/1,000 sqft and keep moist until germination.",
+      type: 'success', icon: '🌿',
+      title: 'Ryegrass overseeding window',
+      body: 'Mid-October to mid-November: overseed Bermuda/Zoysia with annual or perennial ryegrass for winter color. Scalp base turf to 0.5–1" first, seed at 10–15 lbs/1,000 sqft, and keep moist until germination. Annual ryegrass dies out naturally when temps rise above 85–90°F in spring.',
     })
   }
 
+  // Stop N on warm-season grasses in fall
+  if (zoneGroup === 'south' && season === 'fall') {
+    tips.push({
+      type: 'info', icon: '🛑',
+      title: 'Stop nitrogen on warm-season grass',
+      body: 'Apply the last nitrogen to Bermuda/Zoysia/St. Augustine 6–8 weeks before your first expected frost. Late nitrogen forces tender growth that is highly susceptible to freeze damage. Switch to a potassium-only product to harden the turf for dormancy.',
+    })
+  }
+
+  // Transition dual-grass reminder
   if (zoneGroup === 'transition' && season === 'summer') {
     tips.push({
-      type: 'info',
-      icon: '🔀',
-      title: "Two grass types, two schedules",
-      body: "In the transition zone you may have both warm-season (Bermuda, Zoysia) and cool-season (Fescue) grasses. Warm-season grasses thrive now; cool-season grasses need extra water and shade protection.",
+      type: 'info', icon: '🔀',
+      title: 'Transition zone: two grass schedules',
+      body: 'Warm-season grasses (Bermuda, Zoysia) thrive now — fertilize and water actively. Cool-season grasses (Tall Fescue) are stressed — hold nitrogen, raise mowing height to 4", and water 1.5"/week minimum. Treating them the same is one of the most common transition-zone mistakes.',
     })
   }
 
-  // ── Positive tip if conditions are ideal ─────────────────────────────────
+  // ─── IDEAL CONDITIONS ─────────────────────────────────────────────────────
 
   if (
-    temp !== null && temp >= 65 && temp <= 80 &&
-    humidity !== null && humidity >= 40 && humidity <= 70 &&
+    tempF !== null && tempF >= 60 && tempF <= 82 &&
+    humidity !== null && humidity >= 35 && humidity <= 70 &&
     !rainExpectedWithinHours(forecastList, 6) &&
     (windSpeed === null || windSpeed < 10)
   ) {
     tips.push({
-      type: 'success',
-      icon: '✅',
-      title: "Great lawn care conditions today",
-      body: "Mild temperature, moderate humidity, and light wind make today ideal for mowing, spraying, seeding, or fertilizing. Get out there!",
+      type: 'success', icon: '✅',
+      title: 'Great conditions for lawn work today',
+      body: 'Mild temperature, comfortable humidity, light wind, and no immediate rain make today ideal for mowing, fertilizing, spraying, or seeding. Follow the 1/3 rule when mowing and water any granular applications in lightly.',
     })
   }
 
   return tips
 }
 
-/**
- * Determine the current season name for display.
- */
 export function getCurrentSeason(zone, monthIndex) {
   const zg = getZoneGroup(zone) || 'north'
   return getSeason(zg, monthIndex)
