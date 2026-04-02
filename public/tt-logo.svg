@@ -1,13 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <!-- Background rounded square -->
-  <rect width="48" height="48" rx="11" fill="#1B4332"/>
-  <!-- Grass blades (lime green) -->
-  <path d="M11 37 C9 29 13 20 11 13 C15 17 15 26 13 37Z" fill="#95D5B2"/>
-  <path d="M24 38 C22 26 24 16 24 9  C26 16 26 26 24 38Z" fill="#95D5B2"/>
-  <path d="M37 37 C35 26 33 17 37 13 C41 20 39 29 37 37Z" fill="#95D5B2"/>
-  <!-- Ground strip -->
-  <rect x="7" y="37" width="34" height="3" rx="1.5" fill="#95D5B2" opacity="0.35"/>
-  <!-- Orange spark / teriyaki flame -->
-  <circle cx="38" cy="11" r="5.5" fill="#FF6B35"/>
-  <path d="M38 7.5 Q40.5 10 38 14 Q35.5 10 38 7.5Z" fill="#F5F1E8" opacity="0.55"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" fill="none">
+  <defs>
+    <!-- T body: mid-green at top → deep forest at bottom -->
+    <linearGradient id="tBody" x1="80" y1="42" x2="80" y2="185" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#3DAA52"/>
+      <stop offset="100%" stop-color="#1B5E35"/>
+    </linearGradient>
+    <!-- Front leaf: yellow-lime → bright green -->
+    <linearGradient id="lfFront" x1="95" y1="5" x2="140" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#C8E624"/>
+      <stop offset="55%"  stop-color="#5CBF3A"/>
+      <stop offset="100%" stop-color="#2E9B30"/>
+    </linearGradient>
+    <!-- Back leaf: medium → dark green -->
+    <linearGradient id="lfBack" x1="105" y1="10" x2="145" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#5CBF3A"/>
+      <stop offset="100%" stop-color="#236B27"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── T HORIZONTAL BAR ── -->
+  <path d="M20 42 Q20 38 24 38 L138 38 Q142 38 142 42 L142 64 Q142 68 138 68 L24 68 Q20 68 20 64 Z"
+        fill="url(#tBody)"/>
+
+  <!-- ── T VERTICAL STEM ── -->
+  <path d="M66 62 L96 62 L96 185 Q96 190 90 190 L72 190 Q66 190 66 185 Z"
+        fill="url(#tBody)"/>
+
+  <!-- ── GOLD TEARDROP (inside T lower-left corner) ── -->
+  <ellipse cx="68" cy="112" rx="26" ry="30" fill="#F5A623"/>
+
+  <!-- ── BACK LEAF (darker, behind) ── -->
+  <path d="M96 62
+           C 96 40  108 12  132 8
+           C 155 4  162 30  148 52
+           C 138 64 110 66  96 62 Z"
+        fill="url(#lfBack)"/>
+
+  <!-- ── FRONT LEAF (bright lime, in front) ── -->
+  <path d="M84 60
+           C 80 36  92 4   112 2
+           C 130 0  132 32  116 52
+           C 106 62 88 64   84 60 Z"
+        fill="url(#lfFront)"/>
+
+  <!-- ── WORDMARK: TERIYAKI ── -->
+  <text x="172" y="108"
+        font-family="Montserrat, 'Arial Black', sans-serif"
+        font-weight="800"
+        font-size="52"
+        letter-spacing="1"
+        fill="#1B4332">TERIYAKI</text>
+
+  <!-- ── WORDMARK: TURF ── -->
+  <text x="172" y="168"
+        font-family="Montserrat, 'Arial Black', sans-serif"
+        font-weight="800"
+        font-size="64"
+        letter-spacing="1"
+        fill="#1B4332">TURF</text>
+
+  <!-- ── GOLD UNDERLINE ── -->
+  <line x1="172" y1="185" x2="476" y2="185"
+        stroke="#F5A623" stroke-width="4" stroke-linecap="round"/>
 </svg>
