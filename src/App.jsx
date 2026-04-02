@@ -7,6 +7,9 @@ import ProductCalculator from './components/ProductCalculator.jsx'
 import LawnCalendar from './components/LawnCalendar.jsx'
 import TodoList from './components/TodoList.jsx'
 import Notes from './components/Notes.jsx'
+import FAQ from './components/FAQ.jsx'
+import Products from './components/Products.jsx'
+import LawnMeasurement from './components/LawnMeasurement.jsx'
 import { useLocalStorage } from './hooks/useLocalStorage.js'
 
 export default function App() {
@@ -117,6 +120,15 @@ export default function App() {
             />
           </div>
         )}
+
+        {/* ── FAQ ── */}
+        {activeTab === 'faq' && <FAQ />}
+
+        {/* ── Products ── */}
+        {activeTab === 'products' && <Products />}
+
+        {/* ── Lawn Measurement ── */}
+        {activeTab === 'measure' && <LawnMeasurement />}
       </main>
 
       <footer className="text-center text-xs text-tt-charcoal/40 py-6 border-t border-tt-lime/20 mt-10">

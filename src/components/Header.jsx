@@ -1,10 +1,13 @@
-import { Leaf, Calculator, CalendarDays, CheckSquare } from 'lucide-react'
+import { Leaf, Calculator, CalendarDays, CheckSquare, HelpCircle, ShoppingBag, Ruler } from 'lucide-react'
 
 const TABS = [
-  { id: 'dashboard',  label: 'Dashboard',    icon: Leaf },
-  { id: 'calculator', label: 'Calculator',   icon: Calculator },
-  { id: 'calendar',   label: 'Calendar',     icon: CalendarDays },
-  { id: 'tasks',      label: 'Tasks & Notes', icon: CheckSquare },
+  { id: 'dashboard',  label: 'Dashboard',  icon: Leaf },
+  { id: 'calculator', label: 'Calculator', icon: Calculator },
+  { id: 'calendar',   label: 'Calendar',   icon: CalendarDays },
+  { id: 'tasks',      label: 'Tasks',      icon: CheckSquare },
+  { id: 'faq',        label: 'FAQ',        icon: HelpCircle },
+  { id: 'products',   label: 'Products',   icon: ShoppingBag },
+  { id: 'measure',    label: 'Measure',    icon: Ruler },
 ]
 
 export default function Header({ activeTab, onTabChange }) {
