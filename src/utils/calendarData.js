@@ -98,74 +98,83 @@ export const calendarData = {
   transition: [
     // January
     [
-      { title: 'Winter weed scouting',  category: 'weed',     priority: 'medium', description: 'Scout for Poa annua and henbit; spot-treat cool-season weeds actively growing in mild winters.' },
-      { title: 'Send soil test',        category: 'fertilize', priority: 'medium', description: 'Results in 3–4 weeks guide spring fertility planning. Test pH and nutrient levels.' },
-      { title: 'Service equipment',     category: 'cleanup',  priority: 'low',    description: 'Transition zone\'s longer season means more equipment wear—service during the off-season.' },
+      { title: 'Fertilizer blackout in effect', category: 'fertilize', priority: 'high', description: 'Johnson County, KS prohibits fertilizer applications Nov 1–Mar 1. Many other municipalities have similar restrictions—check local ordinances before any application.' },
+      { title: 'Winter weed scouting',  category: 'weed',     priority: 'medium', description: 'Scout for Poa annua and henbit actively growing in mild KC winters. Spot-treat with a post-emergent labeled for cool-season weeds.' },
+      { title: 'Send soil test',        category: 'fertilize', priority: 'medium', description: 'Send a core sample to K-State Extension or a private lab—results arrive in 2–3 weeks and guide your March fertilizer plan once the blackout lifts.' },
+      { title: 'Service equipment',     category: 'cleanup',  priority: 'low',    description: 'Sharpen mower blades, change oil, check belts, and order supplies before the spring rush.' },
     ],
     // February
     [
-      { title: 'Monitor soil temp',     category: 'weed',     priority: 'high',   description: 'Apply crabgrass pre-emergent when 2-inch soil temp hits 50 °F—typically late February in Zones 6–7.' },
-      { title: 'Apply lime if needed',  category: 'fertilize', priority: 'medium', description: 'Apply lime per soil test now—it needs months to react with soil before spring planting.' },
+      { title: 'Monitor forsythia & soil temp', category: 'weed', priority: 'high', description: 'Forsythia budding signals soil approaching 50 °F at 2 inches—your natural pre-emergent indicator. In KC Zone 6a, this typically occurs mid-to-late February. Have product on hand and ready to apply.' },
+      { title: 'Fertilizer blackout ends March 1', category: 'fertilize', priority: 'medium', description: 'Johnson County fertilizer blackout ends March 1. Prepare a slow-release spring fertilizer application so you can apply immediately when the window opens and fescue breaks dormancy.' },
+      { title: 'Apply lime if needed',  category: 'fertilize', priority: 'medium', description: 'Apply lime per soil test—lime needs 2–3 months to react with soil before it affects pH. Target pH 6.0–6.5 for tall fescue.' },
+      { title: 'Thatch assessment',     category: 'cleanup',  priority: 'low',    description: 'Pull a small plug of turf and measure the spongy brown layer above soil. Over 0.5 inch of thatch indicates spring dethatching or fall core aeration is needed.' },
     ],
     // March
     [
-      { title: 'Apply pre-emergent',    category: 'weed',     priority: 'high',   description: 'Apply before soil reaches 55 °F at 2-inch depth; critical for crabgrass and goosegrass prevention.' },
-      { title: 'Cool-season fertilization', category: 'fertilize', priority: 'high', description: 'Apply 0.5–1 lb N/1,000 sqft as cool-season grasses break dormancy. Hold off warm-season grass.' },
-      { title: 'Spot-seed fescue',      category: 'seed',     priority: 'medium', description: 'Spot-seed tall fescue thin areas; water carefully. Fall is better but spring can succeed.' },
-      { title: 'Begin mowing cool-season', category: 'mow',  priority: 'medium', description: 'Start mowing fescue and bluegrass at 3.5 inches when growth resumes.' },
+      { title: 'Apply pre-emergent (forsythia in full bloom)', category: 'weed', priority: 'high', description: 'Apply granular pre-emergent when forsythia reaches full bloom—this aligns with soil at 50–55 °F at 2-inch depth. In KC Zone 6a, target late February through mid-March. Pendimethalin (2.3–4.6 lbs/1k) or prodiamine (1.5–2.5 lbs/1k). Do not overseed for 8–12 weeks after application.' },
+      { title: 'Cool-season fertilization', category: 'fertilize', priority: 'high', description: 'Blackout ends March 1 (Johnson County). Apply 0.5–1 lb N/1,000 sqft with slow-release fertilizer as tall fescue resumes active growth. Avoid applying to dormant warm-season grasses.' },
+      { title: 'Spot-seed fescue bare patches', category: 'seed', priority: 'medium', description: 'Spring seeding is a compromise—fall is far superior. Only spot-seed if areas are too bare to wait. Keep moist 2–3× daily until germination. Note: cannot overseed after pre-emergent is applied.' },
+      { title: 'Begin mowing cool-season', category: 'mow',  priority: 'medium', description: 'Start mowing fescue at 3.5 inches when growth resumes and grass reaches 4.5–5 inches. Avoid scalping dormant turf.' },
     ],
     // April
     [
-      { title: 'First warm-season fertilizer', category: 'fertilize', priority: 'high', description: 'Fertilize Bermuda and Zoysia when 50% of the lawn has greened up; apply 0.5–1 lb N/1,000 sqft.' },
-      { title: 'Adjust mow heights by type', category: 'mow', priority: 'high',  description: 'Bermuda/Zoysia: 1–1.5 inches once active. Fescue: 3–3.5 inches. Use a sharp blade.' },
-      { title: 'Broadleaf weed control', category: 'weed',   priority: 'medium', description: 'Apply broadleaf herbicide when weeds are active and temps are 55–85 °F.' },
-      { title: 'Irrigation startup',    category: 'water',   priority: 'medium', description: 'Open system, check coverage, and set controller for 1 inch/week.' },
+      { title: 'First warm-season fertilizer', category: 'fertilize', priority: 'high', description: 'Fertilize Bermuda and Zoysia once 50% of the lawn has greened up (typically late April in KC). Apply 0.5–1 lb N/1,000 sqft slow-release. Feeding dormant turf wastes product and feeds weeds.' },
+      { title: 'Adjust mow heights by type', category: 'mow', priority: 'high',  description: 'Bermuda/Zoysia: 1–1.5 inches once actively growing. Tall fescue: 3–3.5 inches. Differentiated heights are critical—one pass height damages one grass or the other.' },
+      { title: 'Broadleaf weed control', category: 'weed',   priority: 'medium', description: 'Apply broadleaf herbicide (2,4-D, triclopyr, or three-way mix) when weeds are actively growing and temps are 55–85 °F. Avoid spraying above 85 °F to prevent volatilization and turf damage.' },
+      { title: 'Irrigation startup',    category: 'water',   priority: 'medium', description: 'Open irrigation system; inspect heads and lines for winter damage. Set controller for 1 inch/week split across 2–3 runs in early morning.' },
     ],
     // May
     [
-      { title: 'Warm-season fertilize', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to Bermuda/Zoysia as they enter full active growth. Use slow-release.' },
-      { title: 'Preventive grub control', category: 'pest',  priority: 'medium', description: 'Apply grub preventive; water in within 24 hours of application.' },
-      { title: 'Fescue heat prep',      category: 'water',   priority: 'medium', description: 'Tall fescue begins heat stress in late May; raise mowing height to 4 inches and water 1.5 inches/week.' },
+      { title: 'Warm-season fertilize', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to Bermuda/Zoysia as they enter full active growth. Use slow-release (IBDU or polymer-coated urea) for 6–8 week feeding. Never exceed 1 lb N per 1,000 sqft per application.' },
+      { title: 'Grub preventive window', category: 'pest',  priority: 'high',   description: 'Apply chlorantraniliprole (Acelepryn) in May for the longest pre-egg protection window, or imidacloprid (Merit) by early June before eggs hatch. Water in with 0.5 inch irrigation immediately.' },
+      { title: 'Fescue heat prep',      category: 'water',   priority: 'medium', description: 'Tall fescue begins heat stress when KC daytime temps consistently exceed 85 °F. Raise mowing height to 4 inches now and increase irrigation to 1.5 inches/week to extend its active season.' },
+      { title: 'Second pre-emergent (optional)', category: 'weed', priority: 'low', description: 'A second pre-emergent application 6–8 weeks after the first extends crabgrass barrier into summer. Particularly valuable in high-pressure years or when first application timing was late.' },
     ],
     // June
     [
-      { title: 'Warm-season peak feeding', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to Bermuda/Zoysia—peak growing season, turf uses nutrients efficiently.' },
-      { title: 'Differentiate watering', category: 'water',  priority: 'high',   description: 'Bermuda: 1 in/week. Zoysia: 0.75 in/week. Fescue: 1.5 in/week. All in early morning.' },
-      { title: 'Watch for chinch bugs',  category: 'pest',   priority: 'medium', description: 'Scout St. Augustine and Zoysia for chinch bug damage (yellowing patches in sunny areas).' },
+      { title: 'Warm-season peak feeding', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to Bermuda/Zoysia—peak growing season; turf processes nutrients efficiently. Hold all nitrogen on tall fescue; feeding stressed cool-season grass in June invites disease.' },
+      { title: 'Differentiate watering', category: 'water',  priority: 'high',   description: 'Bermuda: 1 in/week. Zoysia: 0.75 in/week. Fescue: 1.5 in/week minimum (drought-stressed). All irrigation in 5–9 AM window only. Evening watering triggers brown patch on fescue.' },
+      { title: 'Watch for brown patch on fescue', category: 'pest', priority: 'medium', description: 'Hot days + humid nights = prime brown patch conditions in KC June. Circular tan patches with darker border are diagnostic. Apply azoxystrobin or propiconazole fungicide preventively if conditions persist.' },
     ],
     // July
     [
-      { title: 'Warm-season mid-summer fertilize', category: 'fertilize', priority: 'high', description: 'Apply 0.5–1 lb N/1,000 sqft to Bermuda/Zoysia to sustain summer growth. Skip for fescue.' },
-      { title: 'Fescue managed dormancy', category: 'water', priority: 'high',  description: 'Allow fescue to go partially dormant if water is limited; maintain 0.5 inch/week minimum.' },
-      { title: 'Aerate warm-season grass', category: 'aerate', priority: 'medium', description: 'Core aerate Bermuda and Zoysia in July peak growth for best recovery and thatch reduction.' },
+      { title: 'Warm-season mid-summer fertilize', category: 'fertilize', priority: 'high', description: 'Apply 0.5–1 lb N/1,000 sqft to Bermuda/Zoysia. KC July heat suits warm-season grasses; they use nitrogen efficiently now. Skip completely for fescue—no exceptions.' },
+      { title: 'Fescue managed dormancy', category: 'water', priority: 'high',  description: 'Allow tall fescue to go semi-dormant if water is limited. Maintain a consistent 0.5 inch/week minimum—irregular watering stresses turf more than sustained dormancy. Full recovery returns in September cool weather.' },
+      { title: 'Aerate warm-season grass', category: 'aerate', priority: 'medium', description: 'Core aerate Bermuda and Zoysia in peak summer growth for rapid recovery and thatch reduction. Two passes on clay soils. Skip for fescue—summer aeration stresses cool-season grass.' },
+      { title: 'Spot weed only',         category: 'weed',   priority: 'low',    description: 'Limit herbicide to spot-treatment only when temps exceed 85 °F. Broadcast applications risk turf burn. Mark persistent weeds for fall post-emergent treatment instead.' },
     ],
     // August
     [
-      { title: 'Warm-season final fertilize', category: 'fertilize', priority: 'high', description: 'Last summer fertilization for Bermuda/Zoysia—avoid feeding after August to prevent frost damage.' },
-      { title: 'Fescue fall seeding prep', category: 'seed', priority: 'high', description: 'Prep for tall fescue overseeding: aerate, rake thatch, soil test; prime seeding window opens Sep.' },
-      { title: 'Grub treatment if needed', category: 'pest', priority: 'medium', description: 'Apply curative grub treatment if turf lifts easily like carpet or you see spongy areas.' },
+      { title: 'Final warm-season fertilize', category: 'fertilize', priority: 'high', description: 'Last summer feeding for Bermuda/Zoysia. In KC Zone 6a, first average frost is mid-October—stop nitrogen 6–8 weeks prior (by end of August) to prevent tender growth that\'s susceptible to freeze damage.' },
+      { title: 'Core aerate for fall overseeding', category: 'aerate', priority: 'high', description: 'Aerate compacted fescue areas in late August before fall seeding. Two passes on heavy clay. Aeration holes provide 40–60% better seed germination than broadcast seeding alone—do not skip this step.' },
+      { title: 'Fescue overseeding prep (mid-Aug)', category: 'seed', priority: 'high', description: 'Prime KC window: Aug 15–Sep 15. Grade low spots, rake thatch over 0.5 inch, verify pH 6.0–6.5. Rent a slit seeder for large renovations—slit seeding dramatically outperforms broadcast seeding in germination rate and density.' },
+      { title: 'Grub curative check',    category: 'pest',   priority: 'medium', description: 'Check turf for grub damage: spongy areas, turf that lifts like carpet, or increased bird/skunk digging. Apply trichlorfon or carbaryl (curative) if more than 5 grubs per square foot are present.' },
     ],
     // September
     [
-      { title: 'Overseed tall fescue',  category: 'seed',    priority: 'high',   description: 'Best window for tall fescue overseeding in transition zones—soil 65–75 °F, good moisture.' },
-      { title: 'Cool-season fertilize', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to cool-season areas; avoid fertilizing warm-season grasses.' },
-      { title: 'Broadleaf weed control', category: 'weed',   priority: 'high',   description: 'Prime fall window for broadleaf control; weeds are pulling resources to roots.' },
+      { title: 'Overseed tall fescue — prime KC window', category: 'seed', priority: 'high', description: 'Best window for tall fescue overseeding in KC Zone 6a: soil 65–75 °F (soil cools behind air temps). Slit seed at 6 lbs/1,000 sqft (overseeding) or 9 lbs/1,000 sqft (full renovation). Slit seeding gives 40–60% better germination than broadcast. Water 2–3× daily until germination (7–14 days for tall fescue).' },
+      { title: 'Cool-season fall fertilize', category: 'fertilize', priority: 'high', description: 'Apply 1 lb N/1,000 sqft to fescue lawns. Fall is the highest-value fertilizer window for cool-season grass. Avoid fertilizing warm-season grasses—they are transitioning to dormancy.' },
+      { title: 'Broadleaf weed control', category: 'weed',   priority: 'high',   description: 'Prime fall broadleaf window: weeds translocate herbicide to roots, giving the deepest kill. Use three-way mix (2,4-D + MCPP + dicamba) or triclopyr for tough species like wild violet and ground ivy.' },
     ],
     // October
     [
-      { title: 'Second fall fertilization', category: 'fertilize', priority: 'high', description: 'Apply winterizer fertilizer to fescue lawns; support root development and cold hardiness.' },
-      { title: 'Leaf management',        category: 'cleanup', priority: 'high',   description: 'Mulch-mow light leaf fall; rake or blow heavy accumulations weekly.' },
-      { title: 'Winterize irrigation',  category: 'water',   priority: 'high',   description: 'Drain and blow out irrigation lines before first frost.' },
+      { title: 'Winterizer fertilizer (before Nov 1)', category: 'fertilize', priority: 'high', description: 'Apply high-K winterizer (24-0-12 or similar) to tall fescue before Oct 31—Johnson County fertilizer blackout begins Nov 1. October is the single highest-value fertilizer application for cool-season lawns. Builds root carbohydrate reserves for winter survival and spring green-up density.' },
+      { title: 'Leaf management',        category: 'cleanup', priority: 'high',   description: 'Remove or mulch-mow leaves at least weekly. KC\'s oak and maple canopies can bury turf quickly. A mat of leaves for more than 7 days blocks sunlight and promotes snow mold and disease. Bag heavy accumulations; mulch-mow light coverage.' },
+      { title: 'Winterize irrigation',  category: 'water',   priority: 'high',   description: 'Schedule irrigation winterization before the first hard freeze (28 °F sustained). KC average first frost is October 13–17. Blow out all lines; standing water in backflow preventers and valve bodies cracks components.' },
+      { title: 'Final broadleaf herbicide', category: 'weed', priority: 'medium', description: 'Last effective window for broadleaf control before soil temps fall below 50 °F. Treat dandelions, clover, and wild violet now—they\'re actively transporting nutrients to roots and will pull herbicide deep.' },
     ],
     // November
     [
-      { title: 'Final mow (cool-season)', category: 'mow',  priority: 'high',   description: 'Final mow for fescue at 3 inches; warm-season grasses may still need occasional cuts until frost.' },
-      { title: 'Cleanup and winterize', category: 'cleanup', priority: 'medium', description: 'Clear debris, winterize mower, and clean up leaf litter before winter.' },
+      { title: 'Fertilizer blackout begins Nov 1', category: 'fertilize', priority: 'high', description: 'Johnson County, KS fertilizer blackout runs Nov 1–Mar 1. No applications during this period. Check your municipality—many KC metro cities have similar ordinances with fines for violations.' },
+      { title: 'Final mow at 3 inches', category: 'mow',     priority: 'high',   description: 'Final mow for tall fescue at 3 inches before growth stops. Too long (>4") creates matting and snow mold risk; too short (<2.5") stresses roots and reduces winter hardiness.' },
+      { title: 'Cleanup and winterize equipment', category: 'cleanup', priority: 'medium', description: 'Clear all leaf litter before snowfall. Drain or stabilize mower fuel, clean mower deck, lubricate moving parts, and store in frost-free location.' },
     ],
     // December
     [
-      { title: 'Dormant weed scouting', category: 'weed',   priority: 'low',    description: 'Note winter weed pressure (Poa annua, chickweed) to plan January spot-treatment strategy.' },
-      { title: 'Plan next season',      category: 'cleanup', priority: 'low',    description: 'Order seed, pre-emergent, and fertilizer; review irrigation notes from the season.' },
+      { title: 'Fertilizer blackout in effect', category: 'fertilize', priority: 'high', description: 'Johnson County, KS fertilizer blackout continues through February 28. Plan your March applications—slow-release formulas and soil test results should be ready to go when the blackout lifts March 1.' },
+      { title: 'Dormant weed scouting', category: 'weed',   priority: 'low',    description: 'Note Poa annua, chickweed, and henbit pressure for January spot-treatment planning. These cool-season weeds grow actively through KC winters in mild spells.' },
+      { title: 'Plan next season',      category: 'cleanup', priority: 'low',    description: 'Order tall fescue seed (certified varieties: Titan, Falcon, or Crossfire), pre-emergent, and slow-release fertilizer before February price increases. Review irrigation system performance notes.' },
     ],
   ],
 
