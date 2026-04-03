@@ -305,6 +305,27 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
 /* ── SECTION helpers patch ── */
 .section-sub{color:rgba(45,27,14,.65);font-size:1.05rem;max-width:640px;margin:0 auto;text-align:center}
 @media(min-width:768px){.footer-grid{grid-template-columns:1.5fr 1fr 1fr 1.4fr}}
+/* ── TOOLS SECTION ── */
+.tools-section{background:var(--forest);padding:5rem 1.25rem;position:relative;overflow:hidden}
+.tools-section::before{content:'';position:absolute;top:-120px;left:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(82,183,136,.06),transparent 70%);pointer-events:none}
+.tools-label{color:var(--orange)!important}
+.tools-label::before{background:var(--orange)!important}
+.tools-headline{font-family:var(--display);font-size:clamp(2rem,5vw,2.8rem);color:var(--cream);line-height:1.1;margin-bottom:1rem}
+.tools-sub{font-size:1rem;color:var(--lime);line-height:1.6;max-width:52ch;margin-bottom:3rem}
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+@media(min-width:900px){.tools-grid{grid-template-columns:repeat(3,1fr)}}
+.tool-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-md);padding:1.5rem;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;position:relative}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);border-radius:var(--r-md) var(--r-md) 0 0;opacity:0;transition:opacity .2s ease}
+.tool-card:hover{transform:translateY(-4px);border-color:rgba(255,107,53,.5);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.tool-card:hover::before{opacity:1}
+.tool-card--last{grid-column:1/-1}
+@media(min-width:900px){.tool-card--last{grid-column:auto}}
+@media(max-width:899px){.tool-card--last{grid-column:1/-1;max-width:calc(50% - .625rem);justify-self:center}}
+.tool-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:1.375rem;flex-shrink:0}
+.tool-name{font-family:var(--display);font-size:1.3rem;color:var(--cream);margin-top:1rem;letter-spacing:.03em;line-height:1.1}
+.tool-desc{font-size:.875rem;color:rgba(248,244,233,.8);line-height:1.5;margin-top:.5rem}
+.tool-cta{display:block;font-size:.875rem;font-weight:600;color:var(--orange);margin-top:1rem;text-decoration:none;transition:color .2s ease}
+.tool-cta:hover{color:var(--cream)}
 </style>
 </head>
 <body>
@@ -324,6 +345,7 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
     <ul class="nav-links" role="list">
       <li><a href="#" class="active">Home</a></li>
       <li><a href="#lead-magnet">Calendar</a></li>
+      <li><a href="#tools">Tools</a></li>
       <li><a href="#resources">Resources</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#lead-magnet" class="nav-cta">Grab the Free Calendar 🌿</a></li>
@@ -338,6 +360,7 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
 <div class="nav-overlay" id="nav-overlay" role="dialog" aria-label="Navigation" aria-modal="true">
   <a href="#" onclick="closeNav()">Home</a>
   <a href="#lead-magnet" onclick="closeNav()">Calendar</a>
+  <a href="#tools" onclick="closeNav()">Tools</a>
   <a href="#resources" onclick="closeNav()">Resources</a>
   <a href="#about" onclick="closeNav()">About</a>
   <a href="#lead-magnet" onclick="closeNav()" style="color:var(--orange)">Grab the Free Calendar 🌿</a>
@@ -483,6 +506,67 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
           <p>Real KC homeowner.<br>Real clay soil problems.<br>Real husband who questions every product purchase. 🌿</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS SECTION -->
+<section class="tools-section" id="tools" aria-labelledby="tools-heading">
+  <div class="container">
+    <p class="section-label tools-label reveal">Free Tools</p>
+    <h2 class="tools-headline reveal d1" id="tools-heading">Everything You Need.<br>Nothing You Don't.</h2>
+    <p class="tools-sub reveal d2">7 free tools built specifically for Kansas City lawns. No account required. No paywall. Ever.</p>
+    <div class="tools-grid" role="list">
+
+      <article class="tool-card reveal d1" role="listitem">
+        <div class="tool-icon" aria-hidden="true">📍</div>
+        <h3 class="tool-name">Lawn Dashboard</h3>
+        <p class="tool-desc">Enter your KC ZIP code and get your USDA hardiness zone, live weather conditions, and AI-powered lawn tips tailored to your exact season and location.</p>
+        <a href="./app.html" class="tool-cta">Open Dashboard →</a>
+      </article>
+
+      <article class="tool-card reveal d2" role="listitem">
+        <div class="tool-icon" aria-hidden="true">🧮</div>
+        <h3 class="tool-name">Product Calculator</h3>
+        <p class="tool-desc">Stop guessing. Enter your square footage and get exact amounts of seed, fertilizer, pre-emergent, and mulch — no more half-empty bags or emergency hardware store runs.</p>
+        <a href="./app.html" class="tool-cta">Open Calculator →</a>
+      </article>
+
+      <article class="tool-card reveal d3" role="listitem">
+        <div class="tool-icon" aria-hidden="true">📅</div>
+        <h3 class="tool-name">Zone 6a Lawn Calendar</h3>
+        <p class="tool-desc">The exact month-by-month treatment schedule for KC Zone 6a. Pre-emergent windows, fertilizer timing, overseeding dates — never miss the window again.</p>
+        <a href="./app.html" class="tool-cta">View Calendar →</a>
+      </article>
+
+      <article class="tool-card reveal d1" role="listitem">
+        <div class="tool-icon" aria-hidden="true">✅</div>
+        <h3 class="tool-name">Tasks &amp; Notes</h3>
+        <p class="tool-desc">Seasonal KC lawn checklists with zone-specific timing. Track what you've applied, when you applied it, and what's coming up next — all saved locally in your browser.</p>
+        <a href="./app.html" class="tool-cta">Open Tasks →</a>
+      </article>
+
+      <article class="tool-card reveal d2" role="listitem">
+        <div class="tool-icon" aria-hidden="true">🌤️</div>
+        <h3 class="tool-name">Lawn Intelligence</h3>
+        <p class="tool-desc">Real-time lawn advice based on your local KC weather — heat stress warnings, brown patch risk alerts, frost advisories, and watering guidance based on live conditions.</p>
+        <a href="./app.html" class="tool-cta">View Tips →</a>
+      </article>
+
+      <article class="tool-card reveal d3" role="listitem">
+        <div class="tool-icon" aria-hidden="true">📐</div>
+        <h3 class="tool-name">Lawn Measurement</h3>
+        <p class="tool-desc">Draw your lawn boundaries on a satellite map and get instant square footage. Know exactly what you're working with before you order a single bag of anything.</p>
+        <a href="./app.html" class="tool-cta">Measure My Lawn →</a>
+      </article>
+
+      <article class="tool-card reveal d1 tool-card--last" role="listitem">
+        <div class="tool-icon" aria-hidden="true">❓</div>
+        <h3 class="tool-name">KC Lawn FAQ</h3>
+        <p class="tool-desc">17+ answers to the most common Kansas City lawn questions — clay soil compaction, Johnson County rules, fungus ID, overseeding timing, and why your grass is brown in July.</p>
+        <a href="./app.html" class="tool-cta">Browse FAQ →</a>
+      </article>
+
     </div>
   </div>
 </section>
