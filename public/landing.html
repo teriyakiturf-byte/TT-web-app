@@ -311,21 +311,25 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
 .tools-label{color:var(--orange)!important}
 .tools-label::before{background:var(--orange)!important}
 .tools-headline{font-family:var(--display);font-size:clamp(2rem,5vw,2.8rem);color:var(--cream);line-height:1.1;margin-bottom:1rem}
-.tools-sub{font-size:1rem;color:var(--lime);line-height:1.6;max-width:52ch;margin-bottom:3rem}
-.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
-@media(min-width:900px){.tools-grid{grid-template-columns:repeat(3,1fr)}}
-.tool-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-md);padding:1.5rem;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;position:relative}
-.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);border-radius:var(--r-md) var(--r-md) 0 0;opacity:0;transition:opacity .2s ease}
-.tool-card:hover{transform:translateY(-4px);border-color:rgba(255,107,53,.5);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.tool-card:hover::before{opacity:1}
+.tools-sub{font-size:1rem;color:var(--lime);line-height:1.6;max-width:52ch;margin-bottom:0}
+.tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:40px}
+@media(min-width:768px){.tools-grid{grid-template-columns:repeat(3,1fr)}}
+.tool-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-top:3px solid transparent;border-radius:12px;padding:24px;transition:all .2s ease;cursor:pointer;text-decoration:none}
+.tool-card:hover{border-top-color:#FF6B35;border-color:rgba(255,107,53,.3);transform:translateY(-4px)}
 .tool-card--last{grid-column:1/-1}
-@media(min-width:900px){.tool-card--last{grid-column:auto}}
-@media(max-width:899px){.tool-card--last{grid-column:1/-1;max-width:calc(50% - .625rem);justify-self:center}}
-.tool-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:1.375rem;flex-shrink:0}
-.tool-name{font-family:var(--display);font-size:1.3rem;color:var(--cream);margin-top:1rem;letter-spacing:.03em;line-height:1.1}
-.tool-desc{font-size:.875rem;color:rgba(248,244,233,.8);line-height:1.5;margin-top:.5rem}
-.tool-cta{display:block;font-size:.875rem;font-weight:600;color:var(--orange);margin-top:1rem;text-decoration:none;transition:color .2s ease}
-.tool-cta:hover{color:var(--cream)}
+@media(min-width:768px){.tool-card--last{grid-column:auto}}
+@media(max-width:767px){.tool-card--last{grid-column:1/-1;max-width:calc(50% - 8px);justify-self:center}}
+.tool-icon-wrap{width:48px;height:48px;background:rgba(0,0,0,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.tool-name{font-family:'Bebas Neue',sans-serif;color:#F8F4E9;font-size:1.2rem;letter-spacing:.03em;margin-top:16px;margin-bottom:0;line-height:1.1}
+.tool-description{font-family:'DM Sans',sans-serif;color:rgba(248,244,233,.75);font-size:.85rem;line-height:1.55;margin-top:8px}
+.tool-link{display:inline-block;margin-top:16px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.875rem;color:#FF6B35;text-decoration:none;transition:color .2s}
+.tool-link:hover{color:#F8F4E9}
+.tools-section-cta{text-align:center;margin-top:48px}
+.tools-cta-caption{font-family:'DM Mono',monospace;font-size:.8rem;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.tools-main-cta{display:inline-block;padding:16px 36px;background:#FF6B35;color:#fff;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.05em;text-decoration:none;transition:background .2s ease,transform .1s ease}
+.tools-main-cta:hover{background:#e55a25;transform:translateY(-2px)}
+.footer-tools-link{font-size:.9rem;color:var(--orange);font-weight:600;transition:color var(--ease)}
+.footer-tools-link:hover{color:var(--cream)}
 </style>
 </head>
 <body>
@@ -519,55 +523,61 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
     <div class="tools-grid" role="list">
 
       <article class="tool-card reveal d1" role="listitem">
-        <div class="tool-icon" aria-hidden="true">📍</div>
+        <div class="tool-icon-wrap" aria-hidden="true">📍</div>
         <h3 class="tool-name">Lawn Dashboard</h3>
-        <p class="tool-desc">Enter your KC ZIP code and get your USDA hardiness zone, live weather conditions, and AI-powered lawn tips tailored to your exact season and location.</p>
-        <a href="./app.html" class="tool-cta">Open Dashboard →</a>
+        <p class="tool-description">Enter your KC ZIP code and get your USDA hardiness zone, live weather conditions, and AI-powered lawn tips tailored to your exact season and location.</p>
+        <a href="./app.html" class="tool-link">Open Dashboard →</a>
       </article>
 
       <article class="tool-card reveal d2" role="listitem">
-        <div class="tool-icon" aria-hidden="true">🧮</div>
+        <div class="tool-icon-wrap" aria-hidden="true">🧮</div>
         <h3 class="tool-name">Product Calculator</h3>
-        <p class="tool-desc">Stop guessing. Enter your square footage and get exact amounts of seed, fertilizer, pre-emergent, and mulch — no more half-empty bags or emergency hardware store runs.</p>
-        <a href="./app.html" class="tool-cta">Open Calculator →</a>
+        <p class="tool-description">Stop guessing. Enter your square footage and get exact amounts of seed, fertilizer, pre-emergent, and mulch — no more half-empty bags or emergency hardware store runs.</p>
+        <a href="./app.html" class="tool-link">Open Calculator →</a>
       </article>
 
       <article class="tool-card reveal d3" role="listitem">
-        <div class="tool-icon" aria-hidden="true">📅</div>
+        <div class="tool-icon-wrap" aria-hidden="true">📅</div>
         <h3 class="tool-name">Zone 6a Lawn Calendar</h3>
-        <p class="tool-desc">The exact month-by-month treatment schedule for KC Zone 6a. Pre-emergent windows, fertilizer timing, overseeding dates — never miss the window again.</p>
-        <a href="./app.html" class="tool-cta">View Calendar →</a>
+        <p class="tool-description">The exact month-by-month treatment schedule for KC Zone 6a. Pre-emergent windows, fertilizer timing, overseeding dates — never miss the window again.</p>
+        <a href="./app.html" class="tool-link">View Calendar →</a>
       </article>
 
       <article class="tool-card reveal d1" role="listitem">
-        <div class="tool-icon" aria-hidden="true">✅</div>
+        <div class="tool-icon-wrap" aria-hidden="true">✅</div>
         <h3 class="tool-name">Tasks &amp; Notes</h3>
-        <p class="tool-desc">Seasonal KC lawn checklists with zone-specific timing. Track what you've applied, when you applied it, and what's coming up next — all saved locally in your browser.</p>
-        <a href="./app.html" class="tool-cta">Open Tasks →</a>
+        <p class="tool-description">Seasonal KC lawn checklists with zone-specific timing. Track what you've applied, when you applied it, and what actually worked.</p>
+        <a href="./app.html" class="tool-link">Open Tasks →</a>
       </article>
 
       <article class="tool-card reveal d2" role="listitem">
-        <div class="tool-icon" aria-hidden="true">🌤️</div>
-        <h3 class="tool-name">Lawn Intelligence</h3>
-        <p class="tool-desc">Real-time lawn advice based on your local KC weather — heat stress warnings, brown patch risk alerts, frost advisories, and watering guidance based on live conditions.</p>
-        <a href="./app.html" class="tool-cta">View Tips →</a>
+        <div class="tool-icon-wrap" aria-hidden="true">❓</div>
+        <h3 class="tool-name">KC Lawn FAQ</h3>
+        <p class="tool-description">17+ questions answered specifically for KC lawns — clay soil, brown patch, Johnson County fertilizer laws, and Zone 6a timing. Real answers, not generic advice.</p>
+        <a href="./app.html" class="tool-link">Browse FAQ →</a>
       </article>
 
       <article class="tool-card reveal d3" role="listitem">
-        <div class="tool-icon" aria-hidden="true">📐</div>
-        <h3 class="tool-name">Lawn Measurement</h3>
-        <p class="tool-desc">Draw your lawn boundaries on a satellite map and get instant square footage. Know exactly what you're working with before you order a single bag of anything.</p>
-        <a href="./app.html" class="tool-cta">Measure My Lawn →</a>
+        <div class="tool-icon-wrap" aria-hidden="true">📦</div>
+        <h3 class="tool-name">Product Library</h3>
+        <p class="tool-description">Browse and track your lawn product inventory. Pre-loaded with 8 popular KC-relevant products including fertilizers, pre-emergents, and fungicides.</p>
+        <a href="./app.html" class="tool-link">Open Library →</a>
       </article>
 
       <article class="tool-card reveal d1 tool-card--last" role="listitem">
-        <div class="tool-icon" aria-hidden="true">❓</div>
-        <h3 class="tool-name">KC Lawn FAQ</h3>
-        <p class="tool-desc">17+ answers to the most common Kansas City lawn questions — clay soil compaction, Johnson County rules, fungus ID, overseeding timing, and why your grass is brown in July.</p>
-        <a href="./app.html" class="tool-cta">Browse FAQ →</a>
+        <div class="tool-icon-wrap" aria-hidden="true">📐</div>
+        <h3 class="tool-name">Lawn Measurement Tool</h3>
+        <p class="tool-description">Draw your lawn boundaries on satellite imagery and get exact square footage in under 60 seconds. Know exactly what you're working with before you order a single bag.</p>
+        <a href="./app.html" class="tool-link">Measure My Lawn →</a>
       </article>
 
     </div>
+
+    <div class="tools-section-cta reveal">
+      <p class="tools-cta-caption">All tools are free. No account required.</p>
+      <a href="./app.html" class="tools-main-cta">Access All 7 Free Tools →</a>
+    </div>
+
   </div>
 </section>
 
@@ -711,13 +721,8 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
 
       <div class="footer-col">
         <h3 class="footer-col-title">Tools</h3>
-        <ul class="footer-links">
-          <li><a href="./app.html">Lawn Dashboard</a></li>
-          <li><a href="./app.html">Product Calculator</a></li>
-          <li><a href="./app.html">Zone Calendar</a></li>
-          <li><a href="./app.html">Lawn Measurement</a></li>
-          <li><a href="./app.html">Task &amp; Notes</a></li>
-        </ul>
+        <a href="./app.html" class="footer-tools-link">Access All 7 Free Tools →</a>
+        <p style="font-size:.75rem;opacity:.5;margin-top:8px;font-family:'DM Mono',monospace;color:rgba(248,244,233,.5)">No account required. Always free.</p>
       </div>
 
       <div class="footer-col">
