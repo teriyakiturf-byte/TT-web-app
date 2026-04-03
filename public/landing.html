@@ -639,14 +639,14 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
 
 <script>
 /* ── Nav scroll state ── */
-const nav = document.getElementById('main-nav');
+const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 }, { passive: true });
 
 /* ── Hamburger / mobile nav ── */
 const hamburger = document.getElementById('hamburger');
-const mobileOverlay = document.getElementById('mobile-overlay');
+const mobileOverlay = document.getElementById('nav-overlay');
 
 function openNav() {
   mobileOverlay.hidden = false;
