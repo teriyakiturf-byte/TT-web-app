@@ -1,5 +1,6 @@
 import { Lightbulb, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import { generateTips } from '../utils/lawnIntelligence.js'
+import { useLocalStorage } from '../hooks/useLocalStorage.js'
 
 const TYPE_CONFIG = {
   warning: {
@@ -21,7 +22,13 @@ const TYPE_CONFIG = {
 
 export default function LawnIntelligence({ weatherData, zone }) {
   const monthIndex = new Date().getMonth()
-  const tips = generateTips(weatherData, zone, monthIndex)
+  const [customTips] = useLocalStorage('tt_custom_tips', [])
+  const generatedTips = generateTips(weatherData, zone, monthIndex)
+  // Custom tips prepended; map to same shape generateTips returns
+  const customMapped = customTips
+    .filter(t => t.title || t.body)
+    .map(t => ({ type: t.type || 'info', icon: '📌', title: t.title, body: t.body }))
+  const tips = [...customMapped, ...generatedTips]
 
   const hasWeather = !!weatherData?.current
   const hasZone = !!zone
