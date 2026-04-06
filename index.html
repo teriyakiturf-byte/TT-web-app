@@ -817,6 +817,16 @@ const SEASONAL = {
 function initSeasonal() {
   const month = new Date().getMonth();
   const data = SEASONAL[month];
+  // Check for admin override stored from the React app
+  try {
+    const overrides = JSON.parse(localStorage.getItem('tt_seasonal_overrides') || '{}');
+    if (overrides[month]) {
+      document.getElementById('s-emoji').textContent = '';
+      document.getElementById('s-tag').textContent = data.tag;
+      document.getElementById('s-msg').textContent = overrides[month];
+      return;
+    }
+  } catch {}
   document.getElementById('s-emoji').textContent = data.emoji;
   document.getElementById('s-tag').textContent = data.tag;
   document.getElementById('s-msg').textContent = data.msg;
