@@ -1,4 +1,6 @@
-import { Leaf, Calculator, CalendarDays, CheckSquare, HelpCircle, ShoppingBag, Ruler } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Leaf, Calculator, CalendarDays, CheckSquare, HelpCircle, ShoppingBag, Ruler, User, LogOut } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const TABS = [
   { id: 'dashboard',  label: 'Dashboard',  icon: Leaf },
@@ -10,7 +12,26 @@ const TABS = [
   { id: 'measure',    label: 'Measure',    icon: Ruler },
 ]
 
+function getInitials(name) {
+  if (!name) return '?'
+  return name
+    .split(' ')
+    .map(w => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
+
 export default function Header({ activeTab, onTabChange }) {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/login')
+  }
+
   return (
     <header className="bg-tt-forest text-tt-cream shadow-lg">
       <div className="max-w-5xl mx-auto px-4 pt-5 pb-0">
@@ -36,6 +57,33 @@ export default function Header({ activeTab, onTabChange }) {
             <span className="w-1.5 h-1.5 rounded-full bg-tt-orange animate-pulse" />
             Live Tips
           </span>
+
+          {/* User menu */}
+          {user && (
+            <div className="flex items-center gap-2 ml-2">
+              <button
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-2 hover:bg-white/10 rounded-xl px-3 py-1.5 transition-colors"
+                title="My Profile"
+              >
+                {user.avatar ? (
+                  <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-tt-lime/50" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-tt-orange flex items-center justify-center text-white text-xs font-bold">
+                    {getInitials(user.name)}
+                  </div>
+                )}
+                <span className="hidden md:inline text-sm font-semibold text-tt-lime">{user.name.split(' ')[0]}</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-tt-lime/60 hover:text-tt-cream p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tab navigation */}

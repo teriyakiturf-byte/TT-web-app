@@ -13,7 +13,9 @@ export default {
         tt: {
           forest:       '#1B4332',
           lime:         '#95D5B2',
+          'brand-lime': '#52B788',
           orange:       '#FF6B35',
+          'brand-orange':'#F4631E',
           charcoal:     '#2C3E50',
           cream:        '#F5F1E8',
           'light-lime': '#E8F5E9',

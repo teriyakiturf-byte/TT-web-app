@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import ZoneLookup from './components/ZoneLookup.jsx'
 import WeatherWidget from './components/WeatherWidget.jsx'
@@ -10,18 +11,26 @@ import Notes from './components/Notes.jsx'
 import FAQ from './components/FAQ.jsx'
 import Products from './components/Products.jsx'
 import LawnMeasurement from './components/LawnMeasurement.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+import Login from './pages/Login.jsx'
+import Signup from './pages/Signup.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import Profile from './pages/Profile.jsx'
 import { useLocalStorage } from './hooks/useLocalStorage.js'
+import { useAuth } from './contexts/AuthContext.jsx'
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+function Dashboard() {
+  const { user } = useAuth()
 
   // Persistent state
-  const [zipCode, setZipCode] = useLocalStorage('tt_zipCode', '')
+  const [zipCode, setZipCode] = useLocalStorage('tt_zipCode', user?.zipCode || '')
   const [zone, setZone] = useLocalStorage('tt_zone', '')
   const [apiKey, setApiKey] = useLocalStorage('tt_owm_key', '')
   const [sqFootage, setSqFootage] = useLocalStorage('tt_sqft', '')
   const [todos, setTodos] = useLocalStorage('tt_todos', [])
   const [notes, setNotes] = useLocalStorage('tt_notes', [])
+
+  const [activeTab, setActiveTab] = useState('dashboard')
 
   // Session-only weather state (refreshed on demand)
   const [weatherData, setWeatherData] = useState(null)
@@ -53,13 +62,11 @@ export default function App() {
     }
   }
 
-  // When ZIP is updated via ZoneLookup, also refresh weather
   function handleZipChange(newZip) {
     setZipCode(newZip)
     if (apiKey) fetchWeatherData(apiKey, newZip)
   }
 
-  // When API key is saved in WeatherWidget, persist it here
   function handleApiKeyChange(key) {
     setApiKey(key)
   }
@@ -69,7 +76,6 @@ export default function App() {
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="max-w-5xl mx-auto px-4 py-6">
-        {/* ── Dashboard ── */}
         {activeTab === 'dashboard' && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -93,7 +99,6 @@ export default function App() {
           </div>
         )}
 
-        {/* ── Calculator ── */}
         {activeTab === 'calculator' && (
           <ProductCalculator
             sqFootage={sqFootage}
@@ -101,12 +106,10 @@ export default function App() {
           />
         )}
 
-        {/* ── Calendar ── */}
         {activeTab === 'calendar' && (
           <LawnCalendar zone={zone} />
         )}
 
-        {/* ── Tasks & Notes ── */}
         {activeTab === 'tasks' && (
           <div className="space-y-5">
             <TodoList
@@ -121,13 +124,8 @@ export default function App() {
           </div>
         )}
 
-        {/* ── FAQ ── */}
         {activeTab === 'faq' && <FAQ />}
-
-        {/* ── Products ── */}
         {activeTab === 'products' && <Products />}
-
-        {/* ── Lawn Measurement ── */}
         {activeTab === 'measure' && <LawnMeasurement />}
       </main>
 
@@ -135,5 +133,32 @@ export default function App() {
         Teriyaki Turf · Zone data from phzmapi.org · Weather from OpenWeatherMap
       </footer>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
