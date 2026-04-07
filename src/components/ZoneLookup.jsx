@@ -8,7 +8,7 @@ const ZONE_COLORS = {
   south:      'bg-[#fff0ea] border-tt-orange text-tt-charcoal',
 }
 
-export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange }) {
+export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange, onLocationChange }) {
   const [input, setInput] = useState(zipCode || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,13 +23,28 @@ export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange })
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`https://phzmapi.org/${zip}.json`)
-      if (!res.ok) throw new Error('ZIP not found')
-      const data = await res.json()
-      const fetchedZone = data.zone
-      if (!fetchedZone) throw new Error('Zone data unavailable for this ZIP')
+      // Fetch zone + lat/lon in parallel
+      const [zoneRes, geoRes] = await Promise.all([
+        fetch(`https://phzmapi.org/${zip}.json`),
+        fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=us&format=json&limit=1`),
+      ])
+      if (!zoneRes.ok) throw new Error('ZIP not found')
+      const zoneData = await zoneRes.json()
+      if (!zoneData.zone) throw new Error('Zone data unavailable for this ZIP')
+
       onZipChange(zip)
-      onZoneChange(fetchedZone)
+      onZoneChange(zoneData.zone)
+
+      if (geoRes.ok) {
+        const geoData = await geoRes.json()
+        if (geoData.length > 0) {
+          onLocationChange?.({
+            lat: parseFloat(geoData[0].lat),
+            lon: parseFloat(geoData[0].lon),
+            cityName: geoData[0].display_name?.split(',')[0] ?? zip,
+          })
+        }
+      }
     } catch (err) {
       setError(err.message || 'Failed to look up zone. Please try again.')
     } finally {
@@ -44,7 +59,7 @@ export default function ZoneLookup({ zipCode, onZipChange, zone, onZoneChange })
     <div className="card">
       <h2 className="section-title">
         <MapPin className="w-5 h-5 text-tt-orange" />
-        Location & Growing Zone
+        Location &amp; Growing Zone
       </h2>
 
       <form onSubmit={handleLookup} className="flex gap-2 mb-3">

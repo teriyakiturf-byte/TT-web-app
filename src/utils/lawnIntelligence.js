@@ -29,28 +29,30 @@ function getSeason(zoneGroup, monthIndex) {
   return 'winter'
 }
 
-function rainExpectedWithinHours(forecastList, hours) {
-  if (!forecastList || forecastList.length === 0) return false
-  const cutoff = Date.now() / 1000 + hours * 3600
-  return forecastList.some(item =>
-    item.dt <= cutoff && (
-      item.rain?.['3h'] > 0 ||
-      ['Rain', 'Drizzle', 'Thunderstorm'].includes(item.weather?.[0]?.main)
-    )
+// WMO weather code groups for rain/thunderstorm detection
+function isRainCode(code) { return (code >= 51 && code <= 67) || (code >= 80 && code <= 82) }
+function isThunderstormCode(code) { return code >= 95 }
+
+function rainExpectedWithinHours(hourly, hours) {
+  if (!hourly?.time?.length) return false
+  const cutoff = Date.now() + hours * 3600 * 1000
+  return hourly.time.some((t, i) =>
+    new Date(t).getTime() <= cutoff &&
+    (hourly.precipitation[i] > 0 || isRainCode(hourly.weather_code?.[i] ?? 0))
   )
 }
 
-function rainAmountNext48h(forecastList) {
-  if (!forecastList || forecastList.length === 0) return 0
-  const cutoff = Date.now() / 1000 + 48 * 3600
-  return forecastList
-    .filter(item => item.dt <= cutoff)
-    .reduce((sum, item) => sum + (item.rain?.['3h'] ?? 0), 0)
+function rainAmountNext48h(hourly) {
+  if (!hourly?.time?.length) return 0
+  const cutoff = Date.now() + 48 * 3600 * 1000
+  return hourly.time.reduce((sum, t, i) =>
+    new Date(t).getTime() <= cutoff ? sum + (hourly.precipitation[i] ?? 0) : sum
+  , 0)
 }
 
 /**
  * Generate lawn care tips based on current conditions.
- * @param {{ current: object, forecast: { list: object[] } }} weather - OWM API data
+ * @param {object} weather - Open-Meteo API response
  * @param {string} zone - USDA zone string e.g. "6a"
  * @param {number} monthIndex - 0-based month
  * @returns {{ type: 'warning'|'info'|'success', icon: string, title: string, body: string }[]}
@@ -60,19 +62,19 @@ export function generateTips(weather, zone, monthIndex) {
   const zoneGroup = getZoneGroup(zone)
   const season = getSeason(zoneGroup || 'north', monthIndex)
 
-  const current     = weather?.current
-  const forecastList = weather?.forecast?.list ?? []
+  const current  = weather?.current
+  const hourly   = weather?.hourly
 
-  const temp       = current?.main?.temp     ?? null  // already °F from WeatherWidget
-  const tempF      = temp !== null ? Math.round(temp) : null
-  const humidity   = current?.main?.humidity ?? null  // %
-  const windSpeed  = current?.wind?.speed    ?? null  // mph
-  const weatherMain = current?.weather?.[0]?.main ?? ''
-  const rainNext48  = rainAmountNext48h(forecastList)
+  const tempF     = current?.temperature_2m    != null ? Math.round(current.temperature_2m)    : null
+  const humidity  = current?.relative_humidity_2m ?? null  // %
+  const windSpeed = current?.wind_speed_10m       ?? null  // mph (already converted by Open-Meteo)
+  const weatherCode = current?.weather_code       ?? null
+  const isThunderstorm = weatherCode != null && isThunderstormCode(weatherCode)
+  const rainNext48  = rainAmountNext48h(hourly)
 
   // ─── WEATHER-BASED ────────────────────────────────────────────────────────
 
-  if (rainExpectedWithinHours(forecastList, 24)) {
+  if (rainExpectedWithinHours(hourly, 24)) {
     tips.push({
       type: 'warning', icon: '🌧️',
       title: 'Hold off on mowing',
@@ -86,7 +88,7 @@ export function generateTips(weather, zone, monthIndex) {
       title: 'Skip fertilizer & herbicides today',
       body: 'More than 0.5" of rain is expected in the next 48 hours. Applications now will wash into storm drains before absorbing. Wait for a dry window.',
     })
-  } else if (rainExpectedWithinHours(forecastList, 24)) {
+  } else if (rainExpectedWithinHours(hourly, 24)) {
     tips.push({
       type: 'info', icon: '🚫',
       title: 'Hold chemical applications',
@@ -144,7 +146,7 @@ export function generateTips(weather, zone, monthIndex) {
     })
   }
 
-  if (weatherMain === 'Thunderstorm') {
+  if (isThunderstorm) {
     tips.push({
       type: 'warning', icon: '⛈️',
       title: 'Thunderstorm nearby',
@@ -191,7 +193,7 @@ export function generateTips(weather, zone, monthIndex) {
   // ─── SEASON-BASED ─────────────────────────────────────────────────────────
 
   // Pre-emergent spring window
-  if (season === 'spring' && monthIndex >= 2 && monthIndex <= 4 && !rainExpectedWithinHours(forecastList, 24)) {
+  if (season === 'spring' && monthIndex >= 2 && monthIndex <= 4 && !rainExpectedWithinHours(hourly, 24)) {
     tips.push({
       type: 'info', icon: '🛡️',
       title: 'Pre-emergent window — check soil temp',
@@ -314,7 +316,7 @@ export function generateTips(weather, zone, monthIndex) {
   if (
     tempF !== null && tempF >= 60 && tempF <= 82 &&
     humidity !== null && humidity >= 35 && humidity <= 70 &&
-    !rainExpectedWithinHours(forecastList, 6) &&
+    !rainExpectedWithinHours(hourly, 6) &&
     (windSpeed === null || windSpeed < 10)
   ) {
     tips.push({

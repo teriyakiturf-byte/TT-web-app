@@ -28,12 +28,12 @@ export default function App() {
   // Persistent state
   const [zipCode, setZipCode] = useLocalStorage('tt_zipCode', '')
   const [zone, setZone] = useLocalStorage('tt_zone', '')
-  const [apiKey, setApiKey] = useLocalStorage('tt_owm_key', '')
+  const [location, setLocation] = useLocalStorage('tt_location', null) // { lat, lon, cityName }
   const [sqFootage, setSqFootage] = useLocalStorage('tt_sqft', '')
   const [todos, setTodos] = useLocalStorage('tt_todos', [])
   const [notes, setNotes] = useLocalStorage('tt_notes', [])
 
-  // Admin state
+  // Admin state (read-only here; AdminPanel manages writes)
   const [storedPw] = useLocalStorage('tt_admin_pw', 'teriyakiturf2026')
   const [announcement] = useLocalStorage('tt_announcement', null)
   const [annDismissed, setAnnDismissed] = useState(false)
@@ -68,37 +68,39 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (apiKey && zipCode && !weatherData) {
-      fetchWeatherData(apiKey, zipCode)
+    if (location?.lat && !weatherData) {
+      fetchWeatherData(location)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function fetchWeatherData(key, zip) {
-    if (!key || !zip) return
+  async function fetchWeatherData(loc) {
+    if (!loc?.lat || !loc?.lon) return
     setWeatherLoading(true)
     try {
-      const [currentRes, forecastRes] = await Promise.all([
-        fetch(`https://api.openweathermap.org/data/2.5/weather?zip=${zip},us&appid=${key}`),
-        fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zip},us&appid=${key}`),
-      ])
-      if (!currentRes.ok) throw new Error('Weather fetch failed')
-      const [current, forecast] = await Promise.all([currentRes.json(), forecastRes.json()])
-      setWeatherData({ current, forecast })
+      const url = [
+        `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}`,
+        `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,uv_index`,
+        `&hourly=precipitation,weather_code,wind_speed_10m,relative_humidity_2m`,
+        `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum`,
+        `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`,
+        `&timezone=auto&forecast_days=7`,
+      ].join('')
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Weather fetch failed')
+      const data = await res.json()
+      setWeatherData(data)
     } catch {
-      // silently fail; WeatherWidget shows its own error state
+      // silently fail; WeatherWidget shows its own empty state
     } finally {
       setWeatherLoading(false)
     }
   }
 
-  function handleZipChange(newZip) {
-    setZipCode(newZip)
-    if (apiKey) fetchWeatherData(apiKey, newZip)
-  }
-
-  function handleApiKeyChange(key) {
-    setApiKey(key)
+  function handleLocationChange(loc) {
+    setLocation(loc)
+    setWeatherData(null)
+    fetchWeatherData(loc)
   }
 
   // Announcement banner (only on dashboard, dismissable per session)
@@ -136,14 +138,13 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <ZoneLookup
                 zipCode={zipCode}
-                onZipChange={handleZipChange}
+                onZipChange={setZipCode}
                 zone={zone}
                 onZoneChange={setZone}
+                onLocationChange={handleLocationChange}
               />
               <WeatherWidget
-                apiKey={apiKey}
-                onApiKeyChange={handleApiKeyChange}
-                zipCode={zipCode}
+                location={location}
                 weatherData={weatherData}
                 onWeatherData={setWeatherData}
                 loading={weatherLoading}
