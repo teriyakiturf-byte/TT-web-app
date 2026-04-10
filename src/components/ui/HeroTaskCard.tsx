@@ -79,45 +79,77 @@ export default function HeroTaskCard({
 
   return (
     <div
-      className={`rounded-2xl bg-forest p-6 text-white ${border} ${
+      className={`relative rounded-2xl bg-forest p-6 text-white ${border} ${
         isBlurred ? "soft-gate-content" : ""
       }`}
     >
-      {badge && (
-        <span
-          className={`inline-block font-mono text-[10px] uppercase tracking-widest ${badgeColor} rounded-full px-3 py-1 mb-3`}
-        >
-          {badge}
-        </span>
-      )}
-
-      <h2 className="font-display text-3xl text-white leading-tight">
-        {taskName}
-      </h2>
-      <p className="font-mono text-sm text-lime mt-1">{productName}</p>
       {isLocked ? (
-        <p className="inline-flex items-center gap-2 font-mono text-sm text-white/50 mt-3">
-          <Lock size={14} />
-          Unlock to see your exact quantity
-        </p>
-      ) : (
-        <p className="font-mono text-xl text-lime font-medium mt-3">
-          {calculatedQuantity}
-        </p>
-      )}
-      <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
+        <>
+          {/* Card content rendered behind overlay */}
+          <div className="opacity-30">
+            {badge && (
+              <span
+                className={`inline-block font-mono text-[10px] uppercase tracking-widest ${badgeColor} rounded-full px-3 py-1 mb-3`}
+              >
+                {badge}
+              </span>
+            )}
+            <h2 className="font-display text-3xl text-white leading-tight">
+              {taskName}
+            </h2>
+            <p className="font-mono text-sm text-lime mt-1">{productName}</p>
+            <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
+          </div>
 
-      {tier !== 4 && (
-        <div className="mt-5 space-y-2">
-          {isLocked ? (
-            <button
-              onClick={onUnlockClick}
-              className="w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+          {/* Dark overlay */}
+          <div
+            className="absolute inset-0 rounded-2xl z-[5]"
+            style={{
+              background: 'rgba(27, 67, 50, 0.85)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+          />
+
+          {/* Unlock CTA above overlay */}
+          <div className="relative z-10 mt-4 text-center">
+            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+              <Lock size={20} className="text-white" />
+            </div>
+            <p className="font-mono text-sm text-white/70">
+              Unlock to see your exact quantity
+            </p>
+            {tier !== 4 && (
+              <button
+                onClick={onUnlockClick}
+                className="mt-3 w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+              >
+                Unlock My Lawn Plan — $67 →
+              </button>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          {badge && (
+            <span
+              className={`inline-block font-mono text-[10px] uppercase tracking-widest ${badgeColor} rounded-full px-3 py-1 mb-3`}
             >
-              Unlock My Lawn Plan — $67 →
-            </button>
-          ) : (
-            <>
+              {badge}
+            </span>
+          )}
+
+          <h2 className="font-display text-3xl text-white leading-tight">
+            {taskName}
+          </h2>
+          <p className="font-mono text-sm text-lime mt-1">{productName}</p>
+          <p className="font-mono text-xl text-lime font-medium mt-3">
+            {calculatedQuantity}
+          </p>
+          <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
+
+          {tier !== 4 && (
+            <div className="mt-5 space-y-2">
               <button
                 onClick={onMarkComplete}
                 className="w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
@@ -140,26 +172,26 @@ export default function HeroTaskCard({
                   Skip This Task
                 </button>
               </div>
-            </>
+            </div>
           )}
-        </div>
-      )}
 
-      {whyContext && (
-        <div className="mt-4 border-t border-white/10 pt-3">
-          <button
-            onClick={() => setWhyExpanded(!whyExpanded)}
-            className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80"
-          >
-            Why This Task?
-            {whyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
-          {whyExpanded && (
-            <p className="text-sm text-white/60 mt-2 leading-relaxed">
-              {whyContext}
-            </p>
+          {whyContext && (
+            <div className="mt-4 border-t border-white/10 pt-3">
+              <button
+                onClick={() => setWhyExpanded(!whyExpanded)}
+                className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80"
+              >
+                Why This Task?
+                {whyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+              {whyExpanded && (
+                <p className="text-sm text-white/60 mt-2 leading-relaxed">
+                  {whyContext}
+                </p>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
