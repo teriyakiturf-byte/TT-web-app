@@ -1,0 +1,52 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
+export interface UserStateResult {
+  isGuest: boolean;
+  isFree: boolean;
+  isPaid: boolean;
+  lawnSqft: number | null;
+  grassType: string | null;
+  zip: string | null;
+  /** Transition to paid (stub — will be replaced by Stripe webhook) */
+  markPaid: () => void;
+}
+
+export function useUserState(): UserStateResult {
+  const [state, setState] = useState<"guest" | "free" | "paid">("guest");
+  const [lawnSqft, setLawnSqft] = useState<number | null>(null);
+  const [grassType, setGrassType] = useState<string | null>(null);
+  const [zip, setZip] = useState<string | null>(null);
+
+  useEffect(() => {
+    const userState = localStorage.getItem("tt_user_state");
+    if (userState === "paid") setState("paid");
+    else if (userState === "free") setState("free");
+    else setState("guest");
+
+    const sqft = localStorage.getItem("tt_sqft");
+    if (sqft && Number(sqft) > 0) setLawnSqft(Number(sqft));
+
+    const grass = localStorage.getItem("tt_grass");
+    if (grass) setGrassType(grass);
+
+    const z = localStorage.getItem("tt_zip");
+    if (z) setZip(z);
+  }, []);
+
+  function markPaid() {
+    localStorage.setItem("tt_user_state", "paid");
+    setState("paid");
+  }
+
+  return {
+    isGuest: state === "guest",
+    isFree: state === "free",
+    isPaid: state === "paid",
+    lawnSqft,
+    grassType,
+    zip,
+    markPaid,
+  };
+}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import TaskRow from "@/components/ui/TaskRow";
+import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask } from "@/types";
 import { calculateQuantity } from "@/types";
 
@@ -234,21 +235,25 @@ const MONTH_ORDER = [
 
 type FilterType = "all" | "fertilizer" | "weed-pest" | "mechanical";
 
+function formatQuantity(lawnSqft: number | null, labelRate: number): string {
+  if (labelRate === 0) return "—";
+  if (!lawnSqft) return "Add lawn size →";
+  return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
+}
+
 export default function ChecklistPage() {
   const router = useRouter();
+  const { isPaid, lawnSqft } = useUserState();
   const [tasks, setTasks] = useState<LawnTask[]>(FULL_PLAN);
-  const [lawnSqft, setLawnSqft] = useState(5000);
   const [filter, setFilter] = useState<FilterType>("all");
 
-  useEffect(() => {
-    const state = localStorage.getItem("tt_user_state");
-    if (state !== "paid") {
+  // Redirect non-paid users
+  if (!isPaid && typeof window !== "undefined") {
+    const stored = localStorage.getItem("tt_user_state");
+    if (stored !== "paid") {
       router.push("/plan");
-      return;
     }
-    const sqft = localStorage.getItem("tt_sqft");
-    if (sqft) setLawnSqft(Number(sqft));
-  }, [router]);
+  }
 
   function toggleTask(taskId: string) {
     setTasks((prev) =>
@@ -285,8 +290,9 @@ export default function ChecklistPage() {
           Task Checklist
         </h1>
         <p className="text-sm text-muted text-center mt-2">
-          {lawnSqft.toLocaleString()} sq ft · Zone 6a · All quantities
-          calculated for your lawn
+          {lawnSqft
+            ? `${lawnSqft.toLocaleString()} sq ft · Zone 6a · All quantities calculated for your lawn`
+            : "Zone 6a · Add your lawn size to see exact quantities"}
         </p>
 
         {/* Progress bar */}
@@ -349,11 +355,7 @@ export default function ChecklistPage() {
                       key={task.id}
                       taskName={task.name}
                       productName={task.productName}
-                      quantity={
-                        task.labelRate > 0
-                          ? `${calculateQuantity(lawnSqft, task.labelRate)} lbs`
-                          : "—"
-                      }
+                      quantity={formatQuantity(lawnSqft, task.labelRate)}
                       dueDate={task.dueRange ?? task.dueDate}
                       isComplete={task.isComplete}
                       complianceBadges={task.complianceBadges}

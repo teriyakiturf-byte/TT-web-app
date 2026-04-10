@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Lock } from "lucide-react";
 import type { TaskTier } from "@/types";
 
 interface HeroTaskCardProps {
@@ -11,6 +11,7 @@ interface HeroTaskCardProps {
   applicationNotes: string;
   tier: TaskTier;
   isBlurred?: boolean;
+  isLocked?: boolean;
   onMarkComplete: () => void;
   onSnooze: () => void;
   onSkip: () => void;
@@ -48,6 +49,7 @@ export default function HeroTaskCard({
   applicationNotes,
   tier,
   isBlurred,
+  isLocked,
   onMarkComplete,
   onSnooze,
   onSkip,
@@ -91,9 +93,16 @@ export default function HeroTaskCard({
         {taskName}
       </h2>
       <p className="font-mono text-sm text-lime mt-1">{productName}</p>
-      <p className="font-mono text-xl text-lime font-medium mt-3">
-        {calculatedQuantity}
-      </p>
+      {isLocked ? (
+        <p className="inline-flex items-center gap-2 font-mono text-sm text-white/50 mt-3">
+          <Lock size={14} />
+          Unlock to see your exact quantity
+        </p>
+      ) : (
+        <p className="font-mono text-xl text-lime font-medium mt-3">
+          {calculatedQuantity}
+        </p>
+      )}
       <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
 
       {tier !== 4 && (

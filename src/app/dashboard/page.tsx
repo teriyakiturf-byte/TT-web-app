@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import HeroTaskCard from "@/components/ui/HeroTaskCard";
@@ -9,6 +9,7 @@ import TaskRow from "@/components/ui/TaskRow";
 import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask } from "@/types";
 import { calculateSavings, calculateQuantity } from "@/types";
 
@@ -137,34 +138,35 @@ const PLAN_TASKS: LawnTask[] = [
   },
 ];
 
+function formatQuantity(lawnSqft: number | null, labelRate: number): string {
+  if (labelRate === 0) return "—";
+  if (!lawnSqft) return "Add your lawn size →";
+  return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
+  const { isPaid, lawnSqft, grassType } = useUserState();
   const [tasks, setTasks] = useState<LawnTask[]>(PLAN_TASKS);
-  const [lawnSqft, setLawnSqft] = useState(5000);
-  const [grassType, setGrassType] = useState("Tall Fescue");
 
-  useEffect(() => {
-    // Check if user is paid
-    const state = localStorage.getItem("tt_user_state");
-    if (state !== "paid") {
+  // Redirect non-paid users to /plan
+  if (!isPaid && typeof window !== "undefined") {
+    // Check directly from localStorage to avoid flash — useUserState
+    // initializes as "guest" before useEffect runs
+    const stored = localStorage.getItem("tt_user_state");
+    if (stored !== "paid") {
       router.push("/plan");
-      return;
     }
-    const sqft = localStorage.getItem("tt_sqft");
-    if (sqft) setLawnSqft(Number(sqft));
-    const grass = localStorage.getItem("tt_grass");
-    if (grass) {
-      setGrassType(
-        grass.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-      );
-    }
-  }, [router]);
+  }
+
+  const displayGrass = grassType
+    ? grassType.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    : "Tall Fescue";
 
   const completedCount = tasks.filter((t) => t.isComplete).length;
   const totalCount = tasks.length;
-  const savings = calculateSavings(lawnSqft);
+  const savings = lawnSqft ? calculateSavings(lawnSqft) : null;
 
-  // Find the current hero task (first incomplete task with lowest tier number)
   const heroTask = tasks
     .filter((t) => !t.isComplete)
     .sort((a, b) => a.tier - b.tier)[0];
@@ -207,7 +209,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Determine spring task completion for season pill
   const springTasks = tasks.filter((t) =>
     ["March", "April", "May"].includes(t.monthGroup)
   );
@@ -222,19 +223,42 @@ export default function DashboardPage() {
       <Nav userState="paid" />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
-        {/* Header with lawn info chips */}
         <h1 className="font-display text-hero text-forest text-center">
           Your Lawn Dashboard
         </h1>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           <LawnInfoChip type="zone" value="Zone 6a — KC" />
-          <LawnInfoChip type="grass-type" value={grassType} />
-          <LawnInfoChip
-            type="lawn-size"
-            value={`${lawnSqft.toLocaleString()} sq ft`}
-          />
+          <LawnInfoChip type="grass-type" value={displayGrass} />
+          {lawnSqft ? (
+            <LawnInfoChip
+              type="lawn-size"
+              value={`${lawnSqft.toLocaleString()} sq ft`}
+            />
+          ) : (
+            <a
+              href="/measure"
+              className="inline-flex items-center gap-1.5 rounded-full bg-orange-light px-3 py-1 text-xs font-mono text-orange hover:bg-orange/20 transition-colors"
+            >
+              Add your lawn size →
+            </a>
+          )}
           <LawnInfoChip type="soil" value="Heavy Clay" />
         </div>
+
+        {/* Prompt to add lawn size if missing */}
+        {!lawnSqft && (
+          <div className="mt-4 rounded-xl border-2 border-dashed border-orange/40 bg-orange-light p-4 text-center">
+            <p className="text-sm text-charcoal">
+              Add your lawn size to see <strong>exact product quantities</strong> for every task.
+            </p>
+            <a
+              href="/measure"
+              className="mt-2 inline-block rounded-lg bg-orange px-4 py-2 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+            >
+              Measure My Lawn →
+            </a>
+          </div>
+        )}
 
         {/* Alert Banners */}
         <div className="mt-6 space-y-2">
@@ -255,11 +279,7 @@ export default function DashboardPage() {
             <HeroTaskCard
               taskName={heroTask.name}
               productName={heroTask.productName}
-              calculatedQuantity={
-                heroTask.labelRate > 0
-                  ? `${calculateQuantity(lawnSqft, heroTask.labelRate)} lbs`
-                  : "—"
-              }
+              calculatedQuantity={formatQuantity(lawnSqft, heroTask.labelRate)}
               applicationNotes={heroTask.applicationNotes}
               tier={heroTask.tier}
               onMarkComplete={handleMarkComplete}
@@ -292,8 +312,8 @@ export default function DashboardPage() {
           />
           <StatCard
             label="DIY Savings"
-            value={`$${savings.annualSavings}/yr`}
-            subtitle={`$${savings.fiveYearSavings} over 5 years`}
+            value={savings ? `$${savings.annualSavings}/yr` : "—"}
+            subtitle={savings ? `$${savings.fiveYearSavings} over 5 years` : "Add lawn size"}
           />
           <StatCard
             label="Next Task"
@@ -339,11 +359,7 @@ export default function DashboardPage() {
                 key={task.id}
                 taskName={task.name}
                 productName={task.productName}
-                quantity={
-                  task.labelRate > 0
-                    ? `${calculateQuantity(lawnSqft, task.labelRate)} lbs`
-                    : "—"
-                }
+                quantity={formatQuantity(lawnSqft, task.labelRate)}
                 dueDate={task.dueRange ?? task.dueDate}
                 isComplete={task.isComplete}
                 complianceBadges={task.complianceBadges}
@@ -354,31 +370,48 @@ export default function DashboardPage() {
         </div>
 
         {/* DIY Savings Counter */}
-        <div className="mt-8 rounded-xl bg-forest p-6 text-white text-center">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-white/60 mb-2">
-            Your DIY Savings vs. TruGreen
-          </p>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="font-display text-3xl text-white/50">
-                ~${savings.annualProCost}
-              </p>
-              <p className="font-mono text-[10px] text-white/40">TruGreen/yr</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl text-lime">
-                ~${savings.annualDiyCost}
-              </p>
-              <p className="font-mono text-[10px] text-white/60">DIY w/ plan/yr</p>
-            </div>
-            <div>
-              <p className="font-display text-3xl text-orange">
-                ~${savings.annualSavings}
-              </p>
-              <p className="font-mono text-[10px] text-orange">You save/yr</p>
+        {savings ? (
+          <div className="mt-8 rounded-xl bg-forest p-6 text-white text-center">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/60 mb-2">
+              Your DIY Savings vs. TruGreen
+            </p>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <p className="font-display text-3xl text-white/50">
+                  ~${savings.annualProCost}
+                </p>
+                <p className="font-mono text-[10px] text-white/40">TruGreen/yr</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl text-lime">
+                  ~${savings.annualDiyCost}
+                </p>
+                <p className="font-mono text-[10px] text-white/60">DIY w/ plan/yr</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl text-orange">
+                  ~${savings.annualSavings}
+                </p>
+                <p className="font-mono text-[10px] text-orange">You save/yr</p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-8 rounded-xl bg-forest p-6 text-white text-center">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/60 mb-2">
+              Your DIY Savings vs. TruGreen
+            </p>
+            <p className="text-sm text-white/70 mt-2">
+              Add your lawn size to see personalized savings calculations.
+            </p>
+            <a
+              href="/measure"
+              className="mt-3 inline-block rounded-lg bg-orange px-4 py-2 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+            >
+              Measure My Lawn →
+            </a>
+          </div>
+        )}
 
         {/* Quick Links */}
         <div className="mt-8 grid grid-cols-2 gap-3 mb-8">

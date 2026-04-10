@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Nav from "@/components/Nav";
 import SoftGateOverlay from "@/components/ui/SoftGateOverlay";
 import UnlockModal from "@/components/ui/UnlockModal";
@@ -9,13 +9,14 @@ import TaskRow from "@/components/ui/TaskRow";
 import StatCard from "@/components/ui/StatCard";
 import SeasonPill from "@/components/ui/SeasonPill";
 import UpgradeNudge from "@/components/ui/UpgradeNudge";
+import { useUserState } from "@/hooks/useUserState";
 
 const SAMPLE_TASKS = [
   {
     id: "1",
     name: "Apply Pre-Emergent (Split App #1)",
     product: "Prodiamine 65 WDG",
-    quantity: "4.3 lbs",
+    labelRate: 0.86,
     due: "Mar 15 – Apr 1",
     badges: ["blackout-compliant" as const, "joco-law" as const],
   },
@@ -23,7 +24,7 @@ const SAMPLE_TASKS = [
     id: "2",
     name: "First Mow — Set Height to 3.5″",
     product: "Mower blade sharpened",
-    quantity: "—",
+    labelRate: 0,
     due: "When grass hits 4″",
     badges: [],
   },
@@ -31,7 +32,7 @@ const SAMPLE_TASKS = [
     id: "3",
     name: "Broadleaf Weed Spray",
     product: "Trimec Classic",
-    quantity: "2.1 oz",
+    labelRate: 0.42,
     due: "Apr 15 – May 1",
     badges: ["no-phosphorus" as const],
   },
@@ -39,7 +40,7 @@ const SAMPLE_TASKS = [
     id: "4",
     name: "Spring Fertilizer Application",
     product: "Milorganite 6-4-0",
-    quantity: "16 lbs",
+    labelRate: 32,
     due: "May 1 – May 15",
     badges: ["blackout-compliant" as const],
   },
@@ -47,46 +48,46 @@ const SAMPLE_TASKS = [
     id: "5",
     name: "Grub Preventative",
     product: "GrubEx (Chlorantraniliprole)",
-    quantity: "5.5 lbs",
+    labelRate: 1.1,
     due: "May 15 – Jun 1",
     badges: [],
   },
 ];
 
+function formatQuantity(
+  isPaid: boolean,
+  lawnSqft: number | null,
+  labelRate: number
+): string {
+  if (!isPaid) return "";
+  if (labelRate === 0) return "—";
+  if (!lawnSqft) return "Add your lawn size →";
+  return `${(Math.round(((lawnSqft / 1000) * labelRate) * 10) / 10)} lbs`;
+}
+
 export default function PlanPage() {
   const [showModal, setShowModal] = useState(false);
-  const [lawnSqft, setLawnSqft] = useState<number | undefined>(undefined);
-  const [userState, setUserState] = useState<"guest" | "free" | "paid">("free");
+  const { isPaid, lawnSqft, markPaid } = useUserState();
 
-  useEffect(() => {
-    const sqft = localStorage.getItem("tt_sqft");
-    if (sqft) setLawnSqft(Number(sqft));
-    const state = localStorage.getItem("tt_user_state");
-    if (state === "paid") setUserState("paid");
-    else if (state === "free") setUserState("free");
-  }, []);
-
-  const isPaid = userState === "paid";
+  const navState = isPaid ? "paid" : "free";
 
   function handleStripeCheckout() {
     // TODO: Wire up Stripe checkout
-    // Stub: simulate payment success
-    localStorage.setItem("tt_user_state", "paid");
-    setUserState("paid");
+    markPaid();
     setShowModal(false);
     window.location.href = "/thank-you";
   }
 
   return (
     <>
-      <Nav userState={userState} />
+      <Nav userState={navState} />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="font-display text-hero text-forest text-center">
           Your KC Lawn Plan
         </h1>
         <p className="text-sm text-muted text-center mt-2">
-          {lawnSqft
+          {isPaid && lawnSqft
             ? `${lawnSqft.toLocaleString()} sq ft · Zone 6a · Tall Fescue`
             : "Zone 6a · Kansas City Metro"}
         </p>
@@ -99,12 +100,12 @@ export default function PlanPage() {
           <SeasonPill season="winter" status="future" startDate="Nov 15" />
         </div>
 
-        {/* Blurred content section for free users */}
+        {/* Blurred content section for non-paid users */}
         <div className="relative mt-8">
           {!isPaid && (
             <SoftGateOverlay
               onUnlockClick={() => setShowModal(true)}
-              lawnSqft={lawnSqft}
+              lawnSqft={lawnSqft ?? undefined}
             />
           )}
 
@@ -113,10 +114,11 @@ export default function PlanPage() {
             <HeroTaskCard
               taskName="Apply Pre-Emergent (Split App #1)"
               productName="Prodiamine 65 WDG"
-              calculatedQuantity={lawnSqft ? `${((lawnSqft / 1000) * 0.86).toFixed(1)} lbs` : "4.3 lbs"}
+              calculatedQuantity={formatQuantity(isPaid, lawnSqft, 0.86)}
               applicationNotes="Apply when soil temps reach 50–55°F consistently. Water in within 24 hours."
               tier={1}
               isBlurred={false}
+              isLocked={!isPaid}
               onMarkComplete={() => {}}
               onSnooze={() => {}}
               onSkip={() => {}}
@@ -126,9 +128,9 @@ export default function PlanPage() {
 
             {/* Stats Row */}
             <div className="flex gap-3 mt-6 overflow-x-auto pb-2">
-              <StatCard label="Tasks Done" value="2 / 14" subtitle="Spring: 1 of 5" />
+              <StatCard label="Tasks Done" value="0 / 14" subtitle="Spring: 0 of 5" isLocked={!isPaid} />
               <StatCard label="Saved vs. Pro" value="$373" subtitle="per year" />
-              <StatCard label="Next Task" value="Apr 15" subtitle="Broadleaf spray" />
+              <StatCard label="Next Task" value="Apr 15" subtitle="Broadleaf spray" isLocked={!isPaid} />
             </div>
 
             {/* Upcoming Tasks */}
@@ -142,7 +144,7 @@ export default function PlanPage() {
                     key={task.id}
                     taskName={task.name}
                     productName={task.product}
-                    quantity={task.quantity}
+                    quantity={formatQuantity(isPaid, lawnSqft, task.labelRate)}
                     dueDate={task.due}
                     isComplete={false}
                     isLocked={!isPaid}
@@ -155,7 +157,7 @@ export default function PlanPage() {
           </div>
         </div>
 
-        {/* Upgrade nudge for free users */}
+        {/* Upgrade nudge for non-paid users */}
         {!isPaid && (
           <div className="mt-8">
             <UpgradeNudge
@@ -166,7 +168,7 @@ export default function PlanPage() {
           </div>
         )}
 
-        {/* Sticky bottom bar for free users */}
+        {/* Sticky bottom bar for non-paid users */}
         {!isPaid && (
           <div className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3">
             <div className="mx-auto max-w-3xl flex items-center justify-between">
@@ -193,7 +195,7 @@ export default function PlanPage() {
       </main>
 
       <UnlockModal
-        lawnSqft={lawnSqft}
+        lawnSqft={lawnSqft ?? undefined}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onStripeCheckout={handleStripeCheckout}
