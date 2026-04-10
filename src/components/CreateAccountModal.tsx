@@ -3,42 +3,121 @@
 import { useState, useRef, useEffect } from "react";
 import { X } from "lucide-react";
 
+export type AccountEntryPoint = "zip-hook" | "measurement" | "faq-gate" | "plan-nudge";
+
 interface CreateAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAccountCreated: (email: string) => void;
+  onSuccess: (email: string) => void;
+  entryPoint: AccountEntryPoint;
+  prefillData?: {
+    zipCode?: string;
+    lawnSqft?: number;
+  };
+}
+
+const ENTRY_COPY: Record<AccountEntryPoint, { headline: string; sub: string }> = {
+  "zip-hook": {
+    headline: "Save Your Zone Data",
+    sub: "Keep your KC zone info, soil profile, and seasonal alerts. Free forever.",
+  },
+  measurement: {
+    headline: "Save This Measurement",
+    sub: "Your lawn data is ready. Create a free account so you don't lose it.",
+  },
+  "faq-gate": {
+    headline: "Unlock All 17+ Answers",
+    sub: "Create a free account to read every KC lawn care answer.",
+  },
+  "plan-nudge": {
+    headline: "Save Your Lawn Plan Progress",
+    sub: "Free account. No credit card. Track your tasks and keep your data.",
+  },
+};
+
+const KIT_FORM_ID = "9310262";
+
+async function subscribeToKit(email: string, zipCode?: string, lawnSqft?: number) {
+  try {
+    const fields: Record<string, string> = {};
+    if (zipCode) fields.zip_code = zipCode;
+    if (lawnSqft) fields.lawn_sqft = String(lawnSqft);
+
+    const res = await fetch(`https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: "7-a1C3cqbRDSzdf6uv6Plw",
+        email,
+        fields,
+      }),
+    });
+    return res.ok;
+  } catch {
+    // Fail silently — account still gets created locally
+    return false;
+  }
 }
 
 export default function CreateAccountModal({
   isOpen,
   onClose,
-  onAccountCreated,
+  onSuccess,
+  entryPoint,
+  prefillData,
 }: CreateAccountModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  const copy = ENTRY_COPY[entryPoint];
 
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    // TODO: Wire up real auth
-    await new Promise((r) => setTimeout(r, 800));
-    onAccountCreated(email);
+
+    // Subscribe to Kit for email nurture
+    await subscribeToKit(email, prefillData?.zipCode, prefillData?.lawnSqft);
+
+    // Save prefill data to localStorage
+    if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
+    if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
+
+    // TODO: Wire up real auth (Firebase, Supabase, etc.)
+    // For now, stub the account creation
+    await new Promise((r) => setTimeout(r, 400));
+
+    onSuccess(email);
     setLoading(false);
   }
 
   async function handleGoogleAuth() {
-    // TODO: Wire up Google OAuth
-    onAccountCreated("google-user@gmail.com");
+    setError("");
+    setLoading(true);
+
+    // TODO: Wire up Google OAuth — for now stub
+    const googleEmail = "google-user@gmail.com";
+
+    await subscribeToKit(googleEmail, prefillData?.zipCode, prefillData?.lawnSqft);
+
+    if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
+    if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
+
+    onSuccess(googleEmail);
+    setLoading(false);
   }
 
   return (
@@ -56,17 +135,33 @@ export default function CreateAccountModal({
           <X size={20} />
         </button>
 
+        {/* Context-aware headline */}
         <h2 className="font-display text-3xl text-forest uppercase">
-          Save Your Lawn Data
+          {copy.headline}
         </h2>
-        <p className="text-sm text-muted mt-1">
-          Free account. No credit card. Takes 30 seconds.
-        </p>
+        <p className="text-sm text-muted mt-1">{copy.sub}</p>
+
+        {/* Prefill data preview */}
+        {prefillData && (prefillData.zipCode || prefillData.lawnSqft) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {prefillData.zipCode && (
+              <span className="inline-flex items-center rounded-full bg-lime-light px-3 py-1 font-mono text-xs text-forest">
+                ZIP: {prefillData.zipCode}
+              </span>
+            )}
+            {prefillData.lawnSqft && (
+              <span className="inline-flex items-center rounded-full bg-lime-light px-3 py-1 font-mono text-xs text-forest">
+                {prefillData.lawnSqft.toLocaleString()} sq ft
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Google OAuth */}
         <button
           onClick={handleGoogleAuth}
-          className="mt-5 flex w-full items-center justify-center gap-3 rounded-xl border-2 border-border bg-white px-4 py-3 text-sm font-medium text-charcoal hover:bg-cream transition-colors"
+          disabled={loading}
+          className="mt-5 flex w-full items-center justify-center gap-3 rounded-xl border-2 border-border bg-white px-4 py-3 text-sm font-medium text-charcoal hover:bg-cream transition-colors disabled:opacity-50"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -103,6 +198,11 @@ export default function CreateAccountModal({
             minLength={8}
             className="w-full rounded-xl border-2 border-border bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/50 focus:border-lime focus:outline-none"
           />
+
+          {error && (
+            <p className="text-sm text-orange">{error}</p>
+          )}
+
           <button
             type="submit"
             disabled={loading}

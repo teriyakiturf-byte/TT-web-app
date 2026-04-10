@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Thermometer, AlertTriangle, ArrowRight } from "lucide-react";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import CreateAccountModal from "@/components/CreateAccountModal";
+import { useUserState } from "@/hooks/useUserState";
 
 const KC_ZIPS = [
   "64101","64102","64105","64106","64108","64109","64110","64111","64112",
@@ -28,68 +31,68 @@ interface SeasonalAction {
 
 function getSeasonalAction(month: number): SeasonalAction {
   switch (month) {
-    case 0: // Jan
-    case 1: // Feb
+    case 0:
+    case 1:
       return {
         label: "Winter Advisory",
         headline: "Plan Your Spring Pre-Emergent Now",
         body: "Soil temps will cross 50°F in March. Order Prodiamine now so you're ready when forsythia blooms.",
       };
-    case 2: // Mar
+    case 2:
       return {
         label: "March Action",
         headline: "Pre-Emergent Window Opening — Get Ready",
         body: "Soil temps approaching 50°F in KC. Your crabgrass barrier needs to go down before germination starts.",
       };
-    case 3: // Apr
+    case 3:
       return {
         label: "April Action",
         headline: "Pre-Emergent Window Closing — Act Now",
         body: "Soil temps are crossing 55°F in KC. Your crabgrass pre-emergent window is closing fast.",
       };
-    case 4: // May
+    case 4:
       return {
         label: "May Alert",
         headline: "Fertilizer Blackout Approaching — Apply Before or After",
         body: "Johnson County restricts fertilizer applications. Time your spring feeding before the blackout window.",
       };
-    case 5: // Jun
+    case 5:
       return {
         label: "June Action",
         headline: "Raise Mow Height — Summer Stress Incoming",
         body: "KC heat is here. Raise your mow height to 4″ to shade soil and reduce water loss.",
       };
-    case 6: // Jul
+    case 6:
       return {
         label: "July Advisory",
         headline: "Watch for Brown Patch — Fungal Conditions Active",
         body: "Hot, humid KC nights create perfect fungal conditions. Water mornings only, never at night.",
       };
-    case 7: // Aug
+    case 7:
       return {
         label: "August Prep",
         headline: "Fall Overseeding Window Opens Next Month",
         body: "Reserve a core aerator now. September is the #1 month to renovate your KC lawn.",
       };
-    case 8: // Sep
+    case 8:
       return {
         label: "September — The Main Event",
         headline: "Aerate & Overseed Now — Best Window of the Year",
         body: "Soil temps are perfect for tall fescue germination. Aerate, overseed, keep moist for 2-3 weeks.",
       };
-    case 9: // Oct
+    case 9:
       return {
         label: "October Action",
         headline: "Apply Winterizer Fertilizer Before First Frost",
         body: "Final feeding builds root reserves for winter dormancy. Apply Milorganite before ground freezes.",
       };
-    case 10: // Nov
+    case 10:
       return {
         label: "November Prep",
         headline: "Final Mow & Leaf Cleanup",
         body: "Lower mow height to 2.5″ for last cut. Mulch or remove leaves to prevent snow mold.",
       };
-    case 11: // Dec
+    case 11:
       return {
         label: "Winter Advisory",
         headline: "Protect Dormant Turf — Stay Off Frozen Grass",
@@ -114,9 +117,12 @@ function getSoilTempEstimate(month: number): string {
 }
 
 export default function ZipHook() {
+  const router = useRouter();
+  const { isGuest, markFree } = useUserState();
   const [zip, setZip] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isKC, setIsKC] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const month = new Date().getMonth();
   const seasonal = getSeasonalAction(month);
@@ -131,6 +137,22 @@ export default function ZipHook() {
     } else {
       setSubmitted(false);
     }
+  }
+
+  function handleCtaClick() {
+    if (isGuest) {
+      setShowModal(true);
+    } else {
+      // Already has an account — go to plan
+      router.push("/plan");
+    }
+  }
+
+  function handleAccountCreated(email: string) {
+    markFree(email);
+    if (zip) localStorage.setItem("tt_zip", zip);
+    setShowModal(false);
+    router.push("/onboarding");
   }
 
   return (
@@ -200,15 +222,23 @@ export default function ZipHook() {
           </div>
 
           {/* CTA */}
-          <a
-            href="/plan"
+          <button
+            onClick={handleCtaClick}
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors"
           >
             Save Your Zone — Create Free Account
             <ArrowRight size={18} />
-          </a>
+          </button>
         </div>
       )}
+
+      <CreateAccountModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={handleAccountCreated}
+        entryPoint="zip-hook"
+        prefillData={{ zipCode: zip || undefined }}
+      />
     </div>
   );
 }

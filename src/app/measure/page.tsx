@@ -1,19 +1,44 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import EmptyStateCard from "@/components/ui/EmptyStateCard";
+import CreateAccountModal from "@/components/CreateAccountModal";
+import { useUserState } from "@/hooks/useUserState";
 import { calculateSavings } from "@/types";
 
 export default function MeasurePage() {
+  const router = useRouter();
+  const { isGuest, markFree } = useUserState();
   const [sqft, setSqft] = useState("");
   const [measured, setMeasured] = useState(false);
   const [mapError] = useState(true); // TODO: Set to false when Google Maps API is configured
+  const [showModal, setShowModal] = useState(false);
   const savings = sqft ? calculateSavings(Number(sqft)) : null;
 
   function handleManualSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (sqft) setMeasured(true);
+  }
+
+  function handleSaveCta() {
+    // Save sqft to localStorage regardless
+    if (sqft) localStorage.setItem("tt_sqft", sqft);
+
+    if (isGuest) {
+      setShowModal(true);
+    } else {
+      // Already has account — go to onboarding or plan
+      router.push("/onboarding");
+    }
+  }
+
+  function handleAccountCreated(email: string) {
+    markFree(email);
+    if (sqft) localStorage.setItem("tt_sqft", sqft);
+    setShowModal(false);
+    router.push("/onboarding");
   }
 
   return (
@@ -120,15 +145,23 @@ export default function MeasurePage() {
               </div>
             )}
 
-            <a
-              href="/onboarding"
+            <button
+              onClick={handleSaveCta}
               className="block w-full text-center rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
             >
               Save This Measurement — Create Free Account →
-            </a>
+            </button>
           </div>
         )}
       </main>
+
+      <CreateAccountModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={handleAccountCreated}
+        entryPoint="measurement"
+        prefillData={{ lawnSqft: sqft ? Number(sqft) : undefined }}
+      />
     </>
   );
 }

@@ -9,6 +9,9 @@ export interface UserStateResult {
   lawnSqft: number | null;
   grassType: string | null;
   zip: string | null;
+  email: string | null;
+  /** Transition to free account (after email signup) */
+  markFree: (email: string) => void;
   /** Transition to paid (stub — will be replaced by Stripe webhook) */
   markPaid: () => void;
 }
@@ -18,6 +21,7 @@ export function useUserState(): UserStateResult {
   const [lawnSqft, setLawnSqft] = useState<number | null>(null);
   const [grassType, setGrassType] = useState<string | null>(null);
   const [zip, setZip] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const userState = localStorage.getItem("tt_user_state");
@@ -33,7 +37,17 @@ export function useUserState(): UserStateResult {
 
     const z = localStorage.getItem("tt_zip");
     if (z) setZip(z);
+
+    const e = localStorage.getItem("tt_email");
+    if (e) setEmail(e);
   }, []);
+
+  function markFree(userEmail: string) {
+    localStorage.setItem("tt_user_state", "free");
+    localStorage.setItem("tt_email", userEmail);
+    setState("free");
+    setEmail(userEmail);
+  }
 
   function markPaid() {
     localStorage.setItem("tt_user_state", "paid");
@@ -47,6 +61,8 @@ export function useUserState(): UserStateResult {
     lawnSqft,
     grassType,
     zip,
+    email,
+    markFree,
     markPaid,
   };
 }
