@@ -4,8 +4,8 @@
  * always proceeds regardless of Kit availability.
  */
 
-const KIT_FORM_ID = process.env.KIT_FORM_ID || "9310262";
-const KIT_API_KEY = process.env.KIT_API_KEY || "7-a1C3cqbRDSzdf6uv6Plw";
+const KIT_FORM_ID = process.env.KIT_FORM_ID;
+const KIT_API_KEY = process.env.KIT_API_KEY;
 
 export async function syncEmailToKit(
   email: string,
@@ -13,6 +13,11 @@ export async function syncEmailToKit(
   fields?: { zipCode?: string; lawnSqft?: number }
 ): Promise<boolean> {
   try {
+    if (!KIT_FORM_ID || !KIT_API_KEY) {
+      console.warn("Kit env vars missing — skipping email sync");
+      return false;
+    }
+
     const customFields: Record<string, string> = {};
     if (fields?.zipCode) customFields.zip_code = fields.zipCode;
     if (fields?.lawnSqft) customFields.lawn_sqft = String(fields.lawnSqft);

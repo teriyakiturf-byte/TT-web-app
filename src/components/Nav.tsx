@@ -51,7 +51,7 @@ export default function Nav({ userState = "guest" }: NavProps) {
                 FAQ
               </Link>
               <Link
-                href="#"
+                href="/plan"
                 className="text-sm text-white/80 hover:text-white transition-colors"
               >
                 Sign In
@@ -103,7 +103,7 @@ export default function Nav({ userState = "guest" }: NavProps) {
             FAQ
           </Link>
           {userState === "guest" && (
-            <Link href="#" className="block py-2 text-sm text-white/80">
+            <Link href="/plan" className="block py-2 text-sm text-white/80">
               Sign In
             </Link>
           )}
