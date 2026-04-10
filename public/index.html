@@ -464,11 +464,11 @@ footer{background:var(--bark);color:var(--cream);padding:4rem 1.25rem 2rem}
           <li><span aria-hidden="true">✓</span> Exact overseeding and aeration windows for fescue</li>
           <li><span aria-hidden="true">✓</span> What to do when your lawn looks dead in July (spoiler: it's probably not)</li>
         </ul>
-        <form class="lead-form" id="lead-form" novalidate aria-label="Download the calendar">
+        <form class="lead-form" id="lead-form" novalidate aria-label="Get access to KC lawn tools">
           <div class="lead-input-row">
             <label for="lead-email" class="sr-only">Email address</label>
             <input type="email" id="lead-email" name="email" placeholder="your@email.com" autocomplete="email" required />
-            <button type="submit" class="btn btn-primary">Get My Free KC Calendar &rarr;</button>
+            <button type="submit" class="btn btn-primary">Get Free Access &rarr;</button>
           </div>
           <p class="lead-note" role="status" id="lead-status" aria-live="polite"></p>
           <p class="form-fine-print" style="font-size:.75rem;color:rgba(45,27,14,.45);margin-top:.625rem">No spam. Unsubscribe anytime. Built for KC — not everywhere else. 🌿</p>
@@ -875,14 +875,14 @@ document.getElementById('lead-form').addEventListener('submit', async (e) => {
   try {
     await subscribeToKit(email);
     statusEl.style.color = 'var(--lime)';
-    statusEl.textContent = '✓ You\'re in! Check your inbox shortly.';
+    statusEl.textContent = '✓ You\'re in! Redirecting to your tools…';
     form.querySelector('[type="email"]').value = '';
+    setTimeout(() => { window.location.href = '/app'; }, 1000);
   } catch {
     statusEl.style.color = 'var(--orange)';
     statusEl.textContent = 'Something went wrong — please try again.';
-  } finally {
     btn.disabled = false;
-    btn.textContent = 'Get My Free KC Calendar \u2192';
+    btn.textContent = 'Get Free Access \u2192';
   }
 });
 
@@ -900,7 +900,7 @@ document.getElementById('footer-form').addEventListener('submit', async (e) => {
     await subscribeToKit(email);
     btn.textContent = '✓ Joined!';
     form.querySelector('[type="email"]').value = '';
-    setTimeout(() => { btn.textContent = 'Join'; btn.disabled = false; }, 3000);
+    setTimeout(() => { window.location.href = '/app'; }, 1000);
   } catch {
     btn.textContent = 'Error — retry';
     setTimeout(() => { btn.textContent = 'Join'; btn.disabled = false; }, 3000);
