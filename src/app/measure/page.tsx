@@ -38,7 +38,7 @@ export default function MeasurePage() {
     markFree(email);
     if (sqft) localStorage.setItem("tt_sqft", sqft);
     setShowModal(false);
-    router.push("/onboarding");
+    router.push("/onboarding?step=3");
   }
 
   return (

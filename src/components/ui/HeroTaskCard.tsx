@@ -15,6 +15,7 @@ interface HeroTaskCardProps {
   onMarkComplete: () => void;
   onSnooze: () => void;
   onSkip: () => void;
+  onUnlockClick?: () => void;
   snoozeCount: number;
   whyContext?: string;
 }
@@ -53,6 +54,7 @@ export default function HeroTaskCard({
   onMarkComplete,
   onSnooze,
   onSkip,
+  onUnlockClick,
   snoozeCount,
   whyContext,
 }: HeroTaskCardProps) {
@@ -107,28 +109,39 @@ export default function HeroTaskCard({
 
       {tier !== 4 && (
         <div className="mt-5 space-y-2">
-          <button
-            onClick={onMarkComplete}
-            className="w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
-          >
-            Mark Complete
-          </button>
-          <div className="flex items-center justify-center gap-4">
-            {snoozeCount < 2 && (
-              <button
-                onClick={onSnooze}
-                className="text-xs text-white/50 hover:text-white/80 transition-colors"
-              >
-                Snooze 7 Days
-              </button>
-            )}
+          {isLocked ? (
             <button
-              onClick={onSkip}
-              className="text-xs text-white/50 hover:text-white/80 transition-colors"
+              onClick={onUnlockClick}
+              className="w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
             >
-              Skip This Task
+              Unlock My Lawn Plan — $67 →
             </button>
-          </div>
+          ) : (
+            <>
+              <button
+                onClick={onMarkComplete}
+                className="w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+              >
+                Mark Complete
+              </button>
+              <div className="flex items-center justify-center gap-4">
+                {snoozeCount < 2 && (
+                  <button
+                    onClick={onSnooze}
+                    className="text-xs text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    Snooze 7 Days
+                  </button>
+                )}
+                <button
+                  onClick={onSkip}
+                  className="text-xs text-white/50 hover:text-white/80 transition-colors"
+                >
+                  Skip This Task
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 

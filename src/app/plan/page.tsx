@@ -122,6 +122,7 @@ export default function PlanPage() {
               onMarkComplete={() => {}}
               onSnooze={() => {}}
               onSkip={() => {}}
+              onUnlockClick={() => setShowModal(true)}
               snoozeCount={0}
               whyContext="Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing. Prodiamine creates a chemical barrier that prevents crabgrass seeds from germinating."
             />
@@ -129,7 +130,7 @@ export default function PlanPage() {
             {/* Stats Row */}
             <div className="flex gap-3 mt-6 overflow-x-auto pb-2">
               <StatCard label="Tasks Done" value="0 / 14" subtitle="Spring: 0 of 5" isLocked={!isPaid} />
-              <StatCard label="Saved vs. Pro" value="$373" subtitle="per year" />
+              <StatCard label="Saved vs. Pro" value="Save ~$187–$746/yr" subtitle="vs. TruGreen" />
               <StatCard label="Next Task" value="Apr 15" subtitle="Broadleaf spray" isLocked={!isPaid} />
             </div>
 

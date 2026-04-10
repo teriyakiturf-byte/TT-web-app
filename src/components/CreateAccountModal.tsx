@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 export type AccountEntryPoint = "zip-hook" | "measurement" | "faq-gate" | "plan-nudge";
 
@@ -22,42 +22,18 @@ const ENTRY_COPY: Record<AccountEntryPoint, { headline: string; sub: string }> =
     sub: "Keep your KC zone info, soil profile, and seasonal alerts. Free forever.",
   },
   measurement: {
-    headline: "Save This Measurement",
+    headline: "Save Your Lawn Size",
     sub: "Your lawn data is ready. Create a free account so you don't lose it.",
   },
   "faq-gate": {
-    headline: "Unlock All 17+ Answers",
+    headline: "Read All 17+ KC Answers",
     sub: "Create a free account to read every KC lawn care answer.",
   },
   "plan-nudge": {
-    headline: "Save Your Lawn Plan Progress",
+    headline: "Save Your Lawn Data",
     sub: "Free account. No credit card. Track your tasks and keep your data.",
   },
 };
-
-const KIT_FORM_ID = "9310262";
-
-async function subscribeToKit(email: string, zipCode?: string, lawnSqft?: number) {
-  try {
-    const fields: Record<string, string> = {};
-    if (zipCode) fields.zip_code = zipCode;
-    if (lawnSqft) fields.lawn_sqft = String(lawnSqft);
-
-    const res = await fetch(`https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        api_key: "7-a1C3cqbRDSzdf6uv6Plw",
-        email,
-        fields,
-      }),
-    });
-    return res.ok;
-  } catch {
-    // Fail silently — account still gets created locally
-    return false;
-  }
-}
 
 export default function CreateAccountModal({
   isOpen,
@@ -70,6 +46,9 @@ export default function CreateAccountModal({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const submittingRef = useRef(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const copy = ENTRY_COPY[entryPoint];
@@ -84,40 +63,87 @@ export default function CreateAccountModal({
 
   if (!isOpen) return null;
 
+  function validateEmail() {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  }
+
+  function validatePassword() {
+    if (password && password.length < 8) {
+      setPasswordError("Password must be at least 8 characters");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submittingRef.current) return;
+
+    // Validate
+    const emailValid = validateEmail();
+    const passwordValid = validatePassword();
+    if (!emailValid || !passwordValid) return;
+
     setError("");
     setLoading(true);
+    submittingRef.current = true;
 
-    // Subscribe to Kit for email nurture
-    await subscribeToKit(email, prefillData?.zipCode, prefillData?.lawnSqft);
+    try {
+      // Call server signup API (handles bcrypt hash + Kit sync)
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          zipCode: prefillData?.zipCode,
+          lawnSqft: prefillData?.lawnSqft,
+          entryPoint,
+        }),
+      });
 
-    // Save prefill data to localStorage
-    if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
-    if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
+      if (!res.ok) {
+        const data = await res.json();
+        if (data.error === "INVALID_EMAIL") setError("Please enter a valid email address");
+        else if (data.error === "PASSWORD_TOO_SHORT") setError("Password must be at least 8 characters");
+        else setError("Something went wrong. Please try again.");
+        return;
+      }
 
-    // TODO: Wire up real auth (Firebase, Supabase, etc.)
-    // For now, stub the account creation
-    await new Promise((r) => setTimeout(r, 400));
+      // Save prefill data to localStorage
+      if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
+      if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
 
-    onSuccess(email);
-    setLoading(false);
+      onSuccess(email);
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+      submittingRef.current = false;
+    }
   }
 
   async function handleGoogleAuth() {
+    if (submittingRef.current) return;
     setError("");
     setLoading(true);
+    submittingRef.current = true;
 
     // TODO: Wire up Google OAuth — for now stub
     const googleEmail = "google-user@gmail.com";
-
-    await subscribeToKit(googleEmail, prefillData?.zipCode, prefillData?.lawnSqft);
 
     if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
     if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
 
     onSuccess(googleEmail);
     setLoading(false);
+    submittingRef.current = false;
   }
 
   return (
@@ -181,23 +207,31 @@ export default function CreateAccountModal({
 
         {/* Email/Password form */}
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-            required
-            className="w-full rounded-xl border-2 border-border bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/50 focus:border-lime focus:outline-none"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-            minLength={8}
-            className="w-full rounded-xl border-2 border-border bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/50 focus:border-lime focus:outline-none"
-          />
+          <div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
+              onBlur={validateEmail}
+              placeholder="Email address"
+              required
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/50 focus:outline-none transition-colors ${emailError ? "border-orange focus:border-orange" : "border-border focus:border-lime"}`}
+            />
+            {emailError && <p className="text-xs text-orange mt-1">{emailError}</p>}
+          </div>
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setPasswordError(""); }}
+              onBlur={validatePassword}
+              placeholder="Password (8+ characters)"
+              required
+              minLength={8}
+              className={`w-full rounded-xl border-2 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-muted/50 focus:outline-none transition-colors ${passwordError ? "border-orange focus:border-orange" : "border-border focus:border-lime"}`}
+            />
+            {passwordError && <p className="text-xs text-orange mt-1">{passwordError}</p>}
+          </div>
 
           {error && (
             <p className="text-sm text-orange">{error}</p>
@@ -208,7 +242,14 @@ export default function CreateAccountModal({
             disabled={loading}
             className="w-full rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors disabled:opacity-50"
           >
-            {loading ? "Creating Account…" : "Create Free Account →"}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 size={16} className="animate-spin" />
+                Creating Account…
+              </span>
+            ) : (
+              "Create Free Account →"
+            )}
           </button>
         </form>
 
