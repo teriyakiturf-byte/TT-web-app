@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 
 export interface UserStateResult {
+  /** True while localStorage is being read on mount — use to avoid flash of wrong state */
+  loading: boolean;
   isGuest: boolean;
   isFree: boolean;
   isPaid: boolean;
@@ -17,6 +19,7 @@ export interface UserStateResult {
 }
 
 export function useUserState(): UserStateResult {
+  const [loading, setLoading] = useState(true);
   const [state, setState] = useState<"guest" | "free" | "paid">("guest");
   const [lawnSqft, setLawnSqft] = useState<number | null>(null);
   const [grassType, setGrassType] = useState<string | null>(null);
@@ -40,6 +43,8 @@ export function useUserState(): UserStateResult {
 
     const e = localStorage.getItem("tt_email");
     if (e) setEmail(e);
+
+    setLoading(false);
   }, []);
 
   function markFree(userEmail: string) {
@@ -55,6 +60,7 @@ export function useUserState(): UserStateResult {
   }
 
   return {
+    loading,
     isGuest: state === "guest",
     isFree: state === "free",
     isPaid: state === "paid",
