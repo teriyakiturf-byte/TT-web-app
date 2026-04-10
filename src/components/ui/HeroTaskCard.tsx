@@ -101,28 +101,25 @@ export default function HeroTaskCard({
             <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
           </div>
 
-          {/* Dark overlay */}
+          {/* Dark overlay + centered CTA */}
           <div
-            className="absolute inset-0 rounded-2xl z-[5]"
+            className="absolute inset-0 rounded-2xl z-[5] flex flex-col items-center justify-center px-6"
             style={{
               background: 'rgba(27, 67, 50, 0.85)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
             }}
-          />
-
-          {/* Unlock CTA above overlay */}
-          <div className="relative z-10 mt-4 text-center">
+          >
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
               <Lock size={20} className="text-white" />
             </div>
-            <p className="font-mono text-sm text-white/70">
+            <p className="font-mono text-sm text-white/70 text-center">
               Unlock to see your exact quantity
             </p>
             {tier !== 4 && (
               <button
                 onClick={onUnlockClick}
-                className="mt-3 w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+                className="mt-3 w-full max-w-sm rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
               >
                 Unlock My Lawn Plan — $67 →
               </button>

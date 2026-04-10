@@ -100,6 +100,31 @@ export default function PlanPage() {
           <SeasonPill season="winter" status="future" startDate="Nov 15" />
         </div>
 
+        {/* Lawn Info Chips — always visible, never blurred */}
+        <div className="flex flex-wrap gap-2 justify-center my-4 mb-6">
+          <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
+            Zone 6a — KC Metro
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
+            KC Heavy Clay Soil
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
+            Tall Fescue
+          </span>
+          {isPaid && lawnSqft ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
+              {lawnSqft.toLocaleString()} sq ft
+            </span>
+          ) : (
+            <a
+              href="/measure"
+              className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest hover:bg-lime/30 transition-colors"
+            >
+              Add your size →
+            </a>
+          )}
+        </div>
+
         {/* Blurred content section for non-paid users */}
         <div className="relative mt-8">
           {!isPaid && (
