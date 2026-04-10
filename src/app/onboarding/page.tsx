@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Nav from "@/components/Nav";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import EmptyStateCard from "@/components/ui/EmptyStateCard";
 import type { GrassType } from "@/types";
 
 const KC_ZIPS = [
@@ -19,25 +20,27 @@ const KC_ZIPS = [
   "66220","66221","66223","66224","66226","66227",
 ];
 
-const GRASS_OPTIONS: { value: GrassType; label: string; note?: string }[] = [
-  { value: "tall-fescue", label: "Tall Fescue", note: "Most KC lawns are Tall Fescue" },
-  { value: "kentucky-bluegrass", label: "Kentucky Bluegrass" },
-  { value: "zoysia", label: "Zoysia" },
-  { value: "buffalo-grass", label: "Buffalo Grass" },
-  { value: "mixed-unsure", label: "Mixed / Not Sure", note: "We'll default to Tall Fescue rates" },
+const GRASS_OPTIONS: {
+  value: GrassType;
+  label: string;
+  desc: string;
+  fullWidth?: boolean;
+}[] = [
+  { value: "tall-fescue", label: "Tall Fescue", desc: "Most KC lawns" },
+  { value: "kentucky-bluegrass", label: "Kentucky Bluegrass", desc: "Full sun areas" },
+  { value: "zoysia", label: "Zoysia", desc: "Warm season patches" },
+  { value: "buffalo-grass", label: "Buffalo Grass", desc: "Low maintenance" },
+  { value: "mixed-unsure", label: "Mixed / Not Sure", desc: "We'll use Tall Fescue as your base", fullWidth: true },
 ];
 
 function OnboardingWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Read ?step= from URL, default to 1
   const initialStep = Number(searchParams.get("step")) || 1;
   const clampedStep = Math.min(Math.max(initialStep, 1), 3);
 
   const [currentStep, setCurrentStep] = useState(clampedStep);
-
-  // Prefill from localStorage (user may have entered ZIP or sqft already)
   const [zip, setZip] = useState("");
   const [grassType, setGrassType] = useState<GrassType>("tall-fescue");
   const [lawnSqft, setLawnSqft] = useState("");
@@ -59,9 +62,14 @@ function OnboardingWizard() {
 
   const isKC = zip.length === 5 && KC_ZIPS.includes(zip);
   const zipValid = zip.length === 5;
+  const sqftNum = Number(lawnSqft);
+  const sqftValid = sqftNum > 0;
+
+  // Savings calculation for step 3
+  const annualSavings = sqftValid ? Math.round((sqftNum / 5000) * 373) : 0;
+  const fiveYearSavings = annualSavings * 5;
 
   function handleNext() {
-    // Save current step data before advancing
     if (currentStep === 1 && zip) {
       localStorage.setItem("tt_zip", zip);
     }
@@ -76,17 +84,15 @@ function OnboardingWizard() {
   }
 
   function handleFinish() {
-    // Save all data
     if (zip) localStorage.setItem("tt_zip", zip);
     localStorage.setItem("tt_grass", grassType);
-    if (lawnSqft && Number(lawnSqft) > 0) {
+    if (sqftValid) {
       localStorage.setItem("tt_sqft", lawnSqft);
     }
     router.push("/plan");
   }
 
   function handleSkipSize() {
-    // Save ZIP and grass, skip lawn size
     if (zip) localStorage.setItem("tt_zip", zip);
     localStorage.setItem("tt_grass", grassType);
     router.push("/plan");
@@ -163,17 +169,28 @@ function OnboardingWizard() {
               </p>
             )}
 
-            <button
-              onClick={handleNext}
-              disabled={!zipValid}
-              className="w-full rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors disabled:opacity-50"
-            >
-              {isKC ? "Yes, That's Me — Next →" : "Next →"}
-            </button>
+            <div>
+              <button
+                onClick={handleNext}
+                disabled={!zipValid}
+                className={`w-full rounded-xl px-6 py-3 font-display text-lg text-white uppercase tracking-wider transition-colors ${
+                  zipValid
+                    ? "bg-lime hover:bg-lime/90 cursor-pointer"
+                    : "bg-lime/40 cursor-not-allowed"
+                }`}
+              >
+                {isKC ? "Yes, That's Me — Next →" : "Next →"}
+              </button>
+              {!zipValid && (
+                <p className="text-xs text-muted text-center mt-2">
+                  Enter your ZIP code above to continue
+                </p>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Step 2: Grass Type Selection */}
+        {/* Step 2: Grass Type Selection — 2x2 grid */}
         {currentStep === 2 && (
           <div className="space-y-6">
             <div className="text-center">
@@ -185,12 +202,14 @@ function OnboardingWizard() {
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3">
               {GRASS_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setGrassType(opt.value)}
-                  className={`w-full rounded-xl border-2 px-4 py-3 text-left transition-colors ${
+                  className={`rounded-xl border-2 px-4 py-3 text-left transition-colors ${
+                    opt.fullWidth ? "col-span-2" : ""
+                  } ${
                     grassType === opt.value
                       ? "border-lime bg-lime-light"
                       : "border-border bg-white hover:bg-cream"
@@ -199,9 +218,7 @@ function OnboardingWizard() {
                   <p className="text-sm font-medium text-charcoal">
                     {opt.label}
                   </p>
-                  {opt.note && grassType === opt.value && (
-                    <p className="text-xs text-muted mt-0.5">{opt.note}</p>
-                  )}
+                  <p className="text-xs text-muted mt-0.5">{opt.desc}</p>
                 </button>
               ))}
             </div>
@@ -223,7 +240,7 @@ function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 3: Lawn Size */}
+        {/* Step 3: Lawn Size — inline measurement */}
         {currentStep === 3 && (
           <div className="space-y-6">
             <div className="text-center">
@@ -237,12 +254,7 @@ function OnboardingWizard() {
 
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => {
-                  // Save progress before navigating away
-                  if (zip) localStorage.setItem("tt_zip", zip);
-                  localStorage.setItem("tt_grass", grassType);
-                  router.push("/measure");
-                }}
+                onClick={() => setSizeMethod("draw")}
                 className={`rounded-xl border-2 p-4 text-center transition-colors ${
                   sizeMethod === "draw"
                     ? "border-lime bg-lime-light"
@@ -267,6 +279,22 @@ function OnboardingWizard() {
               </button>
             </div>
 
+            {/* Draw It — inline map (or fallback) */}
+            {sizeMethod === "draw" && (
+              <div className="rounded-2xl overflow-hidden border border-border bg-white">
+                <div className="aspect-[4/3] flex items-center justify-center p-6">
+                  <EmptyStateCard
+                    variant="measurement"
+                    headline="Map Loading Soon"
+                    body="Google Maps integration is being configured. Use manual entry for now."
+                    ctaLabel="Enter Size Manually"
+                    onCtaClick={() => setSizeMethod("manual")}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Manual input */}
             {sizeMethod === "manual" && (
               <div className="rounded-xl border border-border bg-white p-4">
                 <label className="font-mono text-xs text-muted uppercase tracking-wide block mb-1">
@@ -279,28 +307,52 @@ function OnboardingWizard() {
                   placeholder="e.g. 5000"
                   className="w-full rounded-lg border-2 border-border bg-cream px-4 py-2 font-mono text-lg text-center focus:border-lime focus:outline-none transition-colors"
                 />
-                {lawnSqft && Number(lawnSqft) > 0 && (
-                  <p className="text-xs text-lime text-center mt-2">
-                    {Number(lawnSqft).toLocaleString()} sq ft — got it
-                  </p>
-                )}
               </div>
             )}
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleBack}
-                className="rounded-xl border-2 border-border px-4 py-3 font-display text-sm text-muted uppercase tracking-wider hover:bg-cream transition-colors"
-              >
-                ← Back
-              </button>
-              <button
-                onClick={handleFinish}
-                disabled={!lawnSqft || Number(lawnSqft) <= 0}
-                className="flex-1 rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors disabled:opacity-50"
-              >
-                Finish Setup →
-              </button>
+            {/* Savings preview — shows when sqft is valid */}
+            {sqftValid && (
+              <div className="rounded-xl bg-forest p-4 text-white text-center">
+                <p className="text-sm text-white/70">
+                  With a {sqftNum.toLocaleString()} sq ft lawn:
+                </p>
+                <p className="mt-1">
+                  <span className="font-display text-[28px] text-lime">
+                    ~${annualSavings}
+                  </span>
+                  <span className="text-sm text-white/70">/yr saved vs. TruGreen</span>
+                </p>
+                <p className="text-xs text-white/50 mt-1">
+                  ~${fiveYearSavings.toLocaleString()} over 5 years
+                </p>
+              </div>
+            )}
+
+            <div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBack}
+                  className="rounded-xl border-2 border-border px-4 py-3 font-display text-sm text-muted uppercase tracking-wider hover:bg-cream transition-colors"
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={handleFinish}
+                  disabled={!sqftValid}
+                  className={`flex-1 rounded-xl px-6 py-3 font-display text-lg text-white uppercase tracking-wider transition-colors ${
+                    sqftValid
+                      ? "bg-orange hover:bg-orange/90 cursor-pointer"
+                      : "bg-orange/40 cursor-not-allowed"
+                  }`}
+                >
+                  Finish Setup →
+                </button>
+              </div>
+              {!sqftValid && (
+                <p className="text-xs text-muted text-center mt-2">
+                  Select a method and enter your lawn size to continue
+                </p>
+              )}
             </div>
 
             <button
