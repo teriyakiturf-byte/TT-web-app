@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { X, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { X, Check, Loader2 } from "lucide-react";
 
 interface UnlockModalProps {
   lawnSqft?: number;
@@ -16,6 +16,7 @@ export default function UnlockModal({
   onClose,
   onStripeCheckout,
 }: UnlockModalProps) {
+  const [loading, setLoading] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,10 +78,21 @@ export default function UnlockModal({
         </ul>
 
         <button
-          onClick={onStripeCheckout}
-          className="mt-6 w-full rounded-xl bg-orange px-6 py-4 font-display text-xl text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+          onClick={() => {
+            setLoading(true);
+            onStripeCheckout();
+          }}
+          disabled={loading}
+          className="mt-6 w-full rounded-xl bg-orange px-6 py-4 font-display text-xl text-white uppercase tracking-wider hover:bg-orange/90 transition-colors disabled:opacity-70"
         >
-          Unlock My KC Lawn Plan — $67 →
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 size={20} className="animate-spin" />
+              Redirecting to Checkout…
+            </span>
+          ) : (
+            "Unlock My KC Lawn Plan — $67 →"
+          )}
         </button>
 
         <p className="font-mono text-[10px] text-muted text-center mt-3">

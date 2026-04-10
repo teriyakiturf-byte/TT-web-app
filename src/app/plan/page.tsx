@@ -67,15 +67,43 @@ function formatQuantity(
 
 export default function PlanPage() {
   const [showModal, setShowModal] = useState(false);
-  const { isPaid, lawnSqft, markPaid } = useUserState();
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const { isPaid, lawnSqft, email } = useUserState();
 
   const navState = isPaid ? "paid" : "free";
 
-  function handleStripeCheckout() {
-    // TODO: Wire up Stripe checkout
-    markPaid();
-    setShowModal(false);
-    window.location.href = "/thank-you";
+  async function handleStripeCheckout() {
+    if (checkoutLoading) return;
+    setCheckoutLoading(true);
+
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email || undefined,
+          lawnSqft: lawnSqft || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        if (data.error === "STRIPE_NOT_CONFIGURED") {
+          // Stripe not set up yet — fallback to stub
+          alert("Stripe is not configured yet. Payment will be available soon.");
+        }
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const { checkoutUrl } = await res.json();
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+      setCheckoutLoading(false);
+    }
   }
 
   return (
