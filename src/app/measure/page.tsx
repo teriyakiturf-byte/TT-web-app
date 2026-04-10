@@ -29,8 +29,8 @@ export default function MeasurePage() {
     if (isGuest) {
       setShowModal(true);
     } else {
-      // Already has account — go to onboarding or plan
-      router.push("/onboarding");
+      // Already has account — go straight to plan
+      router.push("/plan");
     }
   }
 
@@ -149,7 +149,7 @@ export default function MeasurePage() {
               onClick={handleSaveCta}
               className="block w-full text-center rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
             >
-              Save This Measurement — Create Free Account →
+              {isGuest ? "Save This Measurement — Create Free Account →" : "Save & See My Plan →"}
             </button>
           </div>
         )}
