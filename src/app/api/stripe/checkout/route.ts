@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -9,6 +11,14 @@ function getStripe() {
 
 export async function POST(req: NextRequest) {
   try {
+    const authSession = await getServerSession(authOptions);
+    if (!authSession) {
+      return NextResponse.json(
+        { error: "UNAUTHORIZED" },
+        { status: 401 }
+      );
+    }
+
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(
         { error: "STRIPE_NOT_CONFIGURED" },
