@@ -1,9 +1,12 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -18,38 +21,64 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Replace with your actual DB query:
-        // const user = await db.user.findUnique({
-        //   where: { email: credentials.email }
-        // })
-        // if (!user) return null
-        // const valid = await bcrypt.compare(
-        //   credentials.password,
-        //   user.password_hash
-        // )
-        // if (!valid) return null
-        // return user
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
 
-        return null; // placeholder until DB connected
+        if (!user || !user.passwordHash) return null;
+
+        const valid = await bcrypt.compare(
+          credentials.password,
+          user.passwordHash
+        );
+        if (!valid) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
-        token.plan_purchased = (user as any).plan_purchased;
-        token.lawn_sqft = (user as any).lawn_sqft;
       }
+
+      // On every token refresh, fetch latest plan status from DB
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            planPurchased: true,
+            lawnSqft: true,
+            grassType: true,
+            zip: true,
+          },
+        });
+        if (dbUser) {
+          token.planPurchased = dbUser.planPurchased;
+          token.lawnSqft = dbUser.lawnSqft;
+          token.grassType = dbUser.grassType;
+          token.zip = dbUser.zip;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id as string;
-        (session.user as any).plan_purchased =
-          token.plan_purchased as boolean;
-        (session.user as any).lawn_sqft =
-          token.lawn_sqft as number | null;
+        (session.user as any).planPurchased =
+          token.planPurchased as boolean;
+        (session.user as any).lawnSqft =
+          token.lawnSqft as number | null;
+        (session.user as any).grassType =
+          token.grassType as string | null;
+        (session.user as any).zip = token.zip as string | null;
       }
       return session;
     },

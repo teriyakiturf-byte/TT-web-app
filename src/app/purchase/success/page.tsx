@@ -4,12 +4,10 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Loader2 } from "lucide-react";
 import Nav from "@/components/Nav";
-import { useUserState } from "@/hooks/useUserState";
 
 function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { markPaid } = useUserState();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
 
   const sessionId = searchParams.get("session_id");
@@ -20,14 +18,12 @@ function SuccessContent() {
       return;
     }
 
-    // Verify the checkout session server-side
     async function verifyPayment() {
       try {
         const res = await fetch(`/api/stripe/verify?session_id=${sessionId}`);
         if (res.ok) {
           const data = await res.json();
           if (data.paid) {
-            markPaid();
             setStatus("success");
           } else {
             setStatus("error");
@@ -41,7 +37,7 @@ function SuccessContent() {
     }
 
     verifyPayment();
-  }, [sessionId, markPaid]);
+  }, [sessionId]);
 
   if (status === "verifying") {
     return (

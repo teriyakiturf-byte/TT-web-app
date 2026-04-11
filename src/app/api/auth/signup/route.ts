@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { syncEmailToKit } from "@/lib/kit";
 
 export async function POST(req: NextRequest) {
@@ -23,38 +24,46 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Hash password (bcryptjs — NOT bcrypt native module)
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // 3. Check if email already exists
+    const existing = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "EMAIL_EXISTS" },
+        { status: 409 }
+      );
+    }
 
-    // 4. Create user record
-    // TODO: Replace with real database (Supabase, Prisma, etc.)
-    // For now, generate a stub user ID
-    const userId = `user_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    // 4. Hash password (bcryptjs — NOT bcrypt native module)
+    const passwordHash = await bcrypt.hash(password, 12);
 
-    // Store user data — stub implementation
-    // In production: INSERT INTO users (id, email, password_hash, zip, sqft, ...)
-    const user = {
-      id: userId,
-      email,
-      passwordHash: hashedPassword,
-      zipCode: zipCode || null,
-      lawnSqft: lawnSqft || null,
-      planPurchased: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    // 5. Sync to Kit (wrapped in try/catch — Kit failure does NOT block signup)
-    await syncEmailToKit(email, entryPoint || "direct", {
-      zipCode,
-      lawnSqft,
+    // 5. Create user in database
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        zip: zipCode || null,
+        lawnSqft: lawnSqft ? Number(lawnSqft) : null,
+      },
     });
 
-    // 6. Return user (without password hash)
+    // 6. Sync to Kit (wrapped in try/catch — Kit failure does NOT block signup)
+    try {
+      await syncEmailToKit(email, entryPoint || "direct", {
+        zipCode,
+        lawnSqft,
+      });
+    } catch {
+      console.warn("Kit sync failed for", email);
+    }
+
+    // 7. Return user (without password hash)
     return NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
-        zipCode: user.zipCode,
+        zip: user.zip,
         lawnSqft: user.lawnSqft,
       },
     });
