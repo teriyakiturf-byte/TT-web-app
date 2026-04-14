@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import TaskRow from "@/components/ui/TaskRow";
 import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask } from "@/types";
 import { calculateQuantity } from "@/types";
+
+const STORAGE_KEY = "tt_task_completions";
 
 const FULL_PLAN: LawnTask[] = [
   // March
@@ -241,16 +244,37 @@ function formatQuantity(lawnSqft: number | null, labelRate: number): string {
   return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
 }
 
+function loadSavedCompletions(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
 export default function ChecklistPage() {
   const router = useRouter();
-  const { isPaid, lawnSqft } = useUserState();
-  const [tasks, setTasks] = useState<LawnTask[]>(FULL_PLAN);
+  const { isPaid, isFree, isGuest, loading, lawnSqft } = useUserState();
+
+  const [tasks, setTasks] = useState<LawnTask[]>(() => {
+    const saved = loadSavedCompletions();
+    return FULL_PLAN.map((t) => ({ ...t, isComplete: saved[t.id] ?? false }));
+  });
   const [filter, setFilter] = useState<FilterType>("all");
 
-  // Redirect non-paid users
-  if (!isPaid && typeof window !== "undefined") {
-    const stored = localStorage.getItem("tt_user_state");
-    if (stored !== "paid") {
+  // Persist completions to localStorage
+  useEffect(() => {
+    const completions: Record<string, boolean> = {};
+    tasks.forEach((t) => { completions[t.id] = t.isComplete; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(completions));
+  }, [tasks]);
+
+  // Route protection: guest → /, free → /plan
+  if (!loading && !isPaid && typeof window !== "undefined") {
+    if (isGuest) {
+      router.push("/");
+    } else if (isFree) {
       router.push("/plan");
     }
   }
@@ -294,6 +318,27 @@ export default function ChecklistPage() {
             ? `${lawnSqft.toLocaleString()} sq ft · Zone 6a · All quantities calculated for your lawn`
             : "Zone 6a · Add your lawn size to see exact quantities"}
         </p>
+
+        {/* Navigation Tabs */}
+        <div className="flex gap-1 mt-6 border-b border-border overflow-x-auto">
+          {[
+            { label: "Overview", href: "/dashboard", active: false },
+            { label: "Checklist", href: "/checklist", active: true },
+            { label: "Calendar", href: "/calendar", active: false },
+          ].map((tab) => (
+            <Link
+              key={tab.label}
+              href={tab.href}
+              className={`flex-shrink-0 px-4 py-2 font-display text-sm uppercase tracking-wider transition-colors ${
+                tab.active
+                  ? "text-forest border-b-2 border-lime -mb-px"
+                  : "text-muted hover:text-forest"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
 
         {/* Progress bar */}
         <div className="mt-6 rounded-xl border border-border bg-white p-4">
@@ -370,12 +415,12 @@ export default function ChecklistPage() {
 
         {/* Back to dashboard */}
         <div className="mt-8 mb-8 text-center">
-          <a
+          <Link
             href="/dashboard"
             className="inline-flex items-center gap-2 text-sm text-lime hover:text-forest transition-colors"
           >
             ← Back to Dashboard
-          </a>
+          </Link>
         </div>
       </main>
     </>

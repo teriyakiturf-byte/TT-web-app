@@ -7,6 +7,8 @@ interface StatCardProps {
   value: string;
   subtitle?: string;
   isLocked?: boolean;
+  /** 0–100 progress bar shown below value */
+  progress?: number;
 }
 
 export default function StatCard({
@@ -14,6 +16,7 @@ export default function StatCard({
   value,
   subtitle,
   isLocked,
+  progress,
 }: StatCardProps) {
   return (
     <div className="min-w-[140px] flex-shrink-0 rounded-xl border border-border bg-white p-4">
@@ -28,6 +31,14 @@ export default function StatCard({
       ) : (
         <>
           <p className="font-display text-stat text-forest">{value}</p>
+          {progress !== undefined && (
+            <div className="h-1.5 rounded-full bg-lime-light overflow-hidden mt-1.5">
+              <div
+                className="h-full rounded-full bg-lime transition-all duration-500"
+                style={{ width: `${Math.min(progress, 100)}%` }}
+              />
+            </div>
+          )}
           {subtitle && (
             <p className="text-xs text-muted mt-0.5">{subtitle}</p>
           )}

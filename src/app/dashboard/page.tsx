@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import HeroTaskCard from "@/components/ui/HeroTaskCard";
 import StatCard from "@/components/ui/StatCard";
@@ -9,9 +10,12 @@ import TaskRow from "@/components/ui/TaskRow";
 import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
-import type { LawnTask } from "@/types";
+import type { LawnTask, ToastType } from "@/types";
 import { calculateSavings, calculateQuantity } from "@/types";
+
+const STORAGE_KEY = "tt_task_completions";
 
 const PLAN_TASKS: LawnTask[] = [
   {
@@ -144,10 +148,31 @@ function formatQuantity(lawnSqft: number | null, labelRate: number): string {
   return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
 }
 
+function loadSavedCompletions(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { isPaid, isFree, isGuest, loading, lawnSqft, grassType } = useUserState();
-  const [tasks, setTasks] = useState<LawnTask[]>(PLAN_TASKS);
+
+  const [tasks, setTasks] = useState<LawnTask[]>(() => {
+    const saved = loadSavedCompletions();
+    return PLAN_TASKS.map((t) => ({ ...t, isComplete: saved[t.id] ?? false }));
+  });
+  const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
+
+  // Persist completions to localStorage
+  useEffect(() => {
+    const completions: Record<string, boolean> = {};
+    tasks.forEach((t) => { completions[t.id] = t.isComplete; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(completions));
+  }, [tasks]);
 
   // Route protection: guest → /, free → /plan, paid → stay
   if (!loading && !isPaid && typeof window !== "undefined") {
@@ -164,6 +189,7 @@ export default function DashboardPage() {
 
   const completedCount = tasks.filter((t) => t.isComplete).length;
   const totalCount = tasks.length;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const savings = lawnSqft ? calculateSavings(lawnSqft) : null;
 
   const heroTask = tasks
@@ -174,13 +200,25 @@ export default function DashboardPage() {
     .filter((t) => !t.isComplete && t.id !== heroTask?.id)
     .slice(0, 5);
 
+  // Count distinct products with labelRate > 0 that aren't complete
+  const productsNeeded = new Set(
+    tasks.filter((t) => !t.isComplete && t.labelRate > 0).map((t) => t.productName)
+  ).size;
+
   function toggleTask(taskId: string) {
     setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, isComplete: !t.isComplete } : t
-      )
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+        const next = { ...t, isComplete: !t.isComplete };
+        if (next.isComplete) {
+          setToast({ type: "success", message: `✓ ${t.name} — marked complete` });
+        }
+        return next;
+      })
     );
   }
+
+  const handleDismissToast = useCallback(() => setToast(null), []);
 
   function handleMarkComplete() {
     if (heroTask) toggleTask(heroTask.id);
@@ -205,6 +243,7 @@ export default function DashboardPage() {
           t.id === heroTask.id ? { ...t, isComplete: true } : t
         )
       );
+      setToast({ type: "success", message: `Skipped: ${heroTask.name}` });
     }
   }
 
@@ -242,6 +281,27 @@ export default function DashboardPage() {
             </a>
           )}
           <LawnInfoChip type="soil" value="Heavy Clay" />
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex gap-1 mt-6 border-b border-border overflow-x-auto">
+          {[
+            { label: "Overview", href: "/dashboard", active: true },
+            { label: "Checklist", href: "/checklist", active: false },
+            { label: "Calendar", href: "/calendar", active: false },
+          ].map((tab) => (
+            <Link
+              key={tab.label}
+              href={tab.href}
+              className={`flex-shrink-0 px-4 py-2 font-display text-sm uppercase tracking-wider transition-colors ${
+                tab.active
+                  ? "text-forest border-b-2 border-lime -mb-px"
+                  : "text-muted hover:text-forest"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
         </div>
 
         {/* Prompt to add lawn size if missing */}
@@ -310,11 +370,17 @@ export default function DashboardPage() {
             label="Tasks Done"
             value={`${completedCount} / ${totalCount}`}
             subtitle={`Spring: ${springCompleted} of ${springTasks.length}`}
+            progress={progressPercent}
+          />
+          <StatCard
+            label="Products Needed"
+            value={`${productsNeeded}`}
+            subtitle="distinct products to buy"
           />
           <StatCard
             label="DIY Savings"
             value={savings ? `$${savings.annualSavings}/yr` : "—"}
-            subtitle={savings ? `$${savings.fiveYearSavings} over 5 years` : "Add lawn size"}
+            subtitle={savings ? `$${savings.fiveYearSavings} over 5 yrs` : "Add lawn size"}
           />
           <StatCard
             label="Next Task"
@@ -416,22 +482,30 @@ export default function DashboardPage() {
 
         {/* Quick Links */}
         <div className="mt-8 grid grid-cols-2 gap-3 mb-8">
-          <a
+          <Link
             href="/checklist"
             className="rounded-xl border border-border bg-white p-4 text-center hover:bg-cream transition-colors"
           >
             <p className="font-display text-lg text-forest">Full Checklist</p>
             <p className="text-xs text-muted mt-1">All tasks by month</p>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/calendar"
             className="rounded-xl border border-border bg-white p-4 text-center hover:bg-cream transition-colors"
           >
             <p className="font-display text-lg text-forest">Calendar View</p>
             <p className="text-xs text-muted mt-1">Visual schedule</p>
-          </a>
+          </Link>
         </div>
       </main>
+
+      {toast && (
+        <ToastNotification
+          type={toast.type}
+          message={toast.message}
+          onDismiss={handleDismissToast}
+        />
+      )}
     </>
   );
 }
