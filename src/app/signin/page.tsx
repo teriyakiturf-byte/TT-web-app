@@ -126,7 +126,7 @@ export default function SignInPage() {
 
           <p className="text-xs text-muted mt-4 text-center">
             Don&apos;t have an account?{" "}
-            <Link href="/plan" className="text-lime hover:text-forest underline">
+            <Link href="/onboarding" className="text-lime hover:text-forest underline">
               Create one free
             </Link>
           </p>
