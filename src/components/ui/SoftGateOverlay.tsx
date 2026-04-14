@@ -34,10 +34,10 @@ export default function SoftGateOverlay({
             : " Built for your Zone 6a lawn."}
         </p>
         <button className="mt-4 w-full rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors">
-          Unlock My Lawn Plan — $67 →
+          Unlock My Lawn Plan — $47/year →
         </button>
         <p className="font-mono text-[10px] text-white/50 mt-2">
-          One-time payment · Lifetime access · No subscription ever
+          Billed annually · Cancel anytime
         </p>
       </div>
     </div>

@@ -88,7 +88,7 @@ function SuccessContent() {
       </button>
 
       <p className="font-mono text-[10px] text-muted mt-4">
-        Lifetime access · No subscription · No renewals
+        Annual plan · Cancel anytime
       </p>
     </div>
   );

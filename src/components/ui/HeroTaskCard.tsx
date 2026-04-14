@@ -124,7 +124,7 @@ export default function HeroTaskCard({
                 onClick={onUnlockClick}
                 className="mt-3 w-full max-w-sm rounded-xl bg-orange px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
               >
-                Unlock My Lawn Plan — $67 →
+                Unlock My Lawn Plan — $47/year →
               </button>
             )}
           </div>
@@ -170,7 +170,7 @@ export default function HeroTaskCard({
                 onClick={onUnlockClick}
                 className="mt-3 w-full rounded-xl bg-orange px-6 py-3 font-display text-[16px] text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
               >
-                Unlock for $67 — Lifetime →
+                Unlock for $47/year →
               </button>
             )}
           </div>

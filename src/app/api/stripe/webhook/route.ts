@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
                   typeof session.payment_intent === "string"
                     ? session.payment_intent
                     : null,
-                amount: session.amount_total ?? 6700,
-                productType: metadata?.productType ?? "lawn_plan_lifetime",
+                amount: session.amount_total ?? 4700,
+                productType: metadata?.productType ?? "lawn_plan_annual",
                 lawnSqft: metadata?.lawnSqft
                   ? Number(metadata.lawnSqft)
                   : null,

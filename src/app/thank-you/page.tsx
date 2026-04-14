@@ -61,7 +61,7 @@ export default function ThankYouPage() {
               "Product quantities calculated for your lawn size",
               "KC soil temp triggers built into every task",
               "Seasonal alerts and soil temp triggers",
-              "Lifetime access — no subscription, no renewals",
+              "Annual plan — cancel anytime",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2">
                 <Check

@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "payment",
+      mode: "subscription",
       line_items: [
         {
           price_data: {
@@ -55,16 +55,19 @@ export async function POST(req: NextRequest) {
               description:
                 "Full-year personalized lawn care plan. " +
                 "Zone 6a timing. KC clay soil. Soil temp " +
-                "triggers built in. Lifetime access.",
+                "triggers built in.",
             },
-            unit_amount: 6700, // $67.00 in cents
+            unit_amount: 4700, // $47.00 in cents
+            recurring: {
+              interval: "year",
+            },
           },
           quantity: 1,
         },
       ],
       metadata: {
         userId,
-        productType: "lawn_plan_lifetime",
+        productType: "lawn_plan_annual",
         lawnSqft: lawnSqft ? String(lawnSqft) : "",
       },
       success_url: `${baseUrl}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,

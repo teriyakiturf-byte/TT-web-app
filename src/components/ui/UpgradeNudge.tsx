@@ -38,7 +38,7 @@ export default function UpgradeNudge({
             onClick={onUnlockClick}
             className="mt-3 rounded-xl bg-orange px-5 py-2 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
           >
-            Unlock for $67 — lifetime access →
+            Unlock for $47/year →
           </button>
         </div>
       </div>

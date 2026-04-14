@@ -172,7 +172,7 @@ export default function PlanPage() {
               onClick={() => setShowModal(true)}
               className="rounded-full bg-orange px-4 py-1.5 font-display text-xs text-white uppercase tracking-wider hover:bg-orange/90 transition-colors whitespace-nowrap"
             >
-              Unlock Full Plan — $67 →
+              Unlock Full Plan — $47/year →
             </button>
           </div>
         )}
@@ -253,7 +253,7 @@ export default function PlanPage() {
           <div className="mt-8">
             <UpgradeNudge
               headline="See Exact Quantities"
-              body="Unlock your personalized plan with product quantities calculated for your exact lawn size. One-time $67 payment, lifetime access."
+              body="Unlock your personalized plan with product quantities calculated for your exact lawn size. $47/year, cancel anytime."
               onUnlockClick={() => setShowModal(true)}
             />
           </div>
@@ -268,14 +268,14 @@ export default function PlanPage() {
                   Unlock Your Full Plan
                 </p>
                 <p className="font-mono text-xs text-white/60">
-                  One-time $67 · Lifetime access
+                  $47/year · Cancel anytime
                 </p>
               </div>
               <button
                 onClick={() => setShowModal(true)}
                 className="rounded-xl bg-orange px-5 py-2.5 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
               >
-                Unlock — $67 →
+                Unlock — $47/year →
               </button>
             </div>
           </div>
