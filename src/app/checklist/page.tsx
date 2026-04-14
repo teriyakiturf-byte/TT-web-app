@@ -71,7 +71,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "April",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["summer-window"],
+    complianceBadges: ["apply-before-may"],
     taskType: "weed-pest",
   },
   // May
