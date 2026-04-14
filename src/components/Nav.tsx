@@ -2,14 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 
 interface NavProps {
   userState?: "guest" | "free" | "paid";
 }
 
-export default function Nav({ userState = "guest" }: NavProps) {
+export default function Nav({ userState: userStateProp }: NavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data: session } = useSession();
+
+  // Session takes priority over prop
+  const isLoggedIn = !!session?.user;
+  const isPaid = isLoggedIn && !!(session.user as any).planPurchased;
+
+  const userState = isLoggedIn
+    ? isPaid
+      ? "paid"
+      : "free"
+    : userStateProp ?? "guest";
 
   return (
     <nav className="sticky top-0 z-40 bg-forest text-white">
@@ -42,16 +54,31 @@ export default function Nav({ userState = "guest" }: NavProps) {
               </Link>
             </>
           )}
-          {userState === "guest" ? (
+          <Link
+            href="/faq"
+            className="text-sm text-white/80 hover:text-white transition-colors"
+          >
+            FAQ
+          </Link>
+          {isLoggedIn ? (
             <>
-              <Link
-                href="/faq"
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-sm text-white/80 hover:text-white transition-colors"
               >
-                FAQ
-              </Link>
+                Sign Out
+              </button>
               <Link
                 href="/plan"
+                className="rounded-full bg-orange px-4 py-1.5 text-sm font-display uppercase tracking-wider hover:bg-orange/90 transition-colors"
+              >
+                {isPaid ? "My Plan" : "Unlock Plan"}
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/signin"
                 className="text-sm text-white/80 hover:text-white transition-colors"
               >
                 Sign In
@@ -63,13 +90,6 @@ export default function Nav({ userState = "guest" }: NavProps) {
                 Get My Plan
               </Link>
             </>
-          ) : (
-            <Link
-              href="/plan"
-              className="rounded-full bg-orange px-4 py-1.5 text-sm font-display uppercase tracking-wider hover:bg-orange/90 transition-colors"
-            >
-              {userState === "free" ? "Unlock Plan" : "My Plan"}
-            </Link>
           )}
         </div>
 
@@ -102,8 +122,15 @@ export default function Nav({ userState = "guest" }: NavProps) {
           <Link href="/faq" className="block py-2 text-sm text-white/80">
             FAQ
           </Link>
-          {userState === "guest" && (
-            <Link href="/plan" className="block py-2 text-sm text-white/80">
+          {isLoggedIn ? (
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="block py-2 text-sm text-white/80 text-left"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <Link href="/signin" className="block py-2 text-sm text-white/80">
               Sign In
             </Link>
           )}
@@ -111,11 +138,11 @@ export default function Nav({ userState = "guest" }: NavProps) {
             href="/plan"
             className="block w-full text-center rounded-full bg-orange px-4 py-2 text-sm font-display uppercase tracking-wider mt-2"
           >
-            {userState === "guest"
+            {!isLoggedIn
               ? "Get My Plan"
-              : userState === "free"
-              ? "Unlock Plan"
-              : "My Plan"}
+              : isPaid
+              ? "My Plan"
+              : "Unlock Plan"}
           </Link>
         </div>
       )}
