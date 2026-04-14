@@ -3,11 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-03-25.dahlia",
-  });
-}
+// Module-level singleton — initialized once, reused across requests
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2026-03-25.dahlia",
+    })
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,14 +20,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    if (!stripe) {
       return NextResponse.json(
         { error: "STRIPE_NOT_CONFIGURED" },
         { status: 503 }
       );
     }
-
-    const stripe = getStripe();
 
     const body = await req.json();
     const { lawnSqft } = body;
@@ -34,12 +33,6 @@ export async function POST(req: NextRequest) {
     // Use server-verified email — never trust client-sent email for Stripe
     const userEmail = authSession.user.email;
     const userId = (authSession.user as any).id as string;
-
-    console.log("Checkout session user:", {
-      id: userId,
-      email: userEmail,
-      planPurchased: (authSession.user as any).planPurchased,
-    });
 
     const baseUrl = process.env.NEXTAUTH_URL || "https://teriyakiturf.com";
 
