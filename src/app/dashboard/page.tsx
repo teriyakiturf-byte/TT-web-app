@@ -99,7 +99,7 @@ const PLAN_TASKS: LawnTask[] = [
     id: "t6",
     name: "Grub Preventative",
     productName: "GrubEx (Chlorantraniliprole)",
-    labelRate: 1.1,
+    labelRate: 2.9,
     applicationNotes: "Apply preventative before grub eggs hatch. Water in well.",
     tier: 3,
     dueDate: "May 15",
@@ -281,27 +281,6 @@ export default function DashboardPage() {
             </a>
           )}
           <LawnInfoChip type="soil" value="Heavy Clay" />
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex gap-1 mt-6 border-b border-border overflow-x-auto">
-          {[
-            { label: "Overview", href: "/dashboard", active: true },
-            { label: "Checklist", href: "/checklist", active: false },
-            { label: "Calendar", href: "/calendar", active: false },
-          ].map((tab) => (
-            <Link
-              key={tab.label}
-              href={tab.href}
-              className={`flex-shrink-0 px-4 py-2 font-display text-sm uppercase tracking-wider transition-colors ${
-                tab.active
-                  ? "text-forest border-b-2 border-lime -mb-px"
-                  : "text-muted hover:text-forest"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
         </div>
 
         {/* Prompt to add lawn size if missing */}

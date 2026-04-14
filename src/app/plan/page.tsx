@@ -11,6 +11,7 @@ import StatCard from "@/components/ui/StatCard";
 import SeasonPill from "@/components/ui/SeasonPill";
 import UpgradeNudge from "@/components/ui/UpgradeNudge";
 import { useUserState } from "@/hooks/useUserState";
+import { calculateQuantity } from "@/types";
 
 const SAMPLE_TASKS = [
   {
@@ -49,7 +50,7 @@ const SAMPLE_TASKS = [
     id: "5",
     name: "Grub Preventative",
     product: "GrubEx (Chlorantraniliprole)",
-    labelRate: 1.1,
+    labelRate: 2.9,
     due: "May 15 – Jun 1",
     badges: [],
   },
@@ -63,7 +64,7 @@ function formatQuantity(
   if (!isPaid) return "";
   if (labelRate === 0) return "—";
   if (!lawnSqft) return "Add your lawn size →";
-  return `${(Math.round(((lawnSqft / 1000) * labelRate) * 10) / 10)} lbs`;
+  return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
 }
 
 export default function PlanPage() {

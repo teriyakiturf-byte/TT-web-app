@@ -1,6 +1,7 @@
 "use client";
 
 import { Lock } from "lucide-react";
+import { calculateQuantity } from "@/types";
 
 interface QuantityFieldProps {
   isPaid: boolean;
@@ -53,7 +54,7 @@ export default function QuantityField({
   }
 
   // STATE C: Paid with valid lawn size — calculated
-  const qty = Math.round(((lawnSqft / 1000) * labelRate) * 10) / 10;
+  const qty = calculateQuantity(lawnSqft, labelRate);
 
   return (
     <span className="font-mono text-xs text-lime font-medium">
