@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
@@ -34,7 +34,17 @@ export default function SignInPage() {
         return;
       }
 
-      router.push("/plan");
+      if (result?.ok) {
+        const session = await getSession();
+
+        if (!session?.user || !(session.user as any).lawnSqft) {
+          router.push("/onboarding");
+        } else if ((session.user as any).planPurchased) {
+          router.push("/dashboard");
+        } else {
+          router.push("/plan");
+        }
+      }
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
