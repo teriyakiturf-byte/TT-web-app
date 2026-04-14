@@ -11,7 +11,8 @@ interface HeroTaskCardProps {
   applicationNotes: string;
   tier: TaskTier;
   isBlurred?: boolean;
-  isLocked?: boolean;
+  /** "guest" = full overlay lock, "free" = visible but quantities locked, "paid" = full access */
+  userState: "guest" | "free" | "paid";
   onMarkComplete: () => void;
   onSnooze: () => void;
   onSkip: () => void;
@@ -50,7 +51,7 @@ export default function HeroTaskCard({
   applicationNotes,
   tier,
   isBlurred,
-  isLocked,
+  userState,
   onMarkComplete,
   onSnooze,
   onSkip,
@@ -83,7 +84,7 @@ export default function HeroTaskCard({
         isBlurred ? "soft-gate-content" : ""
       }`}
     >
-      {isLocked ? (
+      {userState === "guest" ? (
         <>
           {/* Card content rendered behind overlay */}
           <div className="opacity-30">
@@ -126,8 +127,53 @@ export default function HeroTaskCard({
             )}
           </div>
         </>
+      ) : userState === "free" ? (
+        <>
+          {/* Free: content visible, quantities locked, no action buttons */}
+          {badge && (
+            <span
+              className={`inline-block font-mono text-[10px] uppercase tracking-widest ${badgeColor} rounded-full px-3 py-1 mb-3`}
+            >
+              {badge}
+            </span>
+          )}
+
+          <h2 className="font-display text-3xl text-white leading-tight">
+            {taskName}
+          </h2>
+          <p className="font-mono text-sm text-lime mt-1">{productName}</p>
+
+          {/* Locked quantity */}
+          <button
+            onClick={onUnlockClick}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-mono text-xs text-white/70 hover:bg-white/20 transition-colors"
+          >
+            <Lock size={12} />
+            Unlock quantities — $67
+          </button>
+
+          <p className="text-sm text-white/70 mt-3">{applicationNotes}</p>
+
+          {whyContext && (
+            <div className="mt-4 border-t border-white/10 pt-3">
+              <button
+                onClick={() => setWhyExpanded(!whyExpanded)}
+                className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80"
+              >
+                Why This Task?
+                {whyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+              {whyExpanded && (
+                <p className="text-sm text-white/60 mt-2 leading-relaxed">
+                  {whyContext}
+                </p>
+              )}
+            </div>
+          )}
+        </>
       ) : (
         <>
+          {/* Paid: full access */}
           {badge && (
             <span
               className={`inline-block font-mono text-[10px] uppercase tracking-widest ${badgeColor} rounded-full px-3 py-1 mb-3`}

@@ -68,9 +68,10 @@ function formatQuantity(
 export default function PlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const { isPaid, lawnSqft, email } = useUserState();
+  const { isPaid, isFree, isGuest, lawnSqft, email } = useUserState();
 
-  const navState = isPaid ? "paid" : "free";
+  const navState = isPaid ? "paid" : isFree ? "free" : "guest";
+  const userState = isPaid ? "paid" as const : isFree ? "free" as const : "guest" as const;
 
   async function handleStripeCheckout() {
     if (checkoutLoading) return;
@@ -115,7 +116,7 @@ export default function PlanPage() {
           Your KC Lawn Plan
         </h1>
         <p className="text-sm text-muted text-center mt-2">
-          {isPaid && lawnSqft
+          {lawnSqft && !isGuest
             ? `${lawnSqft.toLocaleString()} sq ft · Zone 6a · Tall Fescue`
             : "Zone 6a · Kansas City Metro"}
         </p>
@@ -139,7 +140,7 @@ export default function PlanPage() {
           <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
             Tall Fescue
           </span>
-          {isPaid && lawnSqft ? (
+          {lawnSqft && !isGuest ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-1 font-mono text-xs text-forest">
               {lawnSqft.toLocaleString()} sq ft
             </span>
@@ -153,16 +154,16 @@ export default function PlanPage() {
           )}
         </div>
 
-        {/* Blurred content section for non-paid users */}
+        {/* Blurred content section — full blur for guests only */}
         <div className="relative mt-8">
-          {!isPaid && (
+          {isGuest && (
             <SoftGateOverlay
               onUnlockClick={() => setShowModal(true)}
               lawnSqft={lawnSqft ?? undefined}
             />
           )}
 
-          <div className={!isPaid ? "soft-gate-content" : ""}>
+          <div className={isGuest ? "soft-gate-content" : ""}>
             {/* Hero Task Card */}
             <HeroTaskCard
               taskName="Apply Pre-Emergent (Split App #1)"
@@ -171,7 +172,7 @@ export default function PlanPage() {
               applicationNotes="Apply when soil temps reach 50–55°F consistently. Water in within 24 hours."
               tier={1}
               isBlurred={false}
-              isLocked={!isPaid}
+              userState={userState}
               onMarkComplete={() => {}}
               onSnooze={() => {}}
               onSkip={() => {}}

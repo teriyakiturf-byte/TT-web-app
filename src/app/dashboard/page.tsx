@@ -282,6 +282,7 @@ export default function DashboardPage() {
               calculatedQuantity={formatQuantity(lawnSqft, heroTask.labelRate)}
               applicationNotes={heroTask.applicationNotes}
               tier={heroTask.tier}
+              userState="paid"
               onMarkComplete={handleMarkComplete}
               onSnooze={handleSnooze}
               onSkip={handleSkip}
@@ -295,6 +296,7 @@ export default function DashboardPage() {
               calculatedQuantity=""
               applicationNotes=""
               tier={5}
+              userState="paid"
               onMarkComplete={() => {}}
               onSnooze={() => {}}
               onSkip={() => {}}
