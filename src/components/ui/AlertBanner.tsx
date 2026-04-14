@@ -15,11 +15,6 @@ const config: Record<
   AlertType,
   { bg: string; borderColor: string; icon: React.ReactNode }
 > = {
-  "blackout-active": {
-    bg: "bg-orange-light",
-    borderColor: "border-l-orange",
-    icon: <AlertTriangle size={16} className="text-orange" />,
-  },
   "soil-temp": {
     bg: "bg-lime-light",
     borderColor: "border-l-lime",
@@ -32,6 +27,11 @@ const config: Record<
   },
   "upcoming-window": {
     bg: "bg-cream",
+    borderColor: "border-l-lime",
+    icon: <Calendar size={16} className="text-lime" />,
+  },
+  "overseeding-window": {
+    bg: "bg-lime-light",
     borderColor: "border-l-lime",
     icon: <Calendar size={16} className="text-lime" />,
   },

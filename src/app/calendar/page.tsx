@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useUserState } from "@/hooks/useUserState";
 
@@ -70,9 +69,9 @@ function getTasksForDay(month: number, day: number): CalendarTask[] {
   });
 }
 
-function isBlackoutDay(month: number, day: number): boolean {
+function isOverseedingWindow(month: number, day: number): boolean {
   const d = new Date(YEAR, month, day);
-  return d >= new Date(YEAR, 3, 1) && d <= new Date(YEAR, 4, 15);
+  return d >= new Date(YEAR, 8, 1) && d <= new Date(YEAR, 8, 20);
 }
 
 function isCurrentDay(month: number, day: number): boolean {
@@ -114,17 +113,6 @@ export default function CalendarPage() {
   const displayGrass = grassType
     ? grassType.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
     : "Tall Fescue";
-
-  // Blackout banner logic
-  const today = new Date();
-  const blackoutStart = new Date(YEAR, 3, 1);
-  const blackoutEnd = new Date(YEAR, 4, 15);
-  const approachStart = new Date(YEAR, 2, 15);
-  const isWithinBlackout = today >= blackoutStart && today <= blackoutEnd;
-  const isApproaching = today >= approachStart && today < blackoutStart;
-  const daysUntilBlackout = Math.ceil(
-    (blackoutStart.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
 
   return (
     <>
@@ -177,36 +165,10 @@ export default function CalendarPage() {
             <span className="text-xs">Mechanical</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded bg-orange-light border border-orange/30" />
-            <span className="text-xs">JoCo Blackout</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-forest" />
+            <span className="text-xs">Fall Overseeding</span>
           </div>
         </div>
-
-        {/* Blackout banner */}
-        {isWithinBlackout && (
-          <div
-            className="flex items-start gap-2 rounded-lg bg-orange-light p-4 mb-6"
-            style={{ borderLeft: "4px solid var(--orange)" }}
-          >
-            <AlertTriangle size={16} className="text-orange flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-charcoal">
-              <strong>Johnson County Fertilizer Blackout Active</strong> — Apr 1
-              through May 15. No phosphorus applications.
-            </p>
-          </div>
-        )}
-        {isApproaching && (
-          <div
-            className="flex items-start gap-2 rounded-lg bg-lime-light p-4 mb-6"
-            style={{ borderLeft: "4px solid var(--lime)" }}
-          >
-            <AlertTriangle size={16} className="text-lime flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-charcoal">
-              Johnson County Fertilizer Blackout starts Apr 1 —{" "}
-              <strong>{daysUntilBlackout} days away</strong>.
-            </p>
-          </div>
-        )}
 
         {/* 12-month calendar */}
         <div className="space-y-10">
@@ -244,13 +206,13 @@ export default function CalendarPage() {
                     }
 
                     const tasks = getTasksForDay(monthIdx, day);
-                    const blackout = isBlackoutDay(monthIdx, day);
+                    const overseedWindow = isOverseedingWindow(monthIdx, day);
                     const todayCell = isCurrentDay(monthIdx, day);
                     const weekend = isWeekendDay(monthIdx, day);
 
                     let cellBg = "bg-white";
                     if (todayCell) cellBg = "bg-forest";
-                    else if (blackout) cellBg = "bg-orange-light";
+                    else if (overseedWindow) cellBg = "bg-lime-light";
                     else if (tasks.length > 0) cellBg = "bg-cream";
                     else if (weekend) cellBg = "bg-[#FAFAF8]";
 

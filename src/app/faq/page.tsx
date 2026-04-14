@@ -3,9 +3,9 @@ import Nav from "@/components/Nav";
 import { ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "KC Lawn Care FAQ — Zone 6a, Clay Soil, JoCo Law | Teriyaki Turf",
+  title: "KC Lawn Care FAQ — Zone 6a, Clay Soil, Soil Temps | Teriyaki Turf",
   description:
-    "Answers to common Kansas City lawn care questions. Pre-emergent timing, clay soil tips, Johnson County fertilizer blackout dates, and more for Zone 6a homeowners.",
+    "Answers to common Kansas City lawn care questions. Pre-emergent timing, clay soil tips, soil temperature triggers, and more for Zone 6a homeowners.",
 };
 
 const FAQ_ITEMS = [
@@ -18,8 +18,12 @@ const FAQ_ITEMS = [
     a: "Core aerate every fall (September is ideal). Don't add sand — it creates concrete-like conditions in clay. Use gypsum to improve drainage over time. Mow high (3.5–4 inches) to encourage deeper root growth that breaks through compacted soil. Milorganite is a great fertilizer choice for clay because it won't burn.",
   },
   {
-    q: "What is the Johnson County fertilizer blackout period?",
-    a: "Johnson County restricts fertilizer applications containing phosphorus near waterways. The blackout typically runs November 15 through March 1. Always check current JoCo regulations before applying any fertilizer during shoulder months. Our plan has these dates built into every schedule automatically.",
+    q: "When should I overseed my KC lawn?",
+    a: "Fall overseeding is the single most important task for KC Tall Fescue lawns. Target September 1\u201320 when soil temps drop below 65\u00B0F and nights cool down. Core aerate first, overseed within 48 hours, apply starter fertilizer immediately, and water twice daily for 3 weeks. This is why we track KC soil temperatures all summer.",
+  },
+  {
+    q: "Why does soil temperature matter more than the calendar date?",
+    a: "National lawn care apps use calendar dates. KC soil temps don\u2019t follow national averages. Pre-emergent needs to go down when your soil hits 50\u00B0F \u2014 not when a generic app says March 15. Overseeding needs soil below 65\u00B0F \u2014 not when Labor Day hits. Teriyaki Turf tracks KC-specific soil temps so your timing is always right for your actual conditions.",
   },
   {
     q: "What type of grass do most KC lawns have?",

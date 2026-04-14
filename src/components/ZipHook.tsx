@@ -53,8 +53,8 @@ function getSeasonalAction(month: number): SeasonalAction {
     case 4:
       return {
         label: "May Alert",
-        headline: "Fertilizer Blackout Approaching — Apply Before or After",
-        body: "Johnson County restricts fertilizer applications. Time your spring feeding before the blackout window.",
+        headline: "Spring Fertilizer Window — Apply Now",
+        body: "Soil temps are warm enough for Milorganite. Apply your spring feeding before summer heat arrives.",
       };
     case 5:
       return {

@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Leaf, MapPin, AlertTriangle, ArrowRight } from "lucide-react";
+import { Leaf, MapPin, Thermometer, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
 import ZipHook from "@/components/ZipHook";
 
 export const metadata: Metadata = {
-  title: "Teriyaki Turf | Kansas City Lawn Care Plan — Zone 6a, Clay Soil, JoCo Law",
+  title: "Teriyaki Turf | Kansas City Lawn Care Plan — Zone 6a, Clay Soil, Soil Temps",
   description:
-    "Free lawn care tools built for Kansas City homeowners. Zone 6a seasonal calendar, KC clay soil guides, Johnson County fertilizer blackout dates, and product calculators. Save $373/year vs. TruGreen.",
+    "Free lawn care tools built for Kansas City homeowners. Zone 6a seasonal calendar, KC clay soil guides, soil temperature triggers, and product calculators. Save $373/year vs. TruGreen.",
   keywords: [
     "Kansas City lawn care",
     "KC lawn plan",
     "Zone 6a lawn schedule",
-    "Johnson County fertilizer blackout",
+    "KC soil temperature lawn care",
     "KC clay soil lawn",
     "tall fescue Kansas City",
     "pre-emergent KC",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Teriyaki Turf – KC Lawn Care Intelligence",
     description:
-      "Free tools for Kansas City lawns. Zone 6a calendar, clay soil guides, Johnson County fertilizer laws. Real advice from a real KC homeowner.",
+      "Free tools for Kansas City lawns. Zone 6a calendar, clay soil guides, soil temp triggers. Real advice from a real KC homeowner.",
     url: "https://teriyakiturf.com",
     type: "website",
   },
@@ -47,7 +47,7 @@ export default function LandingPage() {
             What&apos;s Your Kansas City Lawn Dealing With?
           </h1>
           <p className="text-sm text-muted mt-2 max-w-lg mx-auto">
-            Zone 6a timing. KC clay soil. Johnson County blackout law. Built for KC homeowners.
+            Zone 6a timing. KC clay soil. Soil temp triggers. Built for KC homeowners.
           </p>
 
           {/* Interactive ZIP hook — client island */}
@@ -82,12 +82,13 @@ export default function LandingPage() {
 
           <div className="rounded-xl border border-border bg-white p-5">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-light mb-3">
-              <AlertTriangle size={24} className="text-orange" />
+              <Thermometer size={24} className="text-lime" />
             </div>
-            <h3 className="font-display text-lg text-forest">JoCo Blackout Law</h3>
+            <h3 className="font-display text-lg text-forest">KC Soil Temperature</h3>
             <p className="text-sm text-muted mt-1 leading-relaxed">
-              Johnson County fertilizer blackout dates built into every schedule.
-              Never get fined for a mistimed application.
+              Every task triggered by live KC soil temps — not generic calendar
+              dates. Pre-emergent when soil hits 50°F. Overseeding when it drops
+              below 65°F.
             </p>
           </div>
         </section>
@@ -110,7 +111,7 @@ export default function LandingPage() {
             </div>
             <div className="rounded-xl border border-border bg-white px-5 py-4">
               <p className="text-sm font-medium text-charcoal">
-                What is the Johnson County fertilizer blackout period?
+                Why does soil temperature matter more than the calendar date?
               </p>
             </div>
           </div>

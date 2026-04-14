@@ -64,7 +64,7 @@ export default function UnlockModal({
           {[
             "Week-by-week schedule built for Zone 6a",
             "Product quantities calculated for your exact lawn size",
-            "Johnson County fertilizer blackout law built in",
+            "Fall overseeding window calculated from KC soil temps",
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
               <Check

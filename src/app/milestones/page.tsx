@@ -60,24 +60,24 @@ const MILESTONES: Milestone[] = [
   },
   {
     id: "ms_002",
-    month: "MAY",
-    name: "Johnson County Blackout Period",
-    isUrgent: true,
+    month: "JUNE\u2013AUGUST",
+    name: "Summer Stress Defense",
+    isUrgent: false,
     isMainEvent: false,
     kcContext:
-      "Apr 1 \u2013 May 15, Johnson County prohibits phosphorus fertilizer applications. This is law \u2014 not a suggestion. Milorganite 6-4-0 is compliant because it contains no synthetic phosphorus. All other fertilizers must wait until after May 15.",
-    taskIds: ["task_004"],
+      "KC summers push Tall Fescue to its limits. Mow at 4 inches \u2014 never lower. Water deeply and infrequently (1 inch per week). Watch for brown patch fungus in July humidity. Resist the urge to fertilize during heat stress above 85\u00B0F. Your lawn going semi-dormant in July is normal \u2014 it will recover when temps drop in September.",
+    taskIds: ["task_006", "task_007"],
     status: "upcoming",
   },
   {
     id: "ms_003",
-    month: "JUNE",
-    name: "Summer Defense Mode",
+    month: "AUGUST",
+    name: "Fall Overseeding Prep",
     isUrgent: false,
     isMainEvent: false,
     kcContext:
-      "KC summers are brutal on Tall Fescue. Mow high (4\u2033), water deep and infrequently, and resist the urge to fertilize during heat stress. Your lawn goes semi-dormant in July \u2014 that\u2019s normal. Don\u2019t panic-water or over-fertilize.",
-    taskIds: ["task_006", "task_007"],
+      "Reserve a core aerator now. September is the #1 month to renovate your KC lawn. Stock up on Tall Fescue seed blend and starter fertilizer. Soil temps are still too high to seed \u2014 but they\u2019re dropping. Be ready to execute the moment the window opens.",
+    taskIds: ["task_008"],
     status: "upcoming",
   },
   {
@@ -87,7 +87,7 @@ const MILESTONES: Milestone[] = [
     isUrgent: false,
     isMainEvent: true,
     kcContext:
-      "The single most important lawn task of the year for KC Tall Fescue. Soil temps between 50\u201365\u00B0F, cooling nights, and fall moisture create perfect germination conditions. Core aerate first, overseed within 48 hours, then starter fertilizer immediately. Miss this window and you wait a full year.",
+      "The single most important lawn task of the year for KC Tall Fescue. Soil temps between 50\u201365\u00B0F and cooling nights create perfect germination conditions. Core aerate 24\u201348 hours before seeding. Apply starter fertilizer immediately after seed. Water twice daily for 3 weeks. Miss this window and you wait a full year \u2014 this is why we track KC soil temps all summer.",
     taskIds: ["task_008", "task_009", "task_010"],
     status: "upcoming",
   },

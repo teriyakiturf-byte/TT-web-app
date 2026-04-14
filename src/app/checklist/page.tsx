@@ -25,7 +25,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "March",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant", "joco-law"],
+    complianceBadges: ["soil-temp-triggered"],
     taskType: "weed-pest",
   },
   {
@@ -56,7 +56,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "April",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["no-phosphorus"],
+    complianceBadges: ["apply-before-may"],
     taskType: "weed-pest",
   },
   {
@@ -71,7 +71,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "April",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: ["summer-window"],
     taskType: "weed-pest",
   },
   // May
@@ -87,7 +87,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "May",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: ["slow-release-safe"],
     taskType: "fertilizer",
   },
   {
@@ -133,7 +133,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "June",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: [],
     taskType: "fertilizer",
   },
   // July
@@ -180,7 +180,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "September",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: [],
+    complianceBadges: ["main-event"],
     taskType: "mechanical",
   },
   {
@@ -195,7 +195,7 @@ const FULL_PLAN: LawnTask[] = [
     monthGroup: "October",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: ["fall-window"],
     taskType: "fertilizer",
   },
   // November

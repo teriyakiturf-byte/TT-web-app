@@ -4,7 +4,7 @@ interface CalendarDayCellProps {
   date: Date;
   tasks?: { name: string; type: "fertilizer" | "weed-pest" | "mechanical" }[];
   isToday?: boolean;
-  isBlackoutPeriod?: boolean;
+  isOverseedingWindow?: boolean;
   onClick?: () => void;
 }
 
@@ -18,7 +18,7 @@ export default function CalendarDayCell({
   date,
   tasks,
   isToday,
-  isBlackoutPeriod,
+  isOverseedingWindow,
   onClick,
 }: CalendarDayCellProps) {
   const day = date.getDate();
@@ -27,7 +27,7 @@ export default function CalendarDayCell({
     <button
       onClick={onClick}
       className={`relative flex h-12 w-full flex-col items-center justify-start rounded-lg p-1 text-xs transition-colors hover:bg-lime-light/50 ${
-        isBlackoutPeriod ? "bg-orange-light" : "bg-white"
+        isOverseedingWindow ? "bg-lime-light" : "bg-white"
       } ${isToday ? "ring-2 ring-forest" : ""}`}
     >
       <span

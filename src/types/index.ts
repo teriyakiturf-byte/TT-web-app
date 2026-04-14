@@ -42,16 +42,20 @@ export interface LawnTask {
 
 /* ── Compliance ── */
 export type ComplianceBadgeType =
-  | "blackout-compliant"
-  | "no-phosphorus"
-  | "joco-law";
+  | "soil-temp-triggered"
+  | "apply-before-may"
+  | "slow-release-safe"
+  | "summer-window"
+  | "main-event"
+  | "fall-window"
+  | "apply-before-frost";
 
 /* ── Alerts ── */
 export type AlertType =
-  | "blackout-active"
   | "soil-temp"
   | "deadline"
-  | "upcoming-window";
+  | "upcoming-window"
+  | "overseeding-window";
 
 /* ── Seasons ── */
 export type Season = "spring" | "summer" | "fall" | "winter";

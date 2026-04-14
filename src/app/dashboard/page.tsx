@@ -31,7 +31,7 @@ const PLAN_TASKS: LawnTask[] = [
     isComplete: false,
     snoozeCount: 0,
     whyContext: "Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing.",
-    complianceBadges: ["blackout-compliant", "joco-law"],
+    complianceBadges: ["soil-temp-triggered"],
     taskType: "weed-pest",
   },
   {
@@ -62,7 +62,7 @@ const PLAN_TASKS: LawnTask[] = [
     isComplete: false,
     snoozeCount: 0,
     whyContext: "Spring broadleaf weeds (dandelion, clover) are actively growing — herbicide is most effective now.",
-    complianceBadges: ["no-phosphorus"],
+    complianceBadges: ["apply-before-may"],
     taskType: "weed-pest",
   },
   {
@@ -77,7 +77,7 @@ const PLAN_TASKS: LawnTask[] = [
     monthGroup: "April",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: ["summer-window"],
     taskType: "weed-pest",
   },
   {
@@ -92,7 +92,7 @@ const PLAN_TASKS: LawnTask[] = [
     monthGroup: "May",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: ["slow-release-safe"],
     taskType: "fertilizer",
   },
   {
@@ -137,7 +137,7 @@ const PLAN_TASKS: LawnTask[] = [
     monthGroup: "June",
     isComplete: false,
     snoozeCount: 0,
-    complianceBadges: ["blackout-compliant"],
+    complianceBadges: [],
     taskType: "fertilizer",
   },
 ];
@@ -304,11 +304,22 @@ export default function DashboardPage() {
             type="soil-temp"
             message="Soil temps hitting 55°F in KC — pre-emergent window closing fast."
           />
-          <AlertBanner
-            type="blackout-active"
-            message="Johnson County fertilizer blackout: Nov 15 – Mar 1. No phosphorus applications."
-            expiresAt={new Date("2026-03-01")}
-          />
+          {(new Date().getMonth() === 7 ||
+            (new Date().getMonth() === 8 && new Date().getDate() <= 20)) && (
+            <AlertBanner
+              type="overseeding-window"
+              message="Fall Overseeding Window Open — Soil temps dropping. The Main Event starts now."
+            />
+          )}
+          {new Date().getMonth() === 6 && (
+            <AlertBanner
+              type="overseeding-window"
+              message={`Fall Overseeding window opens in ${Math.ceil(
+                (new Date(new Date().getFullYear(), 7, 1).getTime() - Date.now()) /
+                  (1000 * 60 * 60 * 24 * 7)
+              )} weeks — prep your equipment.`}
+            />
+          )}
         </div>
 
         {/* Hero Task Card */}

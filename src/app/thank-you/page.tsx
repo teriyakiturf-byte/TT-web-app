@@ -59,7 +59,7 @@ export default function ThankYouPage() {
             {[
               "Week-by-week task schedule for Zone 6a",
               "Product quantities calculated for your lawn size",
-              "Johnson County compliance built into every task",
+              "KC soil temp triggers built into every task",
               "Seasonal alerts and soil temp triggers",
               "Lifetime access — no subscription, no renewals",
             ].map((item) => (

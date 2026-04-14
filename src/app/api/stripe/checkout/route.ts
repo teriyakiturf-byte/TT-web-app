@@ -54,8 +54,8 @@ export async function POST(req: NextRequest) {
               name: "Teriyaki Turf — KC Lawn Plan",
               description:
                 "Full-year personalized lawn care plan. " +
-                "Zone 6a timing. KC clay soil. Johnson County " +
-                "blackout law built in. Lifetime access.",
+                "Zone 6a timing. KC clay soil. Soil temp " +
+                "triggers built in. Lifetime access.",
             },
             unit_amount: 6700, // $67.00 in cents
           },

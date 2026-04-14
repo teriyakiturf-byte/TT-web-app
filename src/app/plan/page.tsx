@@ -20,7 +20,7 @@ const SAMPLE_TASKS = [
     product: "Prodiamine 65 WDG",
     labelRate: 0.86,
     due: "Mar 15 – Apr 1",
-    badges: ["blackout-compliant" as const, "joco-law" as const],
+    badges: ["soil-temp-triggered" as const],
   },
   {
     id: "2",
@@ -36,7 +36,7 @@ const SAMPLE_TASKS = [
     product: "Trimec Classic",
     labelRate: 0.42,
     due: "Apr 15 – May 1",
-    badges: ["no-phosphorus" as const],
+    badges: ["apply-before-may" as const],
   },
   {
     id: "4",
@@ -44,7 +44,7 @@ const SAMPLE_TASKS = [
     product: "Milorganite 6-4-0",
     labelRate: 6.4,
     due: "May 1 – May 15",
-    badges: ["blackout-compliant" as const],
+    badges: ["slow-release-safe" as const],
   },
   {
     id: "5",

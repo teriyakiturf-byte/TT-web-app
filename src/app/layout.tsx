@@ -5,11 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Teriyaki Turf | Kansas City Lawn Care Tools & Zone 6a Calendar",
   description:
-    "Free lawn care tools built for Kansas City homeowners. Zone 6a seasonal calendar, KC clay soil guides, Johnson County fertilizer blackout dates, and product calculators.",
+    "Free lawn care tools built for Kansas City homeowners. Zone 6a seasonal calendar, KC clay soil guides, soil temperature triggers, and product calculators.",
   openGraph: {
     title: "Teriyaki Turf – KC Lawn Care Intelligence",
     description:
-      "Free tools for Kansas City lawns. Zone 6a calendar, clay soil guides, Johnson County fertilizer laws. Real advice from a real KC homeowner.",
+      "Free tools for Kansas City lawns. Zone 6a calendar, clay soil guides, soil temp triggers. Real advice from a real KC homeowner.",
     url: "https://teriyakiturf.com",
     type: "website",
   },
