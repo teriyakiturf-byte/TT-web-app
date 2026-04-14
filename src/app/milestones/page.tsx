@@ -183,15 +183,19 @@ export default function MilestonesPage() {
                 {/* Card */}
                 <div className="flex-1 pb-8">
                   <div
-                    className={`rounded-xl border p-4 sm:p-5 ${
+                    className={`rounded-xl p-4 sm:p-5 ${
                       ms.isMainEvent
-                        ? "border-lime border-2 bg-lime-light"
-                        : "border-border bg-white"
+                        ? "bg-forest"
+                        : "border border-border bg-white"
                     }`}
                   >
                     {/* Month + badges */}
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-[11px] uppercase tracking-widest text-muted">
+                      <span
+                        className={`font-mono text-[11px] uppercase tracking-widest ${
+                          ms.isMainEvent ? "text-lime" : "text-muted"
+                        }`}
+                      >
                         {ms.month}
                       </span>
                       <div className="flex gap-1.5">
@@ -201,7 +205,7 @@ export default function MilestonesPage() {
                           </span>
                         )}
                         {ms.isMainEvent && (
-                          <span className="rounded-full bg-forest px-2.5 py-0.5 font-mono text-[10px] text-white uppercase tracking-wider">
+                          <span className="rounded-full bg-orange px-2.5 py-0.5 font-display text-[10px] text-white uppercase tracking-wider">
                             Main Event
                           </span>
                         )}
@@ -210,15 +214,19 @@ export default function MilestonesPage() {
 
                     {/* Name */}
                     <h3
-                      className={`font-display text-xl text-forest ${
-                        ms.isMainEvent ? "text-2xl" : ""
+                      className={`font-display text-xl ${
+                        ms.isMainEvent ? "text-2xl text-white" : "text-forest"
                       }`}
                     >
                       {ms.name}
                     </h3>
 
                     {/* KC Context */}
-                    <p className="text-sm text-muted mt-2 leading-relaxed">
+                    <p
+                      className={`text-sm mt-2 leading-relaxed ${
+                        ms.isMainEvent ? "text-white/85" : "text-muted"
+                      }`}
+                    >
                       {ms.kcContext}
                     </p>
 
@@ -230,9 +238,9 @@ export default function MilestonesPage() {
                         return (
                           <span
                             key={taskId}
-                            className={`rounded-full px-2.5 py-0.5 font-mono text-[10px] text-white ${pillBg(
-                              info.type
-                            )}`}
+                            className={`rounded-full px-2.5 py-0.5 font-mono text-[10px] text-white ${
+                              ms.isMainEvent ? "bg-white/15" : pillBg(info.type)
+                            }`}
                           >
                             {info.name}
                           </span>
@@ -243,7 +251,11 @@ export default function MilestonesPage() {
                     {/* View Tasks link */}
                     <Link
                       href="/checklist"
-                      className="inline-flex items-center gap-1 text-sm text-lime hover:text-forest mt-3 transition-colors"
+                      className={`inline-flex items-center gap-1 text-sm mt-3 transition-colors ${
+                        ms.isMainEvent
+                          ? "text-lime hover:text-white"
+                          : "text-lime hover:text-forest"
+                      }`}
                     >
                       View Tasks →
                     </Link>

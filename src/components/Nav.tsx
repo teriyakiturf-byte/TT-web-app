@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 
@@ -11,6 +12,7 @@ interface NavProps {
 
 export default function Nav({ userState: userStateProp }: NavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
   const { data: session } = useSession();
 
   // Session takes priority over prop
@@ -34,29 +36,33 @@ export default function Nav({ userState: userStateProp }: NavProps) {
         <div className="hidden items-center gap-4 md:flex">
           {userState === "paid" && (
             <>
-              <Link
-                href="/dashboard"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/checklist"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Checklist
-              </Link>
-              <Link
-                href="/calendar"
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                Calendar
-              </Link>
+              {[
+                { href: "/dashboard", label: "Dashboard" },
+                { href: "/checklist", label: "Checklist" },
+                { href: "/calendar", label: "Calendar" },
+                { href: "/milestones", label: "Milestones" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm transition-colors ${
+                    pathname === link.href
+                      ? "text-lime border-b-2 border-lime pb-0.5"
+                      : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </>
           )}
           <Link
             href="/faq"
-            className="text-sm text-white/80 hover:text-white transition-colors"
+            className={`text-sm transition-colors ${
+              pathname === "/faq"
+                ? "text-lime border-b-2 border-lime pb-0.5"
+                : "text-white/80 hover:text-white"
+            }`}
           >
             FAQ
           </Link>
@@ -108,18 +114,30 @@ export default function Nav({ userState: userStateProp }: NavProps) {
         <div className="md:hidden border-t border-white/10 px-4 pb-4 space-y-2">
           {userState === "paid" && (
             <>
-              <Link href="/dashboard" className="block py-2 text-sm text-white/80">
-                Dashboard
-              </Link>
-              <Link href="/checklist" className="block py-2 text-sm text-white/80">
-                Checklist
-              </Link>
-              <Link href="/calendar" className="block py-2 text-sm text-white/80">
-                Calendar
-              </Link>
+              {[
+                { href: "/dashboard", label: "Dashboard" },
+                { href: "/checklist", label: "Checklist" },
+                { href: "/calendar", label: "Calendar" },
+                { href: "/milestones", label: "Milestones" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block py-2 text-sm ${
+                    pathname === link.href ? "text-lime" : "text-white/80"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </>
           )}
-          <Link href="/faq" className="block py-2 text-sm text-white/80">
+          <Link
+            href="/faq"
+            className={`block py-2 text-sm ${
+              pathname === "/faq" ? "text-lime" : "text-white/80"
+            }`}
+          >
             FAQ
           </Link>
           {isLoggedIn ? (
