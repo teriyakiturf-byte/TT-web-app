@@ -106,6 +106,23 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideUp 250ms ease-out;
 }
 
+/* Milestone timeline pulse */
+@keyframes milestonePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 183, 136, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(82, 183, 136, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 183, 136, 0);
+  }
+}
+
+.milestone-dot--current {
+  animation: milestonePulse 2s infinite;
+}
+
 /* Utility: font families */
 .font-display {
   font-family: var(--font-display);
