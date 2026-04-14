@@ -6,3 +6,4 @@ _backup/
 .env*.local
 
 /src/generated/prisma
+*.tsbuildinfo
