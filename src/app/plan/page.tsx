@@ -41,7 +41,7 @@ const SAMPLE_TASKS = [
     id: "4",
     name: "Spring Fertilizer Application",
     product: "Milorganite 6-4-0",
-    labelRate: 32,
+    labelRate: 6.4,
     due: "May 1 – May 15",
     badges: ["blackout-compliant" as const],
   },
