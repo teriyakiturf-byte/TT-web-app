@@ -58,7 +58,7 @@ function SuccessContent() {
           We couldn&apos;t verify your payment. If you were charged, your plan will unlock automatically within a few minutes.
         </p>
         <button
-          onClick={() => router.push("/plan")}
+          onClick={() => router.push("/dashboard")}
           className="mt-6 rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors"
         >
           Go to My Plan →
@@ -81,10 +81,10 @@ function SuccessContent() {
       </p>
 
       <button
-        onClick={() => router.push("/plan")}
+        onClick={() => router.push("/dashboard")}
         className="mt-8 rounded-xl bg-orange px-8 py-4 font-display text-xl text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
       >
-        See My Full Plan →
+        Go to My Dashboard →
       </button>
 
       <p className="font-mono text-[10px] text-muted mt-4">

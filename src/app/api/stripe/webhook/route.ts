@@ -46,51 +46,55 @@ export async function POST(req: NextRequest) {
 
         console.log("Payment successful:", {
           email,
+          userId: metadata?.userId,
           productType: metadata?.productType,
           lawnSqft: metadata?.lawnSqft,
           sessionId: session.id,
         });
 
-        if (email) {
-          // Find user by email and mark as paid
-          const user = await prisma.user.findUnique({
-            where: { email },
-          });
+        // Find user: prefer metadata.userId, fall back to email lookup
+        let user = metadata?.userId
+          ? await prisma.user.findUnique({ where: { id: metadata.userId } })
+          : null;
 
-          if (user) {
-            // Create purchase record + mark user as paid in one transaction
-            await prisma.$transaction([
-              prisma.purchase.create({
-                data: {
-                  userId: user.id,
-                  stripeSessionId: session.id,
-                  stripePaymentIntent:
-                    typeof session.payment_intent === "string"
-                      ? session.payment_intent
-                      : null,
-                  amount: session.amount_total ?? 6700,
-                  productType: metadata?.productType ?? "lawn_plan_lifetime",
-                  lawnSqft: metadata?.lawnSqft
-                    ? Number(metadata.lawnSqft)
+        if (!user && email) {
+          user = await prisma.user.findUnique({ where: { email } });
+        }
+
+        if (user) {
+          // Create purchase record + mark user as paid in one transaction
+          await prisma.$transaction([
+            prisma.purchase.create({
+              data: {
+                userId: user.id,
+                stripeSessionId: session.id,
+                stripePaymentIntent:
+                  typeof session.payment_intent === "string"
+                    ? session.payment_intent
                     : null,
-                },
-              }),
-              prisma.user.update({
-                where: { id: user.id },
-                data: { planPurchased: true },
-              }),
-            ]);
+                amount: session.amount_total ?? 6700,
+                productType: metadata?.productType ?? "lawn_plan_lifetime",
+                lawnSqft: metadata?.lawnSqft
+                  ? Number(metadata.lawnSqft)
+                  : null,
+              },
+            }),
+            prisma.user.update({
+              where: { id: user.id },
+              data: {
+                planPurchased: true,
+                purchasedAt: new Date(),
+              },
+            }),
+          ]);
 
-            console.log("User marked as paid:", user.id);
-          } else {
-            // User paid but no account yet — log for manual resolution
-            console.warn(
-              "Payment received but no user found for email:",
-              email,
-              "sessionId:",
-              session.id
-            );
-          }
+          console.log("User marked as paid:", user.id);
+        } else {
+          // User paid but no account yet — log for manual resolution
+          console.warn(
+            "Payment received but no user found:",
+            { email, userId: metadata?.userId, sessionId: session.id }
+          );
         }
       }
     }

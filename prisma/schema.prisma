@@ -23,6 +23,7 @@ model User {
   lawnSqft      Int?
   grassType     String?
   planPurchased Boolean   @default(false)
+  purchasedAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
