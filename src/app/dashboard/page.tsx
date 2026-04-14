@@ -146,15 +146,14 @@ function formatQuantity(lawnSqft: number | null, labelRate: number): string {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isPaid, lawnSqft, grassType } = useUserState();
+  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType } = useUserState();
   const [tasks, setTasks] = useState<LawnTask[]>(PLAN_TASKS);
 
-  // Redirect non-paid users to /plan
-  if (!isPaid && typeof window !== "undefined") {
-    // Check directly from localStorage to avoid flash — useUserState
-    // initializes as "guest" before useEffect runs
-    const stored = localStorage.getItem("tt_user_state");
-    if (stored !== "paid") {
+  // Route protection: guest → /, free → /plan, paid → stay
+  if (!loading && !isPaid && typeof window !== "undefined") {
+    if (isGuest) {
+      router.push("/");
+    } else if (isFree) {
       router.push("/plan");
     }
   }
@@ -224,7 +223,7 @@ export default function DashboardPage() {
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="font-display text-hero text-forest text-center">
-          Your Lawn Dashboard
+          Your KC Lawn Plan
         </h1>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           <LawnInfoChip type="zone" value="Zone 6a — KC" />
