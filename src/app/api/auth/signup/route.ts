@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
     // 4. Hash password (bcryptjs — NOT bcrypt native module)
     const passwordHash = await bcrypt.hash(password, 12);
 
+    console.log("Signup: creating user in DB for", email);
+
     // 5. Create user in database
     const user = await prisma.user.create({
       data: {
@@ -47,6 +49,8 @@ export async function POST(req: NextRequest) {
         lawnSqft: lawnSqft ? Number(lawnSqft) : null,
       },
     });
+
+    console.log("Signup: user created", user.id, user.email);
 
     // 6. Sync to Kit (wrapped in try/catch — Kit failure does NOT block signup)
     try {
@@ -68,7 +72,8 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error("Signup error:", err);
+    console.error("Signup error:", err instanceof Error ? err.message : err);
+    console.error("Signup error stack:", err instanceof Error ? err.stack : "no stack");
     return NextResponse.json(
       { error: "SIGNUP_FAILED" },
       { status: 500 }
