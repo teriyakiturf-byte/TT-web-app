@@ -12,7 +12,7 @@ function getStripe() {
 export async function POST(req: NextRequest) {
   try {
     const authSession = await getServerSession(authOptions);
-    if (!authSession) {
+    if (!authSession?.user || !(authSession.user as any).id) {
       return NextResponse.json(
         { error: "UNAUTHORIZED" },
         { status: 401 }
@@ -29,7 +29,17 @@ export async function POST(req: NextRequest) {
     const stripe = getStripe();
 
     const body = await req.json();
-    const { email, lawnSqft } = body;
+    const { lawnSqft } = body;
+
+    // Use server-verified email — never trust client-sent email for Stripe
+    const userEmail = authSession.user.email;
+    const userId = (authSession.user as any).id as string;
+
+    console.log("Checkout session user:", {
+      id: userId,
+      email: userEmail,
+      planPurchased: (authSession.user as any).planPurchased,
+    });
 
     const baseUrl = process.env.NEXTAUTH_URL || "https://teriyakiturf.com";
 
@@ -53,12 +63,17 @@ export async function POST(req: NextRequest) {
         },
       ],
       metadata: {
+        userId,
         productType: "lawn_plan_lifetime",
         lawnSqft: lawnSqft ? String(lawnSqft) : "",
       },
       success_url: `${baseUrl}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/plan`,
-      ...(email ? { customer_email: email } : {}),
+      // Only pass customer_email if it's a real email string
+      // Passing undefined/null/empty locks Stripe's email field
+      ...(userEmail && typeof userEmail === "string" && userEmail.includes("@")
+        ? { customer_email: userEmail }
+        : {}),
       allow_promotion_codes: true,
     });
 
