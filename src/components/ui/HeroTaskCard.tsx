@@ -13,6 +13,7 @@ interface HeroTaskCardProps {
   isBlurred?: boolean;
   /** "guest" = full overlay lock, "free" = visible but quantities locked, "paid" = full access */
   userState: "guest" | "free" | "paid";
+  lawnSqft?: number | null;
   onMarkComplete: () => void;
   onSnooze: () => void;
   onSkip: () => void;
@@ -52,6 +53,7 @@ export default function HeroTaskCard({
   tier,
   isBlurred,
   userState,
+  lawnSqft,
   onMarkComplete,
   onSnooze,
   onSkip,
@@ -143,33 +145,35 @@ export default function HeroTaskCard({
           </h2>
           <p className="font-mono text-sm text-lime mt-1">{productName}</p>
 
-          {/* Locked quantity */}
-          <button
-            onClick={onUnlockClick}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 font-mono text-xs text-white/70 hover:bg-white/20 transition-colors"
-          >
-            <Lock size={12} />
-            Unlock quantities — $67
-          </button>
-
           <p className="text-sm text-white/70 mt-3">{applicationNotes}</p>
 
-          {whyContext && (
-            <div className="mt-4 border-t border-white/10 pt-3">
-              <button
-                onClick={() => setWhyExpanded(!whyExpanded)}
-                className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80"
-              >
-                Why This Task?
-                {whyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
-              {whyExpanded && (
-                <p className="text-sm text-white/60 mt-2 leading-relaxed">
-                  {whyContext}
+          {/* Prominent locked quantity section */}
+          <div className="mt-4 border-t border-white/20 pt-4">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-2">
+              Quantity
+            </p>
+            <div className="flex items-start gap-2.5">
+              <Lock size={14} className="text-lime mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-white/80">
+                  Unlock to see exact amount
                 </p>
-              )}
+                {lawnSqft && lawnSqft > 0 && (
+                  <p className="text-xs text-white/50 mt-0.5">
+                    for your {lawnSqft.toLocaleString()} sq ft lawn
+                  </p>
+                )}
+              </div>
             </div>
-          )}
+            {tier !== 4 && (
+              <button
+                onClick={onUnlockClick}
+                className="mt-3 w-full rounded-xl bg-orange px-6 py-3 font-display text-[16px] text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+              >
+                Unlock for $67 — Lifetime →
+              </button>
+            )}
+          </div>
         </>
       ) : (
         <>

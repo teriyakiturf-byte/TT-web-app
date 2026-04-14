@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye } from "lucide-react";
 import Nav from "@/components/Nav";
 import SoftGateOverlay from "@/components/ui/SoftGateOverlay";
 import UnlockModal from "@/components/ui/UnlockModal";
@@ -154,6 +155,27 @@ export default function PlanPage() {
           )}
         </div>
 
+        {/* Free account orientation banner */}
+        {isFree && (
+          <div
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-lime bg-lime-light p-4 mb-5"
+            style={{ borderLeftWidth: "4px" }}
+          >
+            <div className="flex items-center gap-2">
+              <Eye size={16} className="text-lime flex-shrink-0" />
+              <p className="font-display text-[16px] text-forest">
+                Free Preview — Task Names & Products Visible
+              </p>
+            </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="rounded-full bg-orange px-4 py-1.5 font-display text-xs text-white uppercase tracking-wider hover:bg-orange/90 transition-colors whitespace-nowrap"
+            >
+              Unlock Full Plan — $67 →
+            </button>
+          </div>
+        )}
+
         {/* Blurred content section — full blur for guests only */}
         <div className="relative mt-8">
           {isGuest && (
@@ -173,6 +195,7 @@ export default function PlanPage() {
               tier={1}
               isBlurred={false}
               userState={userState}
+              lawnSqft={lawnSqft}
               onMarkComplete={() => {}}
               onSnooze={() => {}}
               onSkip={() => {}}
@@ -183,9 +206,18 @@ export default function PlanPage() {
 
             {/* Stats Row */}
             <div className="flex gap-3 mt-6 overflow-x-auto pb-2">
-              <StatCard label="Tasks Done" value="0 / 14" subtitle="Spring: 0 of 5" isLocked={!isPaid} />
-              <StatCard label="Saved vs. Pro" value="Save ~$187–$746/yr" subtitle="vs. TruGreen" />
-              <StatCard label="Next Task" value="Apr 15" subtitle="Broadleaf spray" isLocked={!isPaid} />
+              {isFree ? (
+                <>
+                  <StatCard label="Current Season" value="Spring" subtitle="8 tasks this season" />
+                  <StatCard label="Saved vs. Pro" value="~$187–$746/yr" subtitle="vs. TruGreen avg" />
+                </>
+              ) : (
+                <>
+                  <StatCard label="Tasks Done" value="0 / 14" subtitle="Spring: 0 of 5" isLocked={isGuest} />
+                  <StatCard label="Saved vs. Pro" value="Save ~$187–$746/yr" subtitle="vs. TruGreen" />
+                  <StatCard label="Next Task" value="Apr 15" subtitle="Broadleaf spray" isLocked={isGuest} />
+                </>
+              )}
             </div>
 
             {/* Upcoming Tasks */}
