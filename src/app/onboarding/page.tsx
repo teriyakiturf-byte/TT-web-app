@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Suspense } from "react";
 import Nav from "@/components/Nav";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
@@ -36,6 +37,7 @@ const GRASS_OPTIONS: {
 function OnboardingWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { status } = useSession();
 
   const initialStep = Number(searchParams.get("step")) || 1;
   const clampedStep = Math.min(Math.max(initialStep, 1), 3);
@@ -83,18 +85,33 @@ function OnboardingWizard() {
     setCurrentStep((s) => Math.max(s - 1, 1));
   }
 
-  function handleFinish() {
+  async function saveProfileToDB(fields: { zip?: string; grassType?: string; lawnSqft?: string }) {
+    if (status !== "authenticated") return;
+    try {
+      await fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+    } catch {
+      // DB save failed — localStorage still has the data as fallback
+    }
+  }
+
+  async function handleFinish() {
     if (zip) localStorage.setItem("tt_zip", zip);
     localStorage.setItem("tt_grass", grassType);
     if (sqftValid) {
       localStorage.setItem("tt_sqft", lawnSqft);
     }
+    await saveProfileToDB({ zip, grassType, lawnSqft: sqftValid ? lawnSqft : undefined });
     router.push("/plan");
   }
 
-  function handleSkipSize() {
+  async function handleSkipSize() {
     if (zip) localStorage.setItem("tt_zip", zip);
     localStorage.setItem("tt_grass", grassType);
+    await saveProfileToDB({ zip, grassType });
     router.push("/plan");
   }
 
