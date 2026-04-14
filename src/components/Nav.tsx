@@ -76,7 +76,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
                     : "text-white/80 hover:text-white"
                 }`}
               >
-                Teriyaki T Approved
+                Products
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
@@ -158,7 +158,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
                   pathname === "/products" ? "text-lime" : "text-white/80"
                 }`}
               >
-                Teriyaki T Approved
+                Products
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
