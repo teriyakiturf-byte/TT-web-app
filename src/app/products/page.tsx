@@ -125,10 +125,10 @@ export default function ProductsPage() {
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Header */}
         <h1 className="font-display text-hero text-forest text-center">
-          Products We Trust on KC Clay
+          Teriyaki T Approved
         </h1>
         <p className="text-sm text-muted text-center mt-2 max-w-lg mx-auto">
-          Every product here is something we use on our own Zone 6a lawn. Curated for KC soil, KC temps, KC results.
+          Only what we&apos;d put on our own lawn.
         </p>
 
         {/* Sections */}
