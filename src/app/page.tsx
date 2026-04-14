@@ -4,9 +4,9 @@ import Nav from "@/components/Nav";
 import ZipHook from "@/components/ZipHook";
 
 export const metadata: Metadata = {
-  title: "Teriyaki Turf | Kansas City Lawn Care Plan — Zone 6a, Clay Soil, Soil Temps",
+  title: "Kansas City Lawn Care — Zone 6a Schedule & KC Soil Temperature Guide | Teriyaki Turf",
   description:
-    "Free lawn care tools built for Kansas City homeowners. Zone 6a seasonal calendar, KC clay soil guides, soil temperature triggers, and product calculators. Save $373/year vs. TruGreen.",
+    "KC-specific lawn care for Zone 6a homeowners. Soil temperature triggered task timing, KC clay soil rates, and fall overseeding calendar. Free tools at teriyakiturf.com.",
   keywords: [
     "Kansas City lawn care",
     "KC lawn plan",
