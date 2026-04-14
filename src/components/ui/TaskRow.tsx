@@ -11,6 +11,7 @@ interface TaskRowProps {
   dueDate: string;
   isComplete: boolean;
   isLocked?: boolean;
+  isFree?: boolean;
   complianceBadges?: ComplianceBadgeType[];
   onToggle: () => void;
 }
@@ -22,6 +23,7 @@ export default function TaskRow({
   dueDate,
   isComplete,
   isLocked,
+  isFree,
   complianceBadges,
   onToggle,
 }: TaskRowProps) {
@@ -29,20 +31,22 @@ export default function TaskRow({
     <div
       className={`flex items-start gap-3 rounded-lg border border-border bg-white px-4 py-3 transition-opacity ${
         isComplete ? "opacity-50" : ""
-      }`}
+      } ${isFree ? "border-l-[3px] border-l-lime" : ""}`}
     >
-      <button
-        onClick={onToggle}
-        disabled={isLocked}
-        className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
-          isComplete
-            ? "border-lime bg-lime text-white"
-            : "border-border hover:border-lime"
-        }`}
-        aria-label={isComplete ? "Mark incomplete" : "Mark complete"}
-      >
-        {isComplete && <Check size={12} strokeWidth={3} />}
-      </button>
+      {!isFree && (
+        <button
+          onClick={onToggle}
+          disabled={isLocked}
+          className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors ${
+            isComplete
+              ? "border-lime bg-lime text-white"
+              : "border-border hover:border-lime"
+          }`}
+          aria-label={isComplete ? "Mark incomplete" : "Mark complete"}
+        >
+          {isComplete && <Check size={12} strokeWidth={3} />}
+        </button>
+      )}
 
       <div className="flex-1 min-w-0">
         <p

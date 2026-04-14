@@ -116,11 +116,11 @@ export default function PlanPage() {
         <h1 className="font-display text-hero text-forest text-center">
           Your KC Lawn Plan
         </h1>
-        <p className="text-sm text-muted text-center mt-2">
-          {lawnSqft && !isGuest
-            ? `${lawnSqft.toLocaleString()} sq ft · Zone 6a · Tall Fescue`
-            : "Zone 6a · Kansas City Metro"}
-        </p>
+        {isGuest && (
+          <p className="text-sm text-muted text-center mt-2">
+            Zone 6a · Kansas City Metro
+          </p>
+        )}
 
         {/* Year at a Glance — Season Pills */}
         <div className="flex gap-2 mt-6">
@@ -187,22 +187,24 @@ export default function PlanPage() {
 
           <div className={isGuest ? "soft-gate-content" : ""}>
             {/* Hero Task Card */}
-            <HeroTaskCard
-              taskName="Apply Pre-Emergent (Split App #1)"
-              productName="Prodiamine 65 WDG"
-              calculatedQuantity={formatQuantity(isPaid, lawnSqft, 0.86)}
-              applicationNotes="Apply when soil temps reach 50–55°F consistently. Water in within 24 hours."
-              tier={1}
-              isBlurred={false}
-              userState={userState}
-              lawnSqft={lawnSqft}
-              onMarkComplete={() => {}}
-              onSnooze={() => {}}
-              onSkip={() => {}}
-              onUnlockClick={() => setShowModal(true)}
-              snoozeCount={0}
-              whyContext="Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing. Prodiamine creates a chemical barrier that prevents crabgrass seeds from germinating."
-            />
+            <div className="mb-5">
+              <HeroTaskCard
+                taskName="Apply Pre-Emergent (Split App #1)"
+                productName="Prodiamine 65 WDG"
+                calculatedQuantity={formatQuantity(isPaid, lawnSqft, 0.86)}
+                applicationNotes="Apply when soil temps reach 50–55°F consistently. Water in within 24 hours."
+                tier={1}
+                isBlurred={false}
+                userState={userState}
+                lawnSqft={lawnSqft}
+                onMarkComplete={() => {}}
+                onSnooze={() => {}}
+                onSkip={() => {}}
+                onUnlockClick={() => setShowModal(true)}
+                snoozeCount={0}
+                whyContext="Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing. Prodiamine creates a chemical barrier that prevents crabgrass seeds from germinating."
+              />
+            </div>
 
             {/* Stats Row */}
             <div className="flex gap-3 mt-6 overflow-x-auto pb-2">
@@ -235,6 +237,7 @@ export default function PlanPage() {
                     dueDate={task.due}
                     isComplete={false}
                     isLocked={!isPaid}
+                    isFree={isFree}
                     complianceBadges={task.badges}
                     onToggle={() => {}}
                   />
