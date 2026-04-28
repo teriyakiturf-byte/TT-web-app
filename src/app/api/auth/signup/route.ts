@@ -49,13 +49,14 @@ export async function POST(req: NextRequest) {
     });
 
     // 6. Sync to Kit (wrapped in try/catch — Kit failure does NOT block signup)
+    let kitSynced = false;
     try {
-      await syncEmailToKit(email, entryPoint || "direct", {
+      kitSynced = await syncEmailToKit(email, entryPoint || "direct", {
         zipCode,
         lawnSqft,
       });
-    } catch {
-      console.warn("Kit sync failed for", email);
+    } catch (kitErr) {
+      console.warn("Kit sync failed for", email, kitErr);
     }
 
     // 7. Return user (without password hash)
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
         zip: user.zip,
         lawnSqft: user.lawnSqft,
       },
+      kitSynced,
     });
   } catch (err) {
     console.error("Signup error:", err);
