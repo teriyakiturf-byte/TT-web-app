@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Thermometer, AlertTriangle, ArrowRight } from "lucide-react";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import CreateAccountModal from "@/components/CreateAccountModal";
@@ -118,7 +119,8 @@ function getSoilTempEstimate(month: number): string {
 
 export default function ZipHook() {
   const router = useRouter();
-  const { isGuest, markFree } = useUserState();
+  const { data: session } = useSession();
+  const { markFree } = useUserState();
   const [zip, setZip] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isKC, setIsKC] = useState(false);
@@ -140,10 +142,9 @@ export default function ZipHook() {
   }
 
   function handleCtaClick() {
-    if (isGuest) {
+    if (!session?.user) {
       setShowModal(true);
     } else {
-      // Already has an account — go to plan
       router.push("/plan");
     }
   }
