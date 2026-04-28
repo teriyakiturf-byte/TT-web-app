@@ -112,6 +112,7 @@ export default function CreateAccountModal({
         const data = await res.json();
         if (data.error === "INVALID_EMAIL") setError("Please enter a valid email address");
         else if (data.error === "PASSWORD_TOO_SHORT") setError("Password must be at least 8 characters");
+        else if (data.error === "EMAIL_EXISTS") setError("An account with this email already exists. Sign in instead.");
         else setError("Something went wrong. Please try again.");
         return;
       }
