@@ -21,6 +21,7 @@ export async function syncEmailToKit(
     const customFields: Record<string, string> = {};
     if (fields?.zipCode) customFields.zip_code = fields.zipCode;
     if (fields?.lawnSqft) customFields.lawn_sqft = String(fields.lawnSqft);
+    if (entryPoint) customFields.entry_point = entryPoint;
 
     const res = await fetch(
       `https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`,
@@ -31,7 +32,6 @@ export async function syncEmailToKit(
           api_key: KIT_API_KEY,
           email,
           fields: customFields,
-          tags: [entryPoint],
         }),
       }
     );
