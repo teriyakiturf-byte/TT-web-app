@@ -23,21 +23,26 @@ export async function syncEmailToKit(
     if (fields?.lawnSqft) customFields.lawn_sqft = String(fields.lawnSqft);
     if (entryPoint) customFields.entry_point = entryPoint;
 
-    const res = await fetch(
-      `https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          api_key: KIT_API_KEY,
-          email,
-          fields: customFields,
-        }),
-      }
-    );
+    const url = `https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`;
+    const payload = {
+      api_key: KIT_API_KEY,
+      email,
+      fields: customFields,
+    };
+
+    console.log("Kit sync request:", { url, email, formId: KIT_FORM_ID, fields: customFields });
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const responseText = await res.text();
+    console.log("Kit sync response:", { status: res.status, body: responseText });
 
     if (!res.ok) {
-      console.error(`Kit sync failed for ${email}:`, await res.text());
+      console.error(`Kit sync failed for ${email}: ${res.status} ${responseText}`);
       return false;
     }
 
