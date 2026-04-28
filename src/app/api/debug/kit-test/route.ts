@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const KIT_FORM_ID = process.env.KIT_FORM_ID;
+  const RAW_FORM_ID = process.env.KIT_FORM_ID ?? "";
+  const KIT_FORM_ID = RAW_FORM_ID.match(/(\d+)/)?.[1] ?? "";
   const KIT_API_KEY = process.env.KIT_API_KEY;
 
   if (!KIT_FORM_ID || !KIT_API_KEY) {
     return NextResponse.json({
       error: "ENV_MISSING",
-      KIT_FORM_ID: KIT_FORM_ID ? "SET" : "MISSING",
+      raw: RAW_FORM_ID,
+      parsed: KIT_FORM_ID || "NONE",
       KIT_API_KEY: KIT_API_KEY ? "SET" : "MISSING",
     });
   }

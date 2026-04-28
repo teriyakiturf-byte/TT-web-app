@@ -4,7 +4,8 @@
  * always proceeds regardless of Kit availability.
  */
 
-const KIT_FORM_ID = process.env.KIT_FORM_ID;
+const RAW_FORM_ID = process.env.KIT_FORM_ID ?? "";
+const KIT_FORM_ID = RAW_FORM_ID.match(/(\d+)/)?.[1] ?? "";
 const KIT_API_KEY = process.env.KIT_API_KEY;
 
 export async function syncEmailToKit(
