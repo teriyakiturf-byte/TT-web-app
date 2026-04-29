@@ -100,7 +100,7 @@ const PRODUCTS: Product[] = [
         primary: false,
       },
     ],
-    taskIds: ["task_003"],
+    taskIds: [],
     isAvailableToFree: true,
   },
   {
@@ -583,7 +583,7 @@ export default function ProductsPage() {
               href="/plan"
               className="mt-3 inline-block rounded-xl bg-orange px-5 py-2.5 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
             >
-              Unlock Full Plan -- $47/year
+              Unlock Full Plan -- $67
             </Link>
           </div>
         )}
