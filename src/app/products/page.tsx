@@ -496,9 +496,27 @@ const SEASON_PILLS: { value: Season | "all"; label: string }[] = [
 ];
 
 const SEASON_TAG_STYLES: Record<Season, string> = {
-  spring: "bg-lime-light text-forest",
-  summer: "bg-orange-light text-orange",
-  fall: "bg-cream text-charcoal border border-border",
+  spring: "bg-[#D8F3DC] text-[#1B4332]",
+  summer: "bg-[#FEF9C3] text-[#854D0E]",
+  fall: "bg-[#FFF0EB] text-[#9A3412]",
+};
+
+const CATEGORY_BADGE_STYLES: Record<Category, string> = {
+  "pre-emergent": "bg-[#FFF0EB] text-[#F4631E]",
+  "weed-control": "bg-[#FFF0EB] text-[#F4631E]",
+  fertilizer: "bg-[#D8F3DC] text-[#1B4332]",
+  "insect-control": "bg-[#FEF9C3] text-[#854D0E]",
+  fungicide: "bg-[#EDE9FE] text-[#6D28D9]",
+  "soil-amendment": "bg-[#F0FDF4] text-[#166534]",
+};
+
+const CATEGORY_BORDER: Record<Category, string> = {
+  "pre-emergent": "border-l-[3px] border-l-[#F4631E]",
+  "weed-control": "border-l-[3px] border-l-[#F4631E]",
+  fertilizer: "border-l-[3px] border-l-[#52B788]",
+  "insect-control": "border-l-[3px] border-l-[#D97706]",
+  fungicide: "border-l-[3px] border-l-[#7C3AED]",
+  "soil-amendment": "border-l-[3px] border-l-[#16A34A]",
 };
 
 /* ── Helpers ── */
@@ -526,12 +544,14 @@ export default function ProductsPage() {
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         {/* Header */}
-        <h1 className="font-display text-hero text-forest text-center">
-          KC Lawn Care Products
-        </h1>
-        <p className="text-sm text-muted text-center mt-2 max-w-lg mx-auto">
-          Products tested for Zone 6a &middot; KC clay soil &middot; Quantities calculated for your lawn
-        </p>
+        <div className="pb-5 mb-5 border-b-2 border-border">
+          <h1 className="font-display text-hero text-forest text-center">
+            KC Lawn Care Products
+          </h1>
+          <p className="text-sm text-muted text-center mt-2 max-w-lg mx-auto">
+            Products tested for Zone 6a &middot; KC clay soil &middot; Quantities calculated for your lawn
+          </p>
+        </div>
 
         {/* Category filter tabs */}
         <div className="mt-8 flex gap-1 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
@@ -569,21 +589,21 @@ export default function ProductsPage() {
 
         {/* Upgrade nudge for guest/free */}
         {!isPaid && (
-          <div className="mt-6 mb-6 rounded-xl border border-border border-l-4 border-l-orange bg-cream p-4">
+          <div className="mt-6 mb-6 rounded-xl border border-border border-l-4 border-l-orange bg-white px-5 py-4">
             <div className="flex items-center gap-2 mb-1">
-              <Lock size={14} className="text-orange" />
-              <span className="font-display text-lg text-forest uppercase">
-                See Quantities for Your Lawn
+              <Lock size={16} className="text-orange" />
+              <span className="font-display text-xl text-forest uppercase">
+                See Exact Quantities for Your Lawn
               </span>
             </div>
-            <p className="text-sm text-muted">
-              Unlock your plan to see exact product amounts calculated for your specific lawn size.
+            <p className="text-[13px] text-muted">
+              Unlock your plan to see product amounts calculated for your specific lawn size.
             </p>
             <Link
               href="/plan"
-              className="mt-3 inline-block rounded-xl bg-orange px-5 py-2.5 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+              className="mt-3 block w-full text-center rounded-xl bg-orange px-5 py-2.5 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
             >
-              Unlock Full Plan -- $67
+              Unlock Full Plan -- $67 &rarr;
             </Link>
           </div>
         )}
@@ -603,11 +623,11 @@ export default function ProductsPage() {
             {filtered.map((product) => (
               <div
                 key={product.id}
-                className="rounded-xl border border-border bg-white p-5 flex flex-col hover:shadow-[0_2px_8px_rgba(27,67,50,0.08)] transition-shadow"
+                className={`rounded-xl border border-border bg-white p-5 flex flex-col transition-all duration-150 hover:shadow-[0_4px_16px_rgba(27,67,50,0.1)] hover:border-lime ${CATEGORY_BORDER[product.category]}`}
               >
                 {/* Top row: subcategory badge + season tag */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="rounded-full bg-lime-light px-2 py-0.5 font-mono text-[10px] text-forest uppercase tracking-wider">
+                  <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${CATEGORY_BADGE_STYLES[product.category]}`}>
                     {product.subcategory}
                   </span>
                   <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${SEASON_TAG_STYLES[product.season]}`}>
@@ -616,18 +636,18 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Product name */}
-                <h3 className="font-display text-xl text-forest leading-tight">
+                <h3 className="font-display text-lg text-forest leading-tight mb-2">
                   {product.name}
                 </h3>
 
                 {/* Description */}
-                <p className="text-[13px] text-muted mt-2 leading-relaxed flex-1">
+                <p className="text-[13px] text-muted leading-relaxed flex-1 mb-3">
                   {product.description}
                 </p>
 
                 {/* Task linkage */}
                 {product.taskIds.length > 0 && (
-                  <div className="flex items-center gap-1 mt-2">
+                  <div className="flex items-center gap-1 mb-3">
                     <CheckCircle size={12} className="text-lime" />
                     <span className="font-mono text-[11px] text-lime">
                       In your task checklist
@@ -635,16 +655,13 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                {/* Divider */}
-                <div className="h-px bg-border my-3" />
-
                 {/* Quantity section */}
                 {product.coverageType === "calculated" ? (
-                  <div className="rounded-lg bg-lime-light px-3 py-2.5 flex items-center justify-between">
+                  <div className="rounded-lg bg-cream border border-border px-3 py-2 flex items-center justify-between my-3">
                     {!isPaid ? (
                       <>
-                        <span className="font-mono text-[11px] text-muted uppercase tracking-wide">
-                          Quantity for your lawn
+                        <span className="font-mono text-[10px] text-muted uppercase tracking-wide">
+                          For your lawn
                         </span>
                         <span className="flex items-center gap-1 font-mono text-xs text-muted">
                           <Lock size={12} />
@@ -653,7 +670,7 @@ export default function ProductsPage() {
                       </>
                     ) : lawnSqft ? (
                       <>
-                        <span className="font-mono text-[11px] text-forest uppercase tracking-wide">
+                        <span className="font-mono text-[10px] text-forest uppercase tracking-wide">
                           For your {lawnSqft.toLocaleString()} sq ft
                         </span>
                         <span className="font-display text-xl text-lime">
@@ -662,7 +679,7 @@ export default function ProductsPage() {
                       </>
                     ) : (
                       <>
-                        <span className="font-mono text-[11px] text-muted uppercase tracking-wide">
+                        <span className="font-mono text-[10px] text-muted uppercase tracking-wide">
                           Quantity
                         </span>
                         <Link
@@ -675,31 +692,31 @@ export default function ProductsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="rounded-lg bg-cream px-3 py-2.5 flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-muted uppercase tracking-wide">
+                  <div className="rounded-lg bg-cream border border-border px-3 py-2 flex items-center justify-between my-3">
+                    <span className="font-mono text-[10px] text-muted uppercase tracking-wide">
                       Coverage
                     </span>
-                    <span className="font-mono text-xs text-charcoal">
+                    <span className="font-mono text-xs text-forest">
                       {product.coverageNote}
                     </span>
                   </div>
                 )}
 
                 {/* Where to buy */}
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="flex flex-wrap gap-2 mt-auto pt-1">
                   {product.whereToBuy.map((source) => (
                     <a
                       key={source.store}
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[13px] transition-colors ${
+                      className={`inline-flex items-center gap-1 rounded-full text-xs transition-colors ${
                         source.primary
-                          ? "bg-forest text-white hover:bg-forest/90"
-                          : "bg-white text-forest border border-border hover:bg-cream"
+                          ? "bg-forest text-white hover:bg-forest/90 px-3.5 py-1.5"
+                          : "bg-transparent text-muted border border-border hover:bg-cream px-3.5 py-1.5"
                       }`}
                     >
-                      <ExternalLink size={12} />
+                      <ExternalLink size={10} />
                       {source.store}
                     </a>
                   ))}
