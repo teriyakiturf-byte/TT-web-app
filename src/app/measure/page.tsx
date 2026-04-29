@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
-import EmptyStateCard from "@/components/ui/EmptyStateCard";
+import LawnMeasurementMap from "@/components/LawnMeasurementMap";
 import CreateAccountModal from "@/components/CreateAccountModal";
 import { useUserState } from "@/hooks/useUserState";
 import { calculateSavings } from "@/types";
@@ -13,7 +13,6 @@ export default function MeasurePage() {
   const { isGuest, markFree } = useUserState();
   const [sqft, setSqft] = useState("");
   const [measured, setMeasured] = useState(false);
-  const [mapError] = useState(true); // TODO: Set to false when Google Maps API is configured
   const [showModal, setShowModal] = useState(false);
   const savings = sqft ? calculateSavings(Number(sqft)) : null;
 
@@ -54,23 +53,14 @@ export default function MeasurePage() {
         </p>
 
         {/* Map area */}
-        <div className="mt-6 aspect-[4/3] rounded-2xl overflow-hidden border border-border bg-white">
-          {mapError ? (
-            <div className="h-full flex items-center justify-center p-6">
-              <EmptyStateCard
-                variant="measurement"
-                headline="Map Loading Soon"
-                body="Google Maps integration is being configured. Enter your lawn size manually below."
-                ctaLabel="Enter Size Manually"
-                onCtaClick={() => document.getElementById("manual-input")?.focus()}
-              />
-            </div>
-          ) : (
-            <div className="h-full bg-gray-200 flex items-center justify-center text-muted">
-              {/* TODO: Google Maps canvas */}
-              Google Maps will render here
-            </div>
-          )}
+        <div className="mt-6">
+          <LawnMeasurementMap
+            onMeasurementComplete={(val) => {
+              setSqft(String(val));
+              setMeasured(true);
+            }}
+            initialSqft={sqft ? Number(sqft) : undefined}
+          />
         </div>
 
         {/* Manual input fallback */}

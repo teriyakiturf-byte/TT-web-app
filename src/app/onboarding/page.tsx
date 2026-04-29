@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { Suspense } from "react";
 import Nav from "@/components/Nav";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
-import EmptyStateCard from "@/components/ui/EmptyStateCard";
+import LawnMeasurementMap from "@/components/LawnMeasurementMap";
 import type { GrassType } from "@/types";
 
 const KC_ZIPS = [
@@ -296,19 +296,14 @@ function OnboardingWizard() {
               </button>
             </div>
 
-            {/* Draw It — inline map (or fallback) */}
+            {/* Draw It — inline map */}
             {sizeMethod === "draw" && (
-              <div className="rounded-2xl overflow-hidden border border-border bg-white">
-                <div className="aspect-[4/3] flex items-center justify-center p-6">
-                  <EmptyStateCard
-                    variant="measurement"
-                    headline="Map Loading Soon"
-                    body="Google Maps integration is being configured. Use manual entry for now."
-                    ctaLabel="Enter Size Manually"
-                    onCtaClick={() => setSizeMethod("manual")}
-                  />
-                </div>
-              </div>
+              <LawnMeasurementMap
+                onMeasurementComplete={(val) => {
+                  setLawnSqft(String(val));
+                }}
+                initialSqft={lawnSqft ? Number(lawnSqft) : undefined}
+              />
             )}
 
             {/* Manual input */}
