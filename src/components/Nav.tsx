@@ -41,6 +41,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
                 { href: "/checklist", label: "Checklist" },
                 { href: "/calendar", label: "Calendar" },
                 { href: "/milestones", label: "Milestones" },
+                { href: "/products", label: "Products" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -78,18 +79,20 @@ export default function Nav({ userState: userStateProp }: NavProps) {
               Weather
             </Link>
           )}
+          {!isPaid && (
+            <Link
+              href="/products"
+              className={`text-sm transition-colors ${
+                pathname === "/products"
+                  ? "text-lime border-b-2 border-lime pb-0.5"
+                  : "text-white/80 hover:text-white"
+              }`}
+            >
+              Products
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
-              <Link
-                href="/products"
-                className={`text-sm transition-colors ${
-                  pathname === "/products"
-                    ? "text-lime border-b-2 border-lime pb-0.5"
-                    : "text-white/80 hover:text-white"
-                }`}
-              >
-                Products
-              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-sm text-white/80 hover:text-white transition-colors"
@@ -141,6 +144,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
                 { href: "/checklist", label: "Checklist" },
                 { href: "/calendar", label: "Calendar" },
                 { href: "/milestones", label: "Milestones" },
+                { href: "/products", label: "Products" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -172,16 +176,18 @@ export default function Nav({ userState: userStateProp }: NavProps) {
               Weather
             </Link>
           )}
+          {!isPaid && (
+            <Link
+              href="/products"
+              className={`block py-2 text-sm ${
+                pathname === "/products" ? "text-lime" : "text-white/80"
+              }`}
+            >
+              Products
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
-              <Link
-                href="/products"
-                className={`block py-2 text-sm ${
-                  pathname === "/products" ? "text-lime" : "text-white/80"
-                }`}
-              >
-                Products
-              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="block py-2 text-sm text-white/80 text-left"
