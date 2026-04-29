@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { signIn } from "next-auth/react";
 import { X, Loader2 } from "lucide-react";
 
 export type AccountEntryPoint = "zip-hook" | "measurement" | "faq-gate" | "plan-nudge";
@@ -130,21 +131,14 @@ export default function CreateAccountModal({
     }
   }
 
-  async function handleGoogleAuth() {
+  function handleGoogleAuth() {
     if (submittingRef.current) return;
-    setError("");
-    setLoading(true);
     submittingRef.current = true;
-
-    // TODO: Wire up Google OAuth — for now stub
-    const googleEmail = "google-user@gmail.com";
 
     if (prefillData?.zipCode) localStorage.setItem("tt_zip", prefillData.zipCode);
     if (prefillData?.lawnSqft) localStorage.setItem("tt_sqft", String(prefillData.lawnSqft));
 
-    onSuccess(googleEmail);
-    setLoading(false);
-    submittingRef.current = false;
+    signIn("google", { callbackUrl: "/onboarding" });
   }
 
   return (
