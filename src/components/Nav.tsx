@@ -66,6 +66,18 @@ export default function Nav({ userState: userStateProp }: NavProps) {
           >
             FAQ
           </Link>
+          {!isPaid && (
+            <Link
+              href="/weather"
+              className={`text-sm transition-colors ${
+                pathname === "/weather"
+                  ? "text-lime border-b-2 border-lime pb-0.5"
+                  : "text-white/80 hover:text-white"
+              }`}
+            >
+              Weather
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
               <Link
@@ -150,6 +162,16 @@ export default function Nav({ userState: userStateProp }: NavProps) {
           >
             FAQ
           </Link>
+          {!isPaid && (
+            <Link
+              href="/weather"
+              className={`block py-2 text-sm ${
+                pathname === "/weather" ? "text-lime" : "text-white/80"
+              }`}
+            >
+              Weather
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
               <Link
