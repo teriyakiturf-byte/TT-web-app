@@ -74,15 +74,15 @@ export async function GET() {
     }
 
     const soilTempAlerts: Record<string, string> = {
-      dormant: "Soil dormant below 50°F — no action needed",
+      dormant: "Soil dormant below 50F -- no action needed",
       "pre-emergent":
-        "Pre-emergent window OPEN — soil at " + soilTemp + "°F. Apply now.",
+        `Pre-emergent window OPEN -- soil at ${soilTemp}F. Apply now.`,
       closing:
-        "Pre-emergent window CLOSING — soil at " + soilTemp + "°F. Act fast.",
+        `Pre-emergent window CLOSING -- soil at ${soilTemp}F. Act fast.`,
       overseeding:
-        "Overseeding conditions IDEAL — soil at " + soilTemp + "°F.",
+        `Overseeding conditions IDEAL -- soil at ${soilTemp}F.`,
       summer:
-        "Summer stress mode — soil at " + soilTemp + "°F. Mow high, water deep.",
+        `Summer stress mode -- soil at ${soilTemp}F. Mow high, water deep.`,
     };
 
     return NextResponse.json({
