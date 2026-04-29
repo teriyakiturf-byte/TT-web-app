@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Thermometer, AlertTriangle, ArrowRight } from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import SoilTempChip from "@/components/SoilTempChip";
 import CreateAccountModal from "@/components/CreateAccountModal";
 import { useUserState } from "@/hooks/useUserState";
 
@@ -108,15 +109,6 @@ function getSeasonalAction(month: number): SeasonalAction {
   }
 }
 
-function getSoilTempEstimate(month: number): string {
-  const estimates: Record<number, string> = {
-    0: "~32°F", 1: "~35°F", 2: "~42°F", 3: "~48°F",
-    4: "~58°F", 5: "~68°F", 6: "~76°F", 7: "~78°F",
-    8: "~72°F", 9: "~60°F", 10: "~48°F", 11: "~38°F",
-  };
-  return estimates[month] ?? "~50°F";
-}
-
 export default function ZipHook() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -128,7 +120,6 @@ export default function ZipHook() {
 
   const month = new Date().getMonth();
   const seasonal = getSeasonalAction(month);
-  const soilTemp = getSoilTempEstimate(month);
 
   function handleZipChange(value: string) {
     const cleaned = value.replace(/\D/g, "").slice(0, 5);
@@ -175,10 +166,7 @@ export default function ZipHook() {
           <div className="flex flex-wrap justify-center gap-2">
             <LawnInfoChip type="zone" value={isKC ? "Zone 6a — KC Metro" : "Zone 6a"} />
             {isKC && <LawnInfoChip type="soil" value="KC Heavy Clay Soil" />}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-lime-light px-3 py-1 font-mono text-xs text-forest">
-              <Thermometer size={12} />
-              Soil Temp: {soilTemp}
-            </span>
+            <SoilTempChip />
           </div>
 
           {/* Seasonal action card — KC only */}

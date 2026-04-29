@@ -10,6 +10,8 @@ import TaskRow from "@/components/ui/TaskRow";
 import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
+import WeatherWidget from "@/components/WeatherWidget";
+import { useWeather } from "@/hooks/useWeather";
 import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask, ToastType } from "@/types";
@@ -160,6 +162,7 @@ function loadSavedCompletions(): Record<string, boolean> {
 export default function DashboardPage() {
   const router = useRouter();
   const { isPaid, isFree, isGuest, loading, lawnSqft, grassType } = useUserState();
+  const { weather } = useWeather();
 
   const [tasks, setTasks] = useState<LawnTask[]>(() => {
     const saved = loadSavedCompletions();
@@ -298,12 +301,14 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Alert Banners */}
-        <div className="mt-6 space-y-2">
-          <AlertBanner
-            type="soil-temp"
-            message="Soil temps hitting 55°F in KC — pre-emergent window closing fast."
-          />
+        {/* Live Weather + Soil Temp Alert */}
+        <div className="mt-6 space-y-3">
+          {weather?.soilTempAlert && (
+            <AlertBanner
+              type="soil-temp"
+              message={weather.soilTempAlert}
+            />
+          )}
           {(new Date().getMonth() === 7 ||
             (new Date().getMonth() === 8 && new Date().getDate() <= 20)) && (
             <AlertBanner
@@ -320,6 +325,7 @@ export default function DashboardPage() {
               )} weeks — prep your equipment.`}
             />
           )}
+          <WeatherWidget compact />
         </div>
 
         {/* Hero Task Card */}
