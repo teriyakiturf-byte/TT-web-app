@@ -134,7 +134,11 @@ export default function ZipHook() {
 
   function handleCtaClick() {
     if (!session?.user) {
-      setShowModal(true);
+      const params = new URLSearchParams();
+      if (zip && zip.length === 5) {
+        params.set("zip", zip);
+      }
+      router.push(`/signup?${params.toString()}`);
     } else {
       router.push("/plan");
     }

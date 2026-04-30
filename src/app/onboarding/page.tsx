@@ -41,16 +41,19 @@ function OnboardingWizard() {
 
   const initialStep = Number(searchParams.get("step")) || 1;
   const clampedStep = Math.min(Math.max(initialStep, 1), 3);
+  const zipFromUrl = searchParams.get("zip") ?? "";
 
   const [currentStep, setCurrentStep] = useState(clampedStep);
-  const [zip, setZip] = useState("");
+  const [zip, setZip] = useState(zipFromUrl);
   const [grassType, setGrassType] = useState<GrassType>("tall-fescue");
   const [lawnSqft, setLawnSqft] = useState("");
   const [sizeMethod, setSizeMethod] = useState<"draw" | "manual" | null>(null);
 
   useEffect(() => {
-    const savedZip = localStorage.getItem("tt_zip");
-    if (savedZip) setZip(savedZip);
+    if (!zipFromUrl) {
+      const savedZip = localStorage.getItem("tt_zip");
+      if (savedZip) setZip(savedZip);
+    }
 
     const savedGrass = localStorage.getItem("tt_grass") as GrassType | null;
     if (savedGrass) setGrassType(savedGrass);
@@ -60,7 +63,7 @@ function OnboardingWizard() {
       setLawnSqft(savedSqft);
       setSizeMethod("manual");
     }
-  }, []);
+  }, [zipFromUrl]);
 
   const isKC = zip.length === 5 && KC_ZIPS.includes(zip);
   const zipValid = zip.length === 5;
