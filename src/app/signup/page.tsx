@@ -11,8 +11,9 @@ function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const zipFromUrl = searchParams.get("zip") ?? "";
+  const emailFromUrl = searchParams.get("email") ?? "";
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(emailFromUrl);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);

@@ -20,9 +20,12 @@ export async function POST(req: NextRequest) {
       where: { email },
     });
 
-    // Always return success to prevent email enumeration
+    // Return 404 so the frontend can offer account creation
     if (!user || !user.passwordHash) {
-      return NextResponse.json({ sent: true });
+      return NextResponse.json(
+        { error: "EMAIL_NOT_FOUND" },
+        { status: 404 }
+      );
     }
 
     // Invalidate any existing unused tokens for this email
