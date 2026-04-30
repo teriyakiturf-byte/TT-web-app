@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ExternalLink, Lock, CheckCircle } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useUserState } from "@/hooks/useUserState";
@@ -625,6 +626,17 @@ export default function ProductsPage() {
                 key={product.id}
                 className={`rounded-xl border border-border bg-white p-5 flex flex-col transition-all duration-150 hover:shadow-[0_4px_16px_rgba(27,67,50,0.1)] hover:border-lime ${CATEGORY_BORDER[product.category]}`}
               >
+                {/* Product image */}
+                <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-cream">
+                  <Image
+                    src={`/products/${product.id}.jpg`}
+                    alt={product.name}
+                    fill
+                    className="object-contain p-2"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+
                 {/* Top row: subcategory badge + season tag */}
                 <div className="flex items-center justify-between mb-3">
                   <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${CATEGORY_BADGE_STYLES[product.category]}`}>
