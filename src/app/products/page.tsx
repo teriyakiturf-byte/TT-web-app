@@ -619,7 +619,7 @@ export default function ProductsPage() {
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-4">
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.map((product) => (
               <div
                 key={product.id}
