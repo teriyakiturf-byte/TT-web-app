@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ExternalLink, Lock, CheckCircle } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useUserState } from "@/hooks/useUserState";
@@ -620,22 +619,27 @@ export default function ProductsPage() {
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-4">
             {filtered.map((product) => (
               <div
                 key={product.id}
-                className={`rounded-xl border border-border bg-white p-5 flex flex-col transition-all duration-150 hover:shadow-[0_4px_16px_rgba(27,67,50,0.1)] hover:border-lime ${CATEGORY_BORDER[product.category]}`}
+                className={`rounded-xl border border-border bg-white p-4 flex items-center gap-4 transition-all duration-150 hover:shadow-[0_4px_16px_rgba(27,67,50,0.1)] hover:border-lime ${CATEGORY_BORDER[product.category]}`}
               >
                 {/* Product image */}
-                <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-cream">
-                  <Image
+                <div className="flex items-center justify-center w-[120px] min-w-[120px] h-[120px] rounded-lg overflow-hidden bg-cream flex-shrink-0">
+                  <img
                     src={`/products/${product.id}.jpg`}
                     alt={product.name}
-                    fill
-                    className="object-contain p-2"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/products/placeholder.svg";
+                    }}
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
+
+                {/* Card content */}
+                <div className="flex flex-col flex-1 min-w-0">
 
                 {/* Top row: subcategory badge + season tag */}
                 <div className="flex items-center justify-between mb-3">
@@ -732,6 +736,7 @@ export default function ProductsPage() {
                       {source.store}
                     </a>
                   ))}
+                </div>
                 </div>
               </div>
             ))}
