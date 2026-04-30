@@ -108,6 +108,15 @@ export default function SignInPage() {
               <p className="text-sm text-orange">{error}</p>
             )}
 
+            <div className="flex items-center justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted hover:text-forest transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
