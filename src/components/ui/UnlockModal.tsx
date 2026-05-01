@@ -54,10 +54,10 @@ export default function UnlockModal({
         </h2>
 
         <p className="font-display text-[72px] leading-none text-forest mt-4">
-          $47
+          $67
         </p>
         <p className="font-mono text-xs text-muted mt-1">
-          Billed annually · Cancel anytime
+          One-time payment. Lifetime access.
         </p>
 
         <ul className="mt-5 space-y-3">
@@ -91,12 +91,12 @@ export default function UnlockModal({
               Redirecting to Checkout…
             </span>
           ) : (
-            "Unlock My KC Lawn Plan — $47/year →"
+            "Unlock My KC Lawn Plan — $67 →"
           )}
         </button>
 
         <p className="font-mono text-[10px] text-muted text-center mt-3">
-          Billed annually · Cancel anytime
+          One-time payment. No subscription. No renewals.
         </p>
       </div>
     </div>
