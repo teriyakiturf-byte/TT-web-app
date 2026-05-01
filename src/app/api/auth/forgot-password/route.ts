@@ -16,11 +16,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log("[forgot-password] Looking up user:", email);
+
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
-    // Return 404 so the frontend can offer account creation
+    console.log("[forgot-password] User found:", !!user, "Has password:", !!user?.passwordHash);
+
     if (!user || !user.passwordHash) {
       return NextResponse.json(
         { error: "EMAIL_NOT_FOUND" },
@@ -28,25 +31,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Invalidate any existing unused tokens for this email
+    console.log("[forgot-password] Invalidating old tokens");
+
     await prisma.passwordResetToken.updateMany({
       where: { email, used: false },
       data: { used: true },
     });
 
-    // Generate a secure token
     const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    console.log("[forgot-password] Creating token:", token.substring(0, 8) + "...");
 
     await prisma.passwordResetToken.create({
       data: { email, token, expiresAt },
     });
 
+    console.log("[forgot-password] Sending email to:", email);
+
     await sendPasswordResetEmail(email, token);
+
+    console.log("[forgot-password] Email sent successfully");
 
     return NextResponse.json({ sent: true });
   } catch (err) {
-    console.error("Forgot password error:", err);
+    console.error("[forgot-password] Error:", err);
     return NextResponse.json(
       { error: "SEND_FAILED" },
       { status: 500 }
