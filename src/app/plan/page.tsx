@@ -5,94 +5,85 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Loader2, Lock } from "lucide-react";
 import Nav from "@/components/Nav";
 import UnlockModal from "@/components/ui/UnlockModal";
-import KCComplianceBadge from "@/components/ui/KCComplianceBadge";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
-import type { ComplianceBadgeType } from "@/types";
 
-interface PlanTask {
-  id: string;
-  name: string;
-  product: string;
-  dateRange: string;
-  whyContext: string;
-  badges: ComplianceBadgeType[];
-}
-
-const TASKS: PlanTask[] = [
+const DIFFERENTIATORS = [
   {
-    id: "task_001",
+    label: "SOIL TEMP TRIGGERS",
+    description:
+      "Pre-emergent goes down when KC soil hits 50°F — not when a national app says March 15.",
+  },
+  {
+    label: "KC CLAY RATES",
+    description:
+      "Product amounts built for compacted clay — not the sandy loam most brands assume.",
+  },
+  {
+    label: "ZONE 6A TIMING",
+    description:
+      "Every task timed to KC's actual seasons — not averaged national data.",
+  },
+];
+
+const PREVIEW_TASKS = [
+  {
     name: "Apply Pre-Emergent (Split App #1)",
     product: "Prodiamine 65 WDG",
     dateRange: "Mar 15 – Apr 1",
-    whyContext:
-      "Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing. Prodiamine creates a chemical barrier that prevents crabgrass seeds from germinating.",
-    badges: ["soil-temp-triggered"],
+    context:
+      "Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing.",
+    badge: "Soil Temp Triggered",
+    badgeColor: "#52B788",
   },
   {
-    id: "task_002",
-    name: "First Mow — Set Height to 3.5″",
-    product: "Mower blade sharpened",
-    dateRange: "When grass hits 4″",
-    whyContext:
-      "First mow of the season sets the tone for the year. A sharp blade prevents tearing and disease entry points.",
-    badges: [],
-  },
-  {
-    id: "task_003",
     name: "Broadleaf Weed Spray",
     product: "Trimec Classic",
     dateRange: "Apr 15 – May 1",
-    whyContext:
-      "Dandelions and clover are actively growing now. Trimec works best on young, actively growing broadleaf weeds before they set seed.",
-    badges: ["apply-before-may"],
+    context:
+      "Dandelions and clover are actively growing in KC clay right now.",
+    badge: "Apply Before May 1",
+    badgeColor: "#F4631E",
   },
   {
-    id: "task_004",
     name: "Spring Fertilizer Application",
     product: "Milorganite 6-4-0",
     dateRange: "May 1 – May 15",
-    whyContext:
-      "Your tall fescue is hitting peak spring growth. Milorganite's slow-release nitrogen feeds roots without burning blades or pushing top growth too fast.",
-    badges: ["slow-release-safe"],
+    context:
+      "Your tall fescue is hitting peak spring growth — feed it now before summer stress begins.",
+    badge: "Slow Release ✓",
+    badgeColor: "#52B788",
   },
-  {
-    id: "task_005",
-    name: "Grub Preventative",
-    product: "GrubEx (Chlorantraniliprole)",
-    dateRange: "May 15 – Jun 1",
-    whyContext:
-      "Adult Japanese beetles are about to lay eggs. Apply now to disrupt the grub cycle before they damage roots in late summer.",
-    badges: [],
-  },
-];
-
-const PREVIEW_IDS = ["task_001", "task_003", "task_004"];
-
-const HERO_STATS = [
-  { value: "14", label: "Tasks" },
-  { value: "8", label: "Products" },
-  { value: "Full Year", label: "Coverage" },
-  { value: "$67", label: "One-time" },
-];
-
-const VALUE_ITEMS = [
-  "14 tasks — full year, every season",
-  "Exact product quantities for your lawn size",
-  "Week-by-week KC timing based on soil temps",
-  "Task completion tracking",
-  "Full year calendar view",
-  "KC context on every task — why it matters now",
-  "Milestone alerts — soil temp triggers and overseeding window",
-  "~$187–$746/yr saved vs. hiring out",
-  "Lifetime access — one-time payment",
 ];
 
 const SAVINGS_FIGURES = [
-  { label: "TruGreen/yr", value: "~$527", color: "#6B7B70", sub: "avg KC service" },
-  { label: "DIY w/ plan/yr", value: "~$154", color: "#52B788", sub: "products only" },
-  { label: "You save/yr", value: "~$373", color: "#F4631E", sub: "every year" },
+  { value: "~$527", label: "TruGreen/yr", color: "#6B7B70" },
+  { value: "~$154", label: "DIY w/ plan", color: "#52B788" },
+  { value: "~$373", label: "You save/yr", color: "#F4631E" },
 ];
+
+const PRIMARY_CTA_STYLE: React.CSSProperties = {
+  padding: "16px 40px",
+  background: "#F4631E",
+  color: "white",
+  border: "none",
+  borderRadius: "999px",
+  fontFamily: "Bebas Neue",
+  fontSize: "20px",
+  letterSpacing: "0.05em",
+  cursor: "pointer",
+  display: "block",
+  margin: "0 auto 10px",
+  width: "100%",
+  maxWidth: "400px",
+};
+
+const TRUST_LINE_STYLE: React.CSSProperties = {
+  fontFamily: "DM Mono",
+  fontSize: "11px",
+  color: "#6B7B70",
+  margin: 0,
+};
 
 export default function PlanPage() {
   const router = useRouter();
@@ -147,370 +138,544 @@ export default function PlanPage() {
   }
 
   const navState = isFree ? "free" : "guest";
-  const previewTasks = PREVIEW_IDS.map((id) => TASKS.find((t) => t.id === id)).filter(
-    (t): t is PlanTask => Boolean(t)
-  );
+  const soilTemp = weather?.soilTemp;
+  const soilTempStatus = weather?.soilTempStatus;
   const showUrgency =
-    weather?.soilTempStatus === "pre-emergent" || weather?.soilTempStatus === "closing";
-
-  const chipStyle: React.CSSProperties = {
-    background: "#D8F3DC",
-    color: "#1B4332",
-    fontFamily: "DM Mono",
-    fontSize: "12px",
-    padding: "4px 12px",
-    borderRadius: "999px",
-    display: "inline-flex",
-    alignItems: "center",
-  };
+    (soilTempStatus === "closing" || soilTempStatus === "pre-emergent") &&
+    typeof soilTemp === "number";
 
   return (
     <>
       <Nav userState={navState} />
 
       <main>
-        {/* SECTION 1 — HERO */}
+        {/* SECTION B1 — THE PROBLEM */}
         <section
           style={{
-            background: "#1B4332",
-            padding: "48px 24px",
+            background: "#F8F4E9",
+            padding: "48px 24px 40px",
             textAlign: "center",
+            borderBottom: "1px solid #D6E8DC",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "8px",
-              flexWrap: "wrap",
-              marginBottom: "20px",
-            }}
-          >
-            <span style={chipStyle}>Zone 6a — KC Metro</span>
-            <span style={chipStyle}>KC Heavy Clay Soil</span>
-            <span style={chipStyle}>Tall Fescue</span>
-            {lawnSqft ? (
-              <span style={chipStyle}>{lawnSqft.toLocaleString()} sq ft</span>
-            ) : (
-              <a href="/measure" style={{ ...chipStyle, textDecoration: "none" }}>
-                Add your size →
-              </a>
-            )}
-          </div>
-
-          <h1
-            className="text-[36px] sm:text-[48px]"
-            style={{
-              fontFamily: "Bebas Neue",
-              color: "white",
-              margin: "0 0 12px",
-              lineHeight: 1.1,
-              letterSpacing: "0.02em",
-            }}
-          >
-            YOUR KC LAWN PLAN
-            <br />
-            IS READY
-          </h1>
-
-          <p
-            style={{
-              fontFamily: "DM Sans",
-              fontSize: "16px",
-              color: "rgba(255,255,255,0.75)",
-              margin: "0 auto 32px",
-              maxWidth: "480px",
-              lineHeight: 1.6,
-            }}
-          >
-            14 tasks. Exact product quantities. Week-by-week timing built for Zone 6a clay
-            soil. Everything your KC lawn needs — all year.
-          </p>
-
-          <div
-            className="grid grid-cols-2 sm:flex"
-            style={{
-              justifyContent: "center",
-              gap: "32px",
-              flexWrap: "wrap",
-              marginBottom: "32px",
-            }}
-          >
-            {HERO_STATS.map((stat) => (
-              <div key={stat.label} style={{ textAlign: "center" }}>
-                <p
-                  style={{
-                    fontFamily: "Bebas Neue",
-                    fontSize: "36px",
-                    color: "#52B788",
-                    margin: 0,
-                    lineHeight: 1,
-                  }}
-                >
-                  {stat.value}
-                </p>
-                <p
-                  style={{
-                    fontFamily: "DM Mono",
-                    fontSize: "11px",
-                    color: "rgba(255,255,255,0.5)",
-                    margin: "4px 0 0",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setUnlockModalOpen(true)}
-            className="w-full sm:w-auto"
-            style={{
-              padding: "16px 48px",
-              background: "#F4631E",
-              color: "white",
-              border: "none",
-              borderRadius: "999px",
-              fontFamily: "Bebas Neue",
-              fontSize: "22px",
-              letterSpacing: "0.05em",
-              cursor: "pointer",
-              marginBottom: "12px",
-            }}
-          >
-            Unlock My KC Lawn Plan — $67 →
-          </button>
-
-          <p
-            style={{
-              fontFamily: "DM Mono",
-              fontSize: "11px",
-              color: "rgba(255,255,255,0.4)",
-              margin: 0,
-            }}
-          >
-            One-time payment · Lifetime access · No subscription ever
-          </p>
-        </section>
-
-        {/* SECTION 2 — URGENCY ALERT */}
-        {showUrgency && weather?.soilTempAlert && (
-          <div
-            style={{
-              background: "#FFF0EB",
-              borderLeft: "4px solid #F4631E",
-              padding: "14px 20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <AlertTriangle size={16} color="#F4631E" />
-            <span
-              style={{
-                fontFamily: "DM Sans",
-                fontSize: "14px",
-                color: "#1B4332",
-                fontWeight: 500,
-              }}
-            >
-              {weather.soilTempAlert}
-            </span>
-          </div>
-        )}
-
-        {/* SECTION 3 — TASK PREVIEW */}
-        <div style={{ padding: "32px 24px 16px" }}>
           <p
             style={{
               fontFamily: "DM Mono",
               fontSize: "11px",
               color: "#6B7B70",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              margin: "0 0 4px",
+              letterSpacing: "0.08em",
+              margin: "0 0 16px",
             }}
           >
-            WHAT&rsquo;S IN YOUR PLAN RIGHT NOW
+            For KC Homeowners Who Care About Their Lawn
           </p>
-          <h2
+
+          <h1
+            className="text-[34px] sm:text-[44px]"
             style={{
               fontFamily: "Bebas Neue",
-              fontSize: "28px",
               color: "#1B4332",
-              margin: 0,
+              margin: "0 auto 16px",
+              lineHeight: 1.05,
+              letterSpacing: "0.02em",
+              maxWidth: "520px",
             }}
           >
-            SPRING TASKS — ZONE 6A
-          </h2>
-        </div>
+            KC Lawns Are Harder Than The Bag Instructions Say.
+          </h1>
 
-        <div style={{ padding: "0 24px" }}>
-          {previewTasks.map((task) => (
-            <div
-              key={task.id}
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "16px",
+              color: "#6B7B70",
+              margin: "0 auto 24px",
+              maxWidth: "480px",
+              lineHeight: 1.7,
+            }}
+          >
+            You&rsquo;re not doing it wrong. You just need KC-specific timing. Heavy
+            clay soil, Zone 6a temperature swings, and a pre-emergent window that
+            opens and closes in weeks — not months.
+          </p>
+
+          <div
+            style={{
+              display: "inline-block",
+              background: "white",
+              border: "1px solid #D6E8DC",
+              borderLeft: "4px solid #52B788",
+              borderRadius: "8px",
+              padding: "14px 20px",
+              maxWidth: "480px",
+              textAlign: "left",
+            }}
+          >
+            <p
               style={{
-                background: "white",
-                border: "1px solid #D6E8DC",
-                borderRadius: "12px",
-                padding: "16px 20px",
-                marginBottom: "12px",
+                fontFamily: "DM Sans",
+                fontSize: "14px",
+                color: "#1B4332",
+                margin: 0,
+                lineHeight: 1.6,
+                fontStyle: "italic",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: "6px",
-                  gap: "12px",
-                }}
-              >
-                <div>
-                  <p
-                    style={{
-                      fontFamily: "DM Sans",
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      color: "#1B4332",
-                      margin: "0 0 2px",
-                    }}
-                  >
-                    {task.name}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "DM Mono",
-                      fontSize: "12px",
-                      color: "#52B788",
-                      margin: 0,
-                    }}
-                  >
-                    {task.product}
-                  </p>
-                </div>
-                <span
-                  style={{
-                    fontFamily: "DM Mono",
-                    fontSize: "11px",
-                    color: "#6B7B70",
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                  }}
-                >
-                  {task.dateRange}
-                </span>
-              </div>
+              &ldquo;Most lawn care advice is written for Atlanta or Dallas. We
+              built Teriyaki Turf for Kansas City — because KC clay, Zone 6a
+              timing, and our weather are a different game entirely.&rdquo;
+            </p>
+            <p
+              style={{
+                fontFamily: "DM Mono",
+                fontSize: "11px",
+                color: "#6B7B70",
+                margin: "8px 0 0",
+              }}
+            >
+              — Teriyaki T, KC homeowner
+            </p>
+          </div>
+        </section>
 
-              <p
-                style={{
-                  fontFamily: "DM Sans",
-                  fontSize: "13px",
-                  color: "#6B7B70",
-                  margin: "0 0 10px",
-                  lineHeight: 1.5,
-                }}
-              >
-                {task.whyContext.split(".")[0] + "."}
-              </p>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: "8px",
-                }}
-              >
-                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                  {task.badges.map((badge) => (
-                    <KCComplianceBadge key={badge} type={badge} />
-                  ))}
-                </div>
-
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    fontFamily: "DM Mono",
-                    fontSize: "12px",
-                    color: "#6B7B70",
-                    background: "#F8F4E9",
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    border: "1px solid #D6E8DC",
-                  }}
-                >
-                  <Lock size={11} />
-                  Unlock quantity
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div
+        {/* SECTION B2 — THE SOLUTION EXISTS */}
+        <section
           style={{
+            background: "white",
+            padding: "48px 24px",
+            borderBottom: "1px solid #D6E8DC",
             textAlign: "center",
-            padding: "16px",
-            color: "#6B7B70",
-            fontFamily: "DM Sans",
-            fontSize: "13px",
           }}
         >
-          + 11 more tasks across Summer, Fall and Winter →
-        </div>
+          <p
+            style={{
+              fontFamily: "DM Mono",
+              fontSize: "11px",
+              color: "#6B7B70",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              margin: "0 0 12px",
+            }}
+          >
+            The KC Difference
+          </p>
 
-        {/* SECTION 4 — WHAT YOU GET */}
+          <h2
+            className="text-[28px] sm:text-[36px]"
+            style={{
+              fontFamily: "Bebas Neue",
+              color: "#1B4332",
+              margin: "0 0 16px",
+              lineHeight: 1.1,
+            }}
+          >
+            There&rsquo;s A Right Order Of Operations For KC Lawns.
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "15px",
+              color: "#6B7B70",
+              margin: "0 auto 32px",
+              maxWidth: "460px",
+              lineHeight: 1.7,
+            }}
+          >
+            Soil temp triggers — not calendar dates. Clay soil product rates — not
+            bag instructions. Zone 6a timing — not national averages. When you
+            get the sequence right, KC lawns respond fast.
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "16px",
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
+            {DIFFERENTIATORS.map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  background: "#F8F4E9",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  textAlign: "left",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "Bebas Neue",
+                    fontSize: "16px",
+                    color: "#1B4332",
+                    margin: "0 0 8px",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {item.label}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "DM Sans",
+                    fontSize: "13px",
+                    color: "#6B7B70",
+                    margin: 0,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SECTION B3 — THIS SOLUTION WORKS */}
         <section
           style={{
             background: "#F8F4E9",
-            padding: "32px 24px",
-            borderTop: "1px solid #D6E8DC",
+            padding: "48px 24px",
             borderBottom: "1px solid #D6E8DC",
           }}
         >
-          <h2
+          <div style={{ textAlign: "center", marginBottom: "24px" }}>
+            <p
+              style={{
+                fontFamily: "DM Mono",
+                fontSize: "11px",
+                color: "#6B7B70",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                margin: "0 0 8px",
+              }}
+            >
+              Real Tasks. Right Now. For KC.
+            </p>
+            <h2
+              className="text-[26px] sm:text-[32px]"
+              style={{
+                fontFamily: "Bebas Neue",
+                color: "#1B4332",
+                margin: 0,
+              }}
+            >
+              Here&rsquo;s What Your Plan Says To Do This Spring
+            </h2>
+          </div>
+
+          {showUrgency && (
+            <div
+              style={{
+                background: "#FFF0EB",
+                borderLeft: "4px solid #F4631E",
+                borderRadius: "8px",
+                padding: "12px 16px",
+                marginBottom: "16px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                maxWidth: "640px",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              <AlertTriangle size={15} color="#F4631E" />
+              <span
+                style={{
+                  fontFamily: "DM Sans",
+                  fontSize: "13px",
+                  color: "#1B4332",
+                  fontWeight: 500,
+                }}
+              >
+                {soilTemp}°F soil temp in KC right now
+                {soilTempStatus === "closing" &&
+                  " — pre-emergent window closing fast"}
+                {soilTempStatus === "pre-emergent" &&
+                  " — pre-emergent window is open now"}
+              </span>
+            </div>
+          )}
+
+          <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+            {PREVIEW_TASKS.map((task) => (
+              <div
+                key={task.name}
+                style={{
+                  background: "white",
+                  border: "1px solid #D6E8DC",
+                  borderRadius: "12px",
+                  padding: "16px 20px",
+                  marginBottom: "10px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                    marginBottom: "6px",
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: "DM Sans",
+                        fontSize: "15px",
+                        fontWeight: 600,
+                        color: "#1B4332",
+                        margin: "0 0 2px",
+                      }}
+                    >
+                      {task.name}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "DM Mono",
+                        fontSize: "12px",
+                        color: "#52B788",
+                        margin: 0,
+                      }}
+                    >
+                      {task.product}
+                    </p>
+                  </div>
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: "#6B7B70",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {task.dateRange}
+                  </span>
+                </div>
+
+                <p
+                  style={{
+                    fontFamily: "DM Sans",
+                    fontSize: "13px",
+                    color: "#6B7B70",
+                    margin: "0 0 10px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {task.context}
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: task.badgeColor,
+                      background: task.badgeColor + "18",
+                      padding: "3px 8px",
+                      borderRadius: "999px",
+                    }}
+                  >
+                    {task.badge}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: "#6B7B70",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    <Lock size={10} />
+                    Unlock quantity
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            <p
+              style={{
+                fontFamily: "DM Sans",
+                fontSize: "13px",
+                color: "#6B7B70",
+                textAlign: "center",
+                margin: "16px 0 0",
+              }}
+            >
+              + 11 more tasks through Summer, Fall and Winter — including the
+              fall overseeding window, winterizer, and grub prevention.
+            </p>
+          </div>
+        </section>
+
+        {/* SECTION B4 — IT WORKS FOR ME */}
+        <section
+          style={{
+            background: "white",
+            padding: "48px 24px",
+            borderBottom: "1px solid #D6E8DC",
+            textAlign: "center",
+          }}
+        >
+          <p
             style={{
-              fontFamily: "Bebas Neue",
-              fontSize: "28px",
-              color: "#1B4332",
-              margin: "0 0 20px",
-              textAlign: "center",
+              fontFamily: "DM Mono",
+              fontSize: "11px",
+              color: "#6B7B70",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              margin: "0 0 12px",
             }}
           >
-            EVERYTHING IN YOUR $67 PLAN
+            Built For Your Specific Lawn
+          </p>
+
+          <h2
+            className="text-[26px] sm:text-[32px]"
+            style={{
+              fontFamily: "Bebas Neue",
+              color: "#1B4332",
+              margin: "0 0 8px",
+              lineHeight: 1.1,
+            }}
+          >
+            This Isn&rsquo;t A Generic Plan. It&rsquo;s Yours.
           </h2>
 
-          <div style={{ maxWidth: "480px", margin: "0 auto" }}>
-            {VALUE_ITEMS.map((item, i) => (
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "15px",
+              color: "#6B7B70",
+              margin: "0 auto 24px",
+              maxWidth: "400px",
+              lineHeight: 1.7,
+            }}
+          >
+            Every task, every quantity, every timing window calculated for your
+            exact lawn profile.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "8px",
+              flexWrap: "wrap",
+              marginBottom: "24px",
+            }}
+          >
+            {[
+              { label: "ZONE", value: "Zone 6a — KC Metro" },
+              { label: "SOIL", value: "KC Heavy Clay" },
+              { label: "GRASS", value: "Tall Fescue" },
+              {
+                label: "SIZE",
+                value: lawnSqft
+                  ? `${lawnSqft.toLocaleString()} sq ft`
+                  : "Add your size →",
+              },
+            ].map((chip) => (
+              <div
+                key={chip.label}
+                style={{
+                  background: "#D8F3DC",
+                  borderRadius: "999px",
+                  padding: "6px 14px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "DM Mono",
+                    fontSize: "10px",
+                    color: "#6B7B70",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {chip.label}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "DM Mono",
+                    fontSize: "12px",
+                    color: "#1B4332",
+                    fontWeight: 500,
+                  }}
+                >
+                  {chip.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              background: "#F8F4E9",
+              borderRadius: "12px",
+              padding: "20px",
+              maxWidth: "420px",
+              margin: "0 auto",
+              textAlign: "left",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "Bebas Neue",
+                fontSize: "16px",
+                color: "#1B4332",
+                margin: "0 0 12px",
+                letterSpacing: "0.03em",
+              }}
+            >
+              YOUR PLAN INCLUDES
+            </p>
+            {[
+              `Product quantities calculated for ${
+                lawnSqft
+                  ? `your ${lawnSqft.toLocaleString()} sq ft`
+                  : "your exact lawn size"
+              }`,
+              "Timing based on KC Zone 6a soil temperatures",
+              "Clay soil application rates — not generic bag instructions",
+              "Full year — Spring through Winter",
+              "Task tracking + milestone alerts",
+            ].map((item, i, arr) => (
               <div
                 key={i}
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: "10px",
-                  marginBottom: "12px",
+                  gap: "8px",
+                  marginBottom: i < arr.length - 1 ? "10px" : 0,
                 }}
               >
                 <span
-                  style={{
-                    color: "#52B788",
-                    fontSize: "16px",
-                    flexShrink: 0,
-                    marginTop: "1px",
-                  }}
+                  style={{ color: "#52B788", flexShrink: 0, marginTop: "2px" }}
                 >
                   ✓
                 </span>
                 <span
                   style={{
                     fontFamily: "DM Sans",
-                    fontSize: "14px",
+                    fontSize: "13px",
                     color: "#1B4332",
                     lineHeight: 1.5,
                   }}
@@ -522,37 +687,72 @@ export default function PlanPage() {
           </div>
         </section>
 
-        {/* SECTION 5 — SAVINGS COMPARISON */}
-        <section style={{ padding: "32px 24px", textAlign: "center" }}>
+        {/* SECTION B5 — ACT NOW */}
+        <section
+          style={{
+            background: "#F8F4E9",
+            padding: "48px 24px",
+            borderBottom: "1px solid #D6E8DC",
+            textAlign: "center",
+          }}
+        >
           <p
             style={{
               fontFamily: "DM Mono",
               fontSize: "11px",
               color: "#6B7B70",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              margin: "0 0 16px",
+              letterSpacing: "0.08em",
+              margin: "0 0 12px",
             }}
           >
-            WHAT KC HOMEOWNERS PAY VS. DIY
+            The Math Is Simple
+          </p>
+
+          <h2
+            className="text-[26px] sm:text-[32px]"
+            style={{
+              fontFamily: "Bebas Neue",
+              color: "#1B4332",
+              margin: "0 0 8px",
+              lineHeight: 1.1,
+            }}
+          >
+            $67 Once.
+            <br />
+            ~$373 Saved Every Year.
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "15px",
+              color: "#6B7B70",
+              margin: "0 auto 28px",
+              maxWidth: "400px",
+              lineHeight: 1.7,
+            }}
+          >
+            TruGreen charges ~$527/yr for KC lawns our size. DIY with this plan
+            costs ~$154/yr in products. The plan pays for itself in the first
+            month.
           </p>
 
           <div
-            className="flex flex-col sm:flex-row"
             style={{
+              display: "flex",
               justifyContent: "center",
-              gap: "16px",
+              gap: "24px",
               flexWrap: "wrap",
-              marginBottom: "16px",
-              alignItems: "center",
+              marginBottom: "32px",
             }}
           >
             {SAVINGS_FIGURES.map((item) => (
-              <div key={item.label} style={{ textAlign: "center", minWidth: "100px" }}>
+              <div key={item.label}>
                 <p
                   style={{
                     fontFamily: "Bebas Neue",
-                    fontSize: "36px",
+                    fontSize: "42px",
                     color: item.color,
                     margin: 0,
                     lineHeight: 1,
@@ -563,7 +763,7 @@ export default function PlanPage() {
                 <p
                   style={{
                     fontFamily: "DM Mono",
-                    fontSize: "10px",
+                    fontSize: "11px",
                     color: "#6B7B70",
                     margin: "4px 0 0",
                     textTransform: "uppercase",
@@ -571,91 +771,56 @@ export default function PlanPage() {
                 >
                   {item.label}
                 </p>
-                <p
-                  style={{
-                    fontFamily: "DM Sans",
-                    fontSize: "11px",
-                    color: "#6B7B70",
-                    margin: "2px 0 0",
-                  }}
-                >
-                  {item.sub}
-                </p>
               </div>
             ))}
           </div>
 
-          <p
-            style={{
-              fontFamily: "DM Sans",
-              fontSize: "13px",
-              color: "#6B7B70",
-              margin: "0 0 24px",
-            }}
-          >
-            The plan pays for itself in the first month.
+          <button onClick={() => setUnlockModalOpen(true)} style={PRIMARY_CTA_STYLE}>
+            Unlock My KC Lawn Plan — $67 →
+          </button>
+          <p style={TRUST_LINE_STYLE}>
+            One-time payment · Lifetime access · No subscription ever
           </p>
         </section>
 
-        {/* SECTION 6 — FINAL CTA */}
+        {/* FINAL CLOSE */}
         <section
           style={{
-            background: "#1B4332",
+            background: "white",
             padding: "48px 24px",
             textAlign: "center",
           }}
         >
           <h2
+            className="text-[28px] sm:text-[36px]"
             style={{
               fontFamily: "Bebas Neue",
-              fontSize: "36px",
-              color: "white",
-              margin: "0 0 8px",
+              color: "#1B4332",
+              margin: "0 0 12px",
               lineHeight: 1.1,
             }}
           >
-            YOUR KC LAWN PLAN IS WAITING.
+            Your KC Lawn Is Waiting For The Right Plan.
           </h2>
+
           <p
             style={{
               fontFamily: "DM Sans",
               fontSize: "15px",
-              color: "rgba(255,255,255,0.7)",
-              margin: "0 0 28px",
-              lineHeight: 1.6,
+              color: "#6B7B70",
+              margin: "0 auto 28px",
+              maxWidth: "400px",
+              lineHeight: 1.7,
             }}
           >
-            14 tasks. Exact quantities. Full year. $67 once. Yours forever.
+            Every week without it is a week of guessing. The pre-emergent window
+            doesn&rsquo;t wait. Neither does crabgrass.
           </p>
 
-          <button
-            onClick={() => setUnlockModalOpen(true)}
-            className="w-full sm:w-auto"
-            style={{
-              padding: "16px 48px",
-              background: "#F4631E",
-              color: "white",
-              border: "none",
-              borderRadius: "999px",
-              fontFamily: "Bebas Neue",
-              fontSize: "22px",
-              letterSpacing: "0.05em",
-              cursor: "pointer",
-              display: "block",
-              margin: "0 auto 12px",
-            }}
-          >
+          <button onClick={() => setUnlockModalOpen(true)} style={PRIMARY_CTA_STYLE}>
             Unlock My KC Lawn Plan — $67 →
           </button>
-
-          <p
-            style={{
-              fontFamily: "DM Mono",
-              fontSize: "11px",
-              color: "rgba(255,255,255,0.4)",
-              margin: 0,
-            }}
-          >
+          <p style={TRUST_LINE_STYLE}>
             One-time payment · Lifetime access · No subscription ever
           </p>
         </section>
