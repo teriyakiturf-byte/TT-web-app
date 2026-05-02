@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bell, Calendar, CheckSquare, MapPin, Ruler } from "lucide-react";
 import Nav from "@/components/Nav";
 import SoftGateOverlay from "@/components/ui/SoftGateOverlay";
 import UnlockModal from "@/components/ui/UnlockModal";
@@ -249,6 +250,76 @@ export default function PlanPage() {
             </div>
           </div>
         </div>
+
+        {/* Locked feature preview — free users only */}
+        {isFree && (
+          <section
+            className="bg-white"
+            style={{
+              border: "1px solid #D6E8DC",
+              borderRadius: "12px",
+              padding: "20px",
+              marginTop: "24px",
+            }}
+          >
+            <h2
+              className="font-display"
+              style={{ fontSize: "18px", color: "#1B4332" }}
+            >
+              UNLOCK YOUR FULL KC LAWN PLAN
+            </h2>
+            <ul className="mt-4 divide-y divide-border">
+              {[
+                {
+                  Icon: CheckSquare,
+                  title: "Task Completion Tracking",
+                  desc: "Check off tasks as you go. Track your progress through the season.",
+                },
+                {
+                  Icon: Calendar,
+                  title: "Full Year Calendar",
+                  desc: "Every task mapped visually across all 12 months.",
+                },
+                {
+                  Icon: MapPin,
+                  title: "KC Context on Every Task",
+                  desc: "Why each task matters right now for Zone 6a clay soil.",
+                },
+                {
+                  Icon: Bell,
+                  title: "Milestone Alerts",
+                  desc: "Soil temp triggers and overseeding window notifications.",
+                },
+                {
+                  Icon: Ruler,
+                  title: "Exact Product Quantities",
+                  desc: "Calculated for your specific lawn size.",
+                },
+              ].map(({ Icon, title, desc }) => (
+                <li key={title} className="flex items-start gap-3 py-3">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-lime-light">
+                    <Icon size={18} className="text-forest" />
+                  </div>
+                  <div>
+                    <p className="font-body text-sm font-bold text-forest">
+                      {title}
+                    </p>
+                    <p className="font-body text-[13px] text-muted">{desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => setShowModal(true)}
+              className="mt-4 w-full rounded-xl bg-orange px-6 py-3 font-display text-base text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
+            >
+              Unlock Full Plan — $67 →
+            </button>
+            <p className="mt-2 text-center font-mono text-[11px] text-muted">
+              One-time payment · Lifetime access · No subscription ever
+            </p>
+          </section>
+        )}
 
         {/* Sticky bottom bar for non-paid users */}
         {!isPaid && (
