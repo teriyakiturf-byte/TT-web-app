@@ -252,7 +252,10 @@ export default function PlanPage() {
 
         {/* Sticky bottom bar for non-paid users */}
         {!isPaid && (
-          <div className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3">
+          <div
+            id="sticky-unlock-bar"
+            className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3"
+          >
             <div className="mx-auto max-w-3xl flex items-center justify-between">
               <div>
                 <p className="font-display text-lg text-white">

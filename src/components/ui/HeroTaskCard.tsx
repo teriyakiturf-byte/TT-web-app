@@ -64,6 +64,47 @@ export default function HeroTaskCard({
   const [whyExpanded, setWhyExpanded] = useState(false);
   const { border, badge, badgeColor } = tierConfig[tier];
 
+  const firstSentence = whyContext
+    ? whyContext.match(/^[^.!?]*[.!?]/)?.[0]?.trim() ?? whyContext
+    : "";
+
+  const lockedWhySection = whyContext && (
+    <div className="mt-4 border-t border-white/10 pt-3">
+      <button
+        onClick={() => setWhyExpanded(!whyExpanded)}
+        className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80"
+      >
+        Why This Task?
+        {whyExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+      {whyExpanded && (
+        <>
+          <p className="text-sm text-white/60 mt-2 leading-relaxed">
+            {firstSentence}
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              document
+                .getElementById("sticky-unlock-bar")
+                ?.scrollIntoView({ behavior: "smooth", block: "center" })
+            }
+            className="mt-2 inline-flex items-center gap-2 rounded-lg font-body cursor-pointer"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              padding: "8px 12px",
+              fontSize: "12px",
+              color: "#52B788",
+            }}
+          >
+            <Lock size={12} color="#52B788" />
+            Unlock to read full KC context →
+          </button>
+        </>
+      )}
+    </div>
+  );
+
   if (tier === 5) {
     return (
       <div
@@ -102,6 +143,7 @@ export default function HeroTaskCard({
             </h2>
             <p className="font-mono text-sm text-lime mt-1">{productName}</p>
             <p className="text-sm text-white/70 mt-2">{applicationNotes}</p>
+            {lockedWhySection}
           </div>
 
           {/* Dark overlay + centered CTA */}
@@ -166,6 +208,7 @@ export default function HeroTaskCard({
               </div>
             </div>
           </div>
+          {lockedWhySection}
         </>
       ) : (
         <>
