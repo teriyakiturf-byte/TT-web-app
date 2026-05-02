@@ -31,9 +31,16 @@ export default function TaskRow({
     <div
       className={`flex items-start gap-3 rounded-lg border border-border bg-white px-4 py-3 transition-opacity ${
         isComplete ? "opacity-50" : ""
-      } ${isFree ? "border-l-[3px] border-l-lime" : ""}`}
+      }`}
     >
-      {!isFree && (
+      {isFree ? (
+        <span
+          title="Unlock to track your progress"
+          className="mt-0.5 flex h-5 w-5 flex-shrink-0 cursor-not-allowed items-center justify-center rounded border-2 border-border bg-cream"
+        >
+          <Lock size={10} color="#6B7B70" />
+        </span>
+      ) : (
         <button
           onClick={onToggle}
           disabled={isLocked}
