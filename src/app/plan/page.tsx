@@ -164,6 +164,31 @@ export default function PlanPage() {
           )}
 
           <div className={isGuest ? "soft-gate-content" : ""}>
+            {/* Estimated Savings Card — free plan only */}
+            {isFree && (
+              <div className="flex flex-wrap justify-between gap-3 rounded-xl bg-forest p-5 mb-5">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-wider text-white/60">
+                    Your Estimated Savings
+                  </p>
+                  <p
+                    className="font-display leading-none mt-1"
+                    style={{ fontSize: "32px", color: "var(--lime)" }}
+                  >
+                    ~$187–$746/YR
+                  </p>
+                  <p className="font-body text-[12px] text-white/60 mt-1">
+                    vs. TruGreen avg for KC lawns
+                  </p>
+                </div>
+                <div className="flex flex-col justify-center gap-1.5 font-mono text-[11px] text-white/70">
+                  <p>✓ 14 tasks · full year</p>
+                  <p>✓ 8 products · KC specific</p>
+                  <p>✓ Zone 6a timing</p>
+                </div>
+              </div>
+            )}
+
             {/* Hero Task Card */}
             <div className="mb-5">
               <HeroTaskCard
