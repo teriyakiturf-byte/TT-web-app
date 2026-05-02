@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Eye } from "lucide-react";
 import Nav from "@/components/Nav";
 import SoftGateOverlay from "@/components/ui/SoftGateOverlay";
 import UnlockModal from "@/components/ui/UnlockModal";
@@ -9,7 +8,6 @@ import HeroTaskCard from "@/components/ui/HeroTaskCard";
 import TaskRow from "@/components/ui/TaskRow";
 import StatCard from "@/components/ui/StatCard";
 import SeasonPill from "@/components/ui/SeasonPill";
-import UpgradeNudge from "@/components/ui/UpgradeNudge";
 import { useUserState } from "@/hooks/useUserState";
 import { calculateQuantity } from "@/types";
 
@@ -156,27 +154,6 @@ export default function PlanPage() {
           )}
         </div>
 
-        {/* Free account orientation banner */}
-        {isFree && (
-          <div
-            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-lime bg-lime-light p-4 mb-5"
-            style={{ borderLeftWidth: "4px" }}
-          >
-            <div className="flex items-center gap-2">
-              <Eye size={16} className="text-lime flex-shrink-0" />
-              <p className="font-display text-[16px] text-forest">
-                Free Preview — Task Names & Products Visible
-              </p>
-            </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="rounded-full bg-orange px-4 py-1.5 font-display text-xs text-white uppercase tracking-wider hover:bg-orange/90 transition-colors whitespace-nowrap"
-            >
-              Unlock Full Plan — $67 →
-            </button>
-          </div>
-        )}
-
         {/* Blurred content section — full blur for guests only */}
         <div className="relative mt-8">
           {isGuest && (
@@ -247,17 +224,6 @@ export default function PlanPage() {
             </div>
           </div>
         </div>
-
-        {/* Upgrade nudge for non-paid users */}
-        {!isPaid && (
-          <div className="mt-8">
-            <UpgradeNudge
-              headline="See Exact Quantities"
-              body="Unlock your personalized plan with product quantities calculated for your exact lawn size. $67 one-time. Lifetime access."
-              onUnlockClick={() => setShowModal(true)}
-            />
-          </div>
-        )}
 
         {/* Sticky bottom bar for non-paid users */}
         {!isPaid && (

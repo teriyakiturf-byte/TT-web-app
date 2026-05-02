@@ -165,14 +165,6 @@ export default function HeroTaskCard({
                 )}
               </div>
             </div>
-            {tier !== 4 && (
-              <button
-                onClick={onUnlockClick}
-                className="mt-3 w-full rounded-xl bg-orange px-6 py-3 font-display text-[16px] text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
-              >
-                Unlock for $67 →
-              </button>
-            )}
           </div>
         </>
       ) : (
