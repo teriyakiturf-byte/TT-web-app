@@ -118,7 +118,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
                 href="/signup"
                 className="rounded-full bg-orange px-4 py-1.5 text-sm font-display uppercase tracking-wider hover:bg-orange/90 transition-colors"
               >
-                Get My Plan
+                Unlock Plan
               </Link>
             </>
           )}
@@ -204,11 +204,7 @@ export default function Nav({ userState: userStateProp }: NavProps) {
             href={!isLoggedIn ? "/signup" : "/plan"}
             className="block w-full text-center rounded-full bg-orange px-4 py-2 text-sm font-display uppercase tracking-wider mt-2"
           >
-            {!isLoggedIn
-              ? "Get My Plan"
-              : isPaid
-              ? "My Plan"
-              : "Unlock Plan"}
+            {isPaid ? "My Plan" : "Unlock Plan"}
           </Link>
         </div>
       )}
