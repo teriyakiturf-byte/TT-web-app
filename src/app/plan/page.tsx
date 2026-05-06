@@ -269,13 +269,6 @@ export default function PlanPage() {
 
   return (
     <>
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
-
       {isGuest && (
         <section
           style={{
@@ -287,7 +280,7 @@ export default function PlanPage() {
         >
           <p style={EYEBROW_STYLE}>Built For Your KC Lawn</p>
 
-          <h1 style={HEADLINE_STYLE}>
+          <h1 className="plan-headline" style={HEADLINE_STYLE}>
             This Isn&rsquo;t A Generic Plan. It&rsquo;s Yours.
           </h1>
 
@@ -363,7 +356,7 @@ export default function PlanPage() {
         >
           <p style={EYEBROW_STYLE}>Built For Your KC Lawn</p>
 
-          <h1 style={HEADLINE_STYLE}>
+          <h1 className="plan-headline" style={HEADLINE_STYLE}>
             This Isn&rsquo;t A Generic Plan. It&rsquo;s Yours.
           </h1>
 
@@ -631,6 +624,7 @@ export default function PlanPage() {
           </p>
 
           <div
+            className="plan-savings-row"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -646,6 +640,7 @@ export default function PlanPage() {
             ].map((item) => (
               <div key={item.label}>
                 <p
+                  className="plan-savings-value"
                   style={{
                     fontFamily: "Bebas Neue",
                     fontSize: "42px",
