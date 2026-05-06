@@ -6,16 +6,179 @@ import UnlockModal from "@/components/ui/UnlockModal";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
 
+const KC_PREFIXES = [
+  "640",
+  "641",
+  "660",
+  "661",
+  "662",
+  "664",
+  "665",
+  "666",
+];
+
+const PRIMARY_CTA_STYLE: React.CSSProperties = {
+  padding: "16px 40px",
+  background: "#F4631E",
+  color: "white",
+  border: "none",
+  borderRadius: "999px",
+  fontFamily: "Bebas Neue",
+  fontSize: "20px",
+  letterSpacing: "0.05em",
+  cursor: "pointer",
+  display: "block",
+  margin: "0 auto 10px",
+  width: "100%",
+  maxWidth: "400px",
+};
+
+const TRUST_LINE_STYLE: React.CSSProperties = {
+  fontFamily: "DM Mono",
+  fontSize: "11px",
+  color: "#6B7B70",
+  margin: 0,
+};
+
+const EYEBROW_STYLE: React.CSSProperties = {
+  fontFamily: "DM Mono",
+  fontSize: "11px",
+  color: "#6B7B70",
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  margin: "0 0 16px",
+};
+
+const HEADLINE_STYLE: React.CSSProperties = {
+  fontFamily: "Bebas Neue",
+  fontSize: "44px",
+  color: "#1B4332",
+  margin: "0 auto 16px",
+  lineHeight: 1.05,
+  letterSpacing: "0.02em",
+  maxWidth: "520px",
+};
+
+const SUBHEAD_STYLE: React.CSSProperties = {
+  fontFamily: "DM Sans",
+  fontSize: "15px",
+  color: "#6B7B70",
+  margin: "0 auto 24px",
+  maxWidth: "420px",
+  lineHeight: 1.7,
+};
+
+const ZIP_INPUT_STYLE: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  maxWidth: "280px",
+  margin: "0 auto 8px",
+  padding: "14px 16px",
+  border: "2px solid #D6E8DC",
+  borderRadius: "999px",
+  fontFamily: "DM Mono",
+  fontSize: "16px",
+  textAlign: "center",
+  outline: "none",
+  background: "white",
+  color: "#1B4332",
+};
+
+const ZIP_HELPER_STYLE: React.CSSProperties = {
+  fontFamily: "DM Sans",
+  fontSize: "12px",
+  color: "#6B7B70",
+  margin: 0,
+};
+
+const CHIP_ROW_STYLE: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: "8px",
+  flexWrap: "wrap",
+  marginBottom: "16px",
+  opacity: 0,
+  animation: "fadeIn 300ms ease-out forwards",
+};
+
+const CHIP_ROW_STATIC_STYLE: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: "8px",
+  flexWrap: "wrap",
+  marginBottom: "24px",
+};
+
+const CHIP_STYLE: React.CSSProperties = {
+  background: "#D8F3DC",
+  borderRadius: "999px",
+  padding: "6px 14px",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+};
+
+const CHIP_LABEL_STYLE: React.CSSProperties = {
+  fontFamily: "DM Mono",
+  fontSize: "10px",
+  color: "#6B7B70",
+  textTransform: "uppercase",
+};
+
+const CHIP_VALUE_STYLE: React.CSSProperties = {
+  fontFamily: "DM Mono",
+  fontSize: "12px",
+  color: "#1B4332",
+  fontWeight: 500,
+};
+
+const READY_MESSAGE_STYLE: React.CSSProperties = {
+  fontFamily: "DM Sans",
+  fontSize: "15px",
+  color: "#1B4332",
+  fontWeight: 700,
+  margin: "0 auto 24px",
+  maxWidth: "420px",
+  lineHeight: 1.6,
+};
+
 export default function PlanPage() {
   const router = useRouter();
-  const { loading: isLoading, isPaid, lawnSqft, email } = useUserState();
+  const {
+    loading: isLoading,
+    isPaid,
+    isGuest,
+    isFree,
+    lawnSqft,
+    grassType,
+    email,
+  } = useUserState();
   useWeather();
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [zip, setZip] = useState("");
+  const [zoneData, setZoneData] = useState<null | {
+    zone: string;
+    soil: string;
+    grass: string;
+  }>(null);
 
   useEffect(() => {
     if (!isLoading && isPaid) router.replace("/dashboard");
   }, [isLoading, isPaid, router]);
+
+  function handleZipChange(value: string) {
+    setZip(value);
+    if (value.length === 5 && /^\d{5}$/.test(value)) {
+      if (KC_PREFIXES.some((p) => value.startsWith(p))) {
+        setZoneData({
+          zone: "Zone 6a — KC Metro",
+          soil: "KC Heavy Clay",
+          grass: "Tall Fescue",
+        });
+      }
+    }
+  }
 
   async function handleStripeCheckout() {
     if (checkoutLoading) return;
@@ -71,6 +234,144 @@ export default function PlanPage() {
 
   return (
     <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
+      {isGuest && (
+        <section
+          style={{
+            background: "#F8F4E9",
+            padding: "56px 24px 48px",
+            textAlign: "center",
+            borderBottom: "1px solid #D6E8DC",
+          }}
+        >
+          <p style={EYEBROW_STYLE}>Built For Your KC Lawn</p>
+
+          <h1 style={HEADLINE_STYLE}>
+            This Isn&rsquo;t A Generic Plan. It&rsquo;s Yours.
+          </h1>
+
+          <p style={SUBHEAD_STYLE}>
+            Enter your ZIP and see exactly what your KC lawn needs — Zone 6a
+            timing, KC clay soil rates, and the right products for your grass
+            type.
+          </p>
+
+          {zoneData === null ? (
+            <div style={{ marginBottom: "24px" }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={5}
+                placeholder="Enter your ZIP code"
+                value={zip}
+                onChange={(e) => handleZipChange(e.target.value)}
+                style={ZIP_INPUT_STYLE}
+              />
+              <p style={ZIP_HELPER_STYLE}>
+                We&rsquo;ll show your zone data instantly
+              </p>
+            </div>
+          ) : (
+            <>
+              <div style={CHIP_ROW_STYLE}>
+                <div style={CHIP_STYLE}>
+                  <span style={CHIP_LABEL_STYLE}>ZONE</span>
+                  <span style={CHIP_VALUE_STYLE}>{zoneData.zone}</span>
+                </div>
+                <div style={CHIP_STYLE}>
+                  <span style={CHIP_LABEL_STYLE}>SOIL</span>
+                  <span style={CHIP_VALUE_STYLE}>{zoneData.soil}</span>
+                </div>
+                <div style={CHIP_STYLE}>
+                  <span style={CHIP_LABEL_STYLE}>GRASS</span>
+                  <span style={CHIP_VALUE_STYLE}>{zoneData.grass}</span>
+                </div>
+                <div style={CHIP_STYLE}>
+                  <span style={CHIP_LABEL_STYLE}>SIZE</span>
+                  <span style={CHIP_VALUE_STYLE}>Add your size →</span>
+                </div>
+              </div>
+
+              <p style={READY_MESSAGE_STYLE}>
+                Your Zone 6a KC lawn plan is ready. 14 tasks. Exact quantities.
+                Full year coverage.
+              </p>
+            </>
+          )}
+
+          <button
+            onClick={() => setUnlockModalOpen(true)}
+            style={PRIMARY_CTA_STYLE}
+          >
+            Unlock My KC Lawn Plan — $67 →
+          </button>
+          <p style={TRUST_LINE_STYLE}>
+            One-time payment · Lifetime access · No subscription ever
+          </p>
+        </section>
+      )}
+
+      {isFree && (
+        <section
+          style={{
+            background: "#F8F4E9",
+            padding: "56px 24px 48px",
+            textAlign: "center",
+            borderBottom: "1px solid #D6E8DC",
+          }}
+        >
+          <p style={EYEBROW_STYLE}>Built For Your KC Lawn</p>
+
+          <h1 style={HEADLINE_STYLE}>
+            This Isn&rsquo;t A Generic Plan. It&rsquo;s Yours.
+          </h1>
+
+          <p style={SUBHEAD_STYLE}>
+            Your Zone 6a KC lawn plan is ready. 14 tasks. Exact product
+            quantities. Full year coverage.
+          </p>
+
+          <div style={CHIP_ROW_STATIC_STYLE}>
+            <div style={CHIP_STYLE}>
+              <span style={CHIP_LABEL_STYLE}>ZONE</span>
+              <span style={CHIP_VALUE_STYLE}>Zone 6a — KC Metro</span>
+            </div>
+            <div style={CHIP_STYLE}>
+              <span style={CHIP_LABEL_STYLE}>SOIL</span>
+              <span style={CHIP_VALUE_STYLE}>KC Heavy Clay</span>
+            </div>
+            <div style={CHIP_STYLE}>
+              <span style={CHIP_LABEL_STYLE}>GRASS</span>
+              <span style={CHIP_VALUE_STYLE}>{grassType || "Tall Fescue"}</span>
+            </div>
+            <div style={CHIP_STYLE}>
+              <span style={CHIP_LABEL_STYLE}>SIZE</span>
+              <span style={CHIP_VALUE_STYLE}>
+                {lawnSqft
+                  ? `${lawnSqft.toLocaleString()} sq ft`
+                  : "Add your size →"}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setUnlockModalOpen(true)}
+            style={PRIMARY_CTA_STYLE}
+          >
+            Unlock My KC Lawn Plan — $67 →
+          </button>
+          <p style={TRUST_LINE_STYLE}>
+            One-time payment · Lifetime access · No subscription ever
+          </p>
+        </section>
+      )}
+
       <div
         id="sticky-unlock-bar"
         className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3"
