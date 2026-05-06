@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertTriangle, Lock } from "lucide-react";
 import UnlockModal from "@/components/ui/UnlockModal";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
@@ -15,6 +16,35 @@ const KC_PREFIXES = [
   "664",
   "665",
   "666",
+];
+
+const PREVIEW_TASKS = [
+  {
+    name: "Apply Pre-Emergent (Split App #1)",
+    product: "Prodiamine 65 WDG",
+    dateRange: "Mar 15 – Apr 1",
+    context:
+      "Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing.",
+    badge: "Soil Temp Triggered",
+    badgeColor: "#52B788",
+  },
+  {
+    name: "Broadleaf Weed Spray",
+    product: "Trimec Classic",
+    dateRange: "Apr 15 – May 1",
+    context: "Dandelions and clover are actively growing in KC clay right now.",
+    badge: "Apply Before May 1",
+    badgeColor: "#F4631E",
+  },
+  {
+    name: "Spring Fertilizer Application",
+    product: "Milorganite 6-4-0",
+    dateRange: "May 1 – May 15",
+    context:
+      "Your tall fescue is hitting peak spring growth — feed it before summer heat stress arrives.",
+    badge: "Slow Release ✓",
+    badgeColor: "#52B788",
+  },
 ];
 
 const PRIMARY_CTA_STYLE: React.CSSProperties = {
@@ -153,7 +183,12 @@ export default function PlanPage() {
     grassType,
     email,
   } = useUserState();
-  useWeather();
+  const { weather } = useWeather();
+  const soilTemp = weather?.soilTemp;
+  const soilTempStatus = weather?.soilTempStatus;
+  const showUrgency =
+    typeof soilTemp === "number" &&
+    (soilTempStatus === "closing" || soilTempStatus === "pre-emergent");
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [zip, setZip] = useState("");
@@ -369,6 +404,191 @@ export default function PlanPage() {
           <p style={TRUST_LINE_STYLE}>
             One-time payment · Lifetime access · No subscription ever
           </p>
+        </section>
+      )}
+
+      {(isGuest || isFree) && (
+        <section
+          style={{
+            background: "white",
+            padding: "48px 24px",
+            borderBottom: "1px solid #D6E8DC",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: "24px" }}>
+            <p
+              style={{
+                fontFamily: "DM Mono",
+                fontSize: "11px",
+                color: "#6B7B70",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                margin: "0 0 8px",
+              }}
+            >
+              Real Tasks. Right Now. For KC.
+            </p>
+            <h2
+              style={{
+                fontFamily: "Bebas Neue",
+                fontSize: "32px",
+                color: "#1B4332",
+                margin: 0,
+                lineHeight: 1.1,
+              }}
+            >
+              Here&rsquo;s What Your Plan Includes This Spring
+            </h2>
+          </div>
+
+          <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+            {showUrgency && (
+              <div
+                style={{
+                  background: "#FFF0EB",
+                  borderLeft: "4px solid #F4631E",
+                  borderRadius: "8px",
+                  padding: "12px 16px",
+                  marginBottom: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <AlertTriangle size={15} color="#F4631E" />
+                <span
+                  style={{
+                    fontFamily: "DM Sans",
+                    fontSize: "13px",
+                    color: "#1B4332",
+                    fontWeight: 500,
+                  }}
+                >
+                  {soilTemp}°F soil temp in KC right now — pre-emergent window
+                  closing fast
+                </span>
+              </div>
+            )}
+
+            {PREVIEW_TASKS.map((task) => (
+              <div
+                key={task.name}
+                style={{
+                  background: "#F8F4E9",
+                  border: "1px solid #D6E8DC",
+                  borderRadius: "12px",
+                  padding: "16px 20px",
+                  marginBottom: "10px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: "DM Sans",
+                      fontSize: "15px",
+                      fontWeight: 700,
+                      color: "#1B4332",
+                      margin: 0,
+                    }}
+                  >
+                    {task.name}
+                  </p>
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: "#6B7B70",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {task.dateRange}
+                  </span>
+                </div>
+
+                <p
+                  style={{
+                    fontFamily: "DM Mono",
+                    fontSize: "12px",
+                    color: "#52B788",
+                    margin: "0 0 8px",
+                  }}
+                >
+                  {task.product}
+                </p>
+
+                <p
+                  style={{
+                    fontFamily: "DM Sans",
+                    fontSize: "13px",
+                    color: "#6B7B70",
+                    margin: "0 0 10px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {task.context}
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: task.badgeColor,
+                      background: task.badgeColor + "18",
+                      padding: "3px 8px",
+                      borderRadius: "999px",
+                    }}
+                  >
+                    {task.badge}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "DM Mono",
+                      fontSize: "11px",
+                      color: "#6B7B70",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    <Lock size={10} color="#6B7B70" />
+                    Unlock quantity
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            <p
+              style={{
+                fontFamily: "DM Sans",
+                fontSize: "13px",
+                color: "#6B7B70",
+                textAlign: "center",
+                margin: "16px 0 0",
+                lineHeight: 1.5,
+              }}
+            >
+              + 11 more tasks through Summer, Fall and Winter — including fall
+              overseeding, winterizer, and grub prevention.
+            </p>
+          </div>
         </section>
       )}
 
