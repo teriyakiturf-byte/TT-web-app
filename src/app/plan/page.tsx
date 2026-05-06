@@ -592,6 +592,112 @@ export default function PlanPage() {
         </section>
       )}
 
+      {(isGuest || isFree) && (
+        <section
+          style={{
+            background: "#F8F4E9",
+            padding: "48px 24px",
+            borderBottom: "1px solid #D6E8DC",
+            textAlign: "center",
+          }}
+        >
+          <p style={EYEBROW_STYLE}>The Math Is Simple</p>
+
+          <h2
+            style={{
+              fontFamily: "Bebas Neue",
+              fontSize: "40px",
+              lineHeight: 1.05,
+              margin: "0 0 16px",
+            }}
+          >
+            <span style={{ color: "#1B4332" }}>$67 Once.</span>
+            <br />
+            <span style={{ color: "#F4631E" }}>~$373 Saved Every Year.</span>
+          </h2>
+
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "15px",
+              color: "#6B7B70",
+              margin: "0 auto 28px",
+              maxWidth: "380px",
+              lineHeight: 1.7,
+            }}
+          >
+            TruGreen charges ~$527/yr for KC lawns. DIY with this plan costs
+            ~$154/yr in products. The plan pays for itself in the first month.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "32px",
+              flexWrap: "wrap",
+              marginBottom: "32px",
+            }}
+          >
+            {[
+              { value: "~$527", label: "TruGreen/yr", color: "#6B7B70" },
+              { value: "~$154", label: "DIY w/ plan", color: "#52B788" },
+              { value: "~$373", label: "You save/yr", color: "#F4631E" },
+            ].map((item) => (
+              <div key={item.label}>
+                <p
+                  style={{
+                    fontFamily: "Bebas Neue",
+                    fontSize: "42px",
+                    color: item.color,
+                    margin: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  {item.value}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "DM Mono",
+                    fontSize: "11px",
+                    color: "#6B7B70",
+                    margin: "4px 0 0",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setUnlockModalOpen(true)}
+            style={PRIMARY_CTA_STYLE}
+          >
+            Unlock My KC Lawn Plan — $67 →
+          </button>
+          <p style={{ ...TRUST_LINE_STYLE, marginBottom: "24px" }}>
+            One-time payment · Lifetime access · No subscription ever
+          </p>
+
+          <p
+            style={{
+              fontFamily: "DM Sans",
+              fontSize: "13px",
+              color: "#6B7B70",
+              fontStyle: "italic",
+              margin: "0 auto",
+              maxWidth: "360px",
+              lineHeight: 1.6,
+            }}
+          >
+            Every week without it is a week of guessing. The pre-emergent
+            window doesn&rsquo;t wait. Neither does crabgrass.
+          </p>
+        </section>
+      )}
+
       <div
         id="sticky-unlock-bar"
         className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3"
