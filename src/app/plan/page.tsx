@@ -18,6 +18,21 @@ const KC_PREFIXES = [
   "666",
 ];
 
+function formatGrassType(grass: string | null | undefined): string {
+  const map: Record<string, string> = {
+    "tall-fescue": "Tall Fescue",
+    "tall_fescue": "Tall Fescue",
+    "kentucky-bluegrass": "Kentucky Bluegrass",
+    "kentucky_bluegrass": "Kentucky Bluegrass",
+    "zoysia": "Zoysia",
+    "buffalo-grass": "Buffalo Grass",
+    "buffalo_grass": "Buffalo Grass",
+    "mixed": "Mixed",
+    "not-sure": "Tall Fescue",
+  };
+  return map[grass?.toLowerCase() ?? ""] ?? "Tall Fescue";
+}
+
 const PREVIEW_TASKS = [
   {
     name: "Apply Pre-Emergent (Split App #1)",
@@ -376,7 +391,7 @@ export default function PlanPage() {
             </div>
             <div style={CHIP_STYLE}>
               <span style={CHIP_LABEL_STYLE}>GRASS</span>
-              <span style={CHIP_VALUE_STYLE}>{grassType || "Tall Fescue"}</span>
+              <span style={CHIP_VALUE_STYLE}>{formatGrassType(grassType)}</span>
             </div>
             <div style={CHIP_STYLE}>
               <span style={CHIP_LABEL_STYLE}>SIZE</span>
