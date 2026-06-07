@@ -16,42 +16,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("[forgot-password] Looking up user:", email);
-
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
-    console.log("[forgot-password] User found:", !!user, "Has password:", !!user?.passwordHash);
+    // Only act on accounts that can actually reset a password, but NEVER
+    // change the response based on existence — otherwise this endpoint becomes
+    // an account-enumeration oracle (EMAIL_NOT_FOUND vs. sent). The response
+    // below is identical whether or not the email is registered.
+    if (user?.passwordHash) {
+      await prisma.passwordResetToken.updateMany({
+        where: { email, used: false },
+        data: { used: true },
+      });
 
-    if (!user || !user.passwordHash) {
-      return NextResponse.json(
-        { error: "EMAIL_NOT_FOUND" },
-        { status: 404 }
-      );
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+      await prisma.passwordResetToken.create({
+        data: { email, token, expiresAt },
+      });
+
+      await sendPasswordResetEmail(email, token);
     }
-
-    console.log("[forgot-password] Invalidating old tokens");
-
-    await prisma.passwordResetToken.updateMany({
-      where: { email, used: false },
-      data: { used: true },
-    });
-
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-    console.log("[forgot-password] Creating token:", token.substring(0, 8) + "...");
-
-    await prisma.passwordResetToken.create({
-      data: { email, token, expiresAt },
-    });
-
-    console.log("[forgot-password] Sending email to:", email);
-
-    await sendPasswordResetEmail(email, token);
-
-    console.log("[forgot-password] Email sent successfully");
 
     return NextResponse.json({ sent: true });
   } catch (err) {

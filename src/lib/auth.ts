@@ -55,8 +55,16 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) return url;
+      // Relative callback URLs are always same-origin and safe.
       if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Absolute URLs must match the app's origin EXACTLY. A prefix check
+      // (url.startsWith(baseUrl)) is bypassable via lookalike domains such as
+      // "https://teriyakiturf.com.evil.com", so compare parsed origins instead.
+      try {
+        if (new URL(url).origin === baseUrl) return url;
+      } catch {
+        // Malformed URL — fall through to the safe default.
+      }
       return baseUrl;
     },
     async jwt({ token, user, trigger, session }) {

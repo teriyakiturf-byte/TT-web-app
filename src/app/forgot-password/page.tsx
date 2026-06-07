@@ -9,7 +9,6 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -22,7 +21,6 @@ export default function ForgotPasswordPage() {
     }
 
     setError("");
-    setNotFound(false);
     setLoading(true);
 
     try {
@@ -31,14 +29,6 @@ export default function ForgotPasswordPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-
-      const data = await res.json();
-
-      if (res.status === 404 && data.error === "EMAIL_NOT_FOUND") {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
 
       if (!res.ok) {
         setError("Something went wrong. Please try again.");
@@ -95,7 +85,6 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setError("");
-                    setNotFound(false);
                   }}
                   placeholder="Email address"
                   required
@@ -104,65 +93,31 @@ export default function ForgotPasswordPage() {
 
                 {error && <p className="text-sm text-orange">{error}</p>}
 
-                {!notFound && (
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <span className="inline-flex items-center gap-2">
-                        <Loader2 size={16} className="animate-spin" />
-                        Sending...
-                      </span>
-                    ) : (
-                      "Send Reset Link →"
-                    )}
-                  </button>
-                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors disabled:opacity-50"
+                >
+                  {loading ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Sending...
+                    </span>
+                  ) : (
+                    "Send Reset Link →"
+                  )}
+                </button>
               </form>
 
-              {notFound && (
-                <div className="mt-4 rounded-xl bg-orange/10 border-l-4 border-orange p-4">
-                  <p className="text-sm font-medium text-forest mb-1">
-                    No account found for this email.
-                  </p>
-                  <p className="text-[13px] text-muted leading-relaxed mb-4">
-                    There&apos;s no Teriyaki Turf account associated with{" "}
-                    <strong className="text-forest">{email}</strong>. Would
-                    you like to create one?
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <Link
-                      href={`/signup?email=${encodeURIComponent(email)}`}
-                      className="block w-full text-center rounded-full bg-lime px-4 py-3 font-display text-base text-white uppercase tracking-wider hover:bg-lime/90 transition-colors"
-                    >
-                      Create Free Account →
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setNotFound(false);
-                        setEmail("");
-                      }}
-                      className="w-full rounded-full border border-border px-4 py-3 text-sm text-muted hover:bg-white transition-colors"
-                    >
-                      Try a different email
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {!notFound && (
-                <p className="text-xs text-muted mt-4 text-center">
-                  Remember your password?{" "}
-                  <Link
-                    href="/signin"
-                    className="text-lime hover:text-forest underline"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              )}
+              <p className="text-xs text-muted mt-4 text-center">
+                Remember your password?{" "}
+                <Link
+                  href="/signin"
+                  className="text-lime hover:text-forest underline"
+                >
+                  Sign in
+                </Link>
+              </p>
             </>
           )}
         </div>
