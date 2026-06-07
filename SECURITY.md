@@ -51,7 +51,28 @@ down in Google Cloud Console so a leaked key can't be abused for quota theft:
   `GOOGLE_CLIENT_SECRET`) must be set server-side only — never with a
   `NEXT_PUBLIC_` prefix.
 
-## 4. Deferred control — rate limiting (tracked, not yet implemented)
+## 4. Deferred — Next.js major upgrade (tracked, pre-launch)
+
+`next@14.2.35` is the latest 14.x release; **no in-major patch fixes the open
+advisories**. Remediation requires a major upgrade to `15.5.x` (security-backport
+line) or `16.2.7` (latest).
+
+Applicability assessment for this app (App Router + `next-auth` middleware,
+pre-launch):
+- 3 of the 4 "high" audit entries are **dev-tooling only** (`eslint-config-next`,
+  `@next/eslint-plugin-next`, `glob`) and do not ship to production.
+- `next`'s runtime advisories that apply here are **DoS-class** (RSC request
+  deserialization, Image Optimizer, image disk-cache growth) and **middleware
+  redirect cache-poisoning**. None are RCE or auth-bypass for this config; the
+  CSP-nonce XSS, `beforeInteractive` XSS, and Pages-Router i18n bypass do **not**
+  apply (no nonces, no `beforeInteractive`, App Router only).
+
+**Severity: moderate; do before public launch.** Treat as a dedicated, tested
+effort: the upgrade has runtime breaking changes (async `cookies()`/`headers()`,
+caching defaults) plus `next-auth@4` interplay that must be validated against
+live auth flows — not bundled into a quick patch pass.
+
+## 5. Deferred control — rate limiting (tracked, not yet implemented)
 
 The authentication endpoints (`/api/auth/signup`, `/api/auth/forgot-password`,
 `/api/auth/reset-password`) and credentials sign-in are not yet rate limited.
