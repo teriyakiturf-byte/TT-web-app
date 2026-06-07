@@ -13,8 +13,8 @@ export default function ThankYouPage() {
   useEffect(() => {
     const sqft = localStorage.getItem("tt_sqft");
     if (sqft) setLawnSqft(Number(sqft));
-    // Ensure user is marked as paid
-    localStorage.setItem("tt_user_state", "paid");
+    // Paid status is authoritative from the server session (planPurchased) and
+    // is never read from localStorage — do not persist a client-side "paid" flag.
   }, []);
 
   useEffect(() => {
