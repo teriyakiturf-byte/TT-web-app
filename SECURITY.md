@@ -65,9 +65,22 @@ protected routes, `/signin` 200, `/api/weather` 200.
 against the live database to confirm the end-to-end auth/payment flow (the smoke
 test used placeholder env and an empty DB).
 
-## 5. Deferred control — rate limiting (tracked, not yet implemented)
+## 5. Rate limiting — DONE ✅ (in-process limiter)
 
-The authentication endpoints (`/api/auth/signup`, `/api/auth/forgot-password`,
-`/api/auth/reset-password`) and credentials sign-in are not yet rate limited.
-Add an IP + identifier limiter (e.g. `@upstash/ratelimit`) before launch to
-prevent brute-force, reset-token guessing, and email-bombing.
+Per-IP rate limiting now guards the sensitive auth paths via `src/lib/rateLimit.ts`:
+
+| Endpoint | Limit | Rationale |
+|---|---|---|
+| Credentials sign-in (`authorize`) | 10 / 10 min | brute-force (checked before bcrypt) |
+| `/api/auth/signup` | 5 / 10 min | automated account creation |
+| `/api/auth/forgot-password` | 3 / 15 min | email-bombing / reset spam |
+| `/api/auth/reset-password` | 10 / 15 min | reset-token guessing |
+
+Verified at runtime: the 4th request from one IP returns `429` while a different
+IP is unaffected.
+
+**Scaling caveat:** the limiter is in-process (a module-level Map), so on
+multi-instance/serverless hosting (e.g. Vercel) counters are per-instance and
+reset on cold start — effective but not globally exact. When traffic grows, swap
+the body of `rateLimit()` for a shared store (`@upstash/ratelimit` +
+`@upstash/redis`); the call sites and return shape can stay identical.

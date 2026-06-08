@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { syncEmailToKit } from "@/lib/kit";
+import { rateLimit, getClientIp } from "@/lib/rateLimit";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -19,8 +20,14 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
+
+        // Throttle login attempts per IP (10 / 10 min) before doing any DB
+        // lookup or bcrypt work. On limit we return null (indistinguishable
+        // from a bad password) so we don't reveal the throttle to attackers.
+        const ip = getClientIp(req?.headers);
+        if (!rateLimit(`signin:${ip}`, 10, 10 * 60_000).success) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },

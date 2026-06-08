@@ -2,11 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { rateLimit, getClientIp, tooManyRequests } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    // Tight per-IP limit (3 / 15 min): this endpoint sends email, so it's an
+    // email-bombing / reset-spam vector.
+    const limit = rateLimit(
+      `forgot:${getClientIp(req.headers)}`,
+      3,
+      15 * 60_000
+    );
+    if (!limit.success) return tooManyRequests(limit.retryAfterSec);
+
     const { email } = await req.json();
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

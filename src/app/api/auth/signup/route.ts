@@ -2,9 +2,14 @@ import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { syncEmailToKit } from "@/lib/kit";
+import { rateLimit, getClientIp, tooManyRequests } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
+    // Throttle account creation per IP (5 / 10 min) to deter automated abuse.
+    const limit = rateLimit(`signup:${getClientIp(req.headers)}`, 5, 10 * 60_000);
+    if (!limit.success) return tooManyRequests(limit.retryAfterSec);
+
     const { email, password, zipCode, lawnSqft, entryPoint } =
       await req.json();
 
