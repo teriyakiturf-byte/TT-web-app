@@ -4,36 +4,29 @@ Code-level controls live in the app. The items below are **infrastructure/consol
 settings** that the codebase cannot enforce on its own and MUST be verified
 before any public launch.
 
-## 1. Supabase Data API must be disabled (or RLS enforced) — REQUIRED
+## 1. Database public-API exposure — RLS APPLIED ✅ (verify Data API toggle)
 
 This app talks to Postgres **only through Prisma** using a privileged connection
 role (`DATABASE_URL` / `DIRECT_URL`). It does **not** use the Supabase client
-libraries or the auto-generated PostgREST Data API.
+libraries or the auto-generated PostgREST/GraphQL Data API.
 
-Prisma migrations create tables with **Row Level Security disabled** (Postgres
-default), and Supabase exposes the `public` schema to the public `anon` key by
-default. If left as-is after migrating, anyone with the publishable anon key
-could read `User.passwordHash` and live `PasswordResetToken.token` values —
-enabling account takeover.
+**Status:** Row Level Security has been **enabled on all six tables** (`User`,
+`Account`, `Session`, `VerificationToken`, `Purchase`, `PasswordResetToken`) via
+the `enable_rls_on_all_public_tables` migration. With RLS on and no policies, the
+public `anon`/`authenticated` API roles are default-denied, while Prisma's
+privileged role (which bypasses RLS) continues to work unchanged. Supabase's
+security advisor no longer reports the critical `rls_disabled` exposure.
 
-**Action (choose one):**
+**Recommended belt-and-suspenders (one dashboard click):** the tables are now
+unreadable via the public key, but their *names/shape* are still discoverable in
+the GraphQL schema (advisor WARN `pg_graphql_*_table_exposed`). To remove that
+too, **disable the Data API**: Supabase Dashboard → Project Settings → API →
+turn off the Data API. The app is unaffected (Prisma connects directly to
+Postgres). This makes the public API moot entirely.
 
-- **Recommended:** Supabase Dashboard → Project Settings → API → **disable the
-  Data API**. The app keeps working (Prisma connects directly to Postgres).
-- **Alternative:** keep the Data API on and enable RLS with default-deny on every
-  table (`User`, `Account`, `Session`, `PasswordResetToken`, `Purchase`):
-  ```sql
-  ALTER TABLE "User"               ENABLE ROW LEVEL SECURITY;
-  ALTER TABLE "Account"            ENABLE ROW LEVEL SECURITY;
-  ALTER TABLE "Session"            ENABLE ROW LEVEL SECURITY;
-  ALTER TABLE "PasswordResetToken" ENABLE ROW LEVEL SECURITY;
-  ALTER TABLE "Purchase"           ENABLE ROW LEVEL SECURITY;
-  ```
-  (Prisma's privileged role bypasses RLS, so the app is unaffected; the anon
-  role is denied.)
-
-**Verify after migrating:** run Supabase's security advisors and confirm there
-are no `rls_disabled_in_public` lints.
+> Note: RLS was applied directly to the live database. If the database is ever
+> recreated from scratch, re-run the `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+> statements (or disable the Data API) before any real user data lands.
 
 ## 2. Restrict the Google Maps API key — REQUIRED
 
