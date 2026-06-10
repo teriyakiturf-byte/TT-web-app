@@ -1,9 +1,18 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getClientIp, tooManyRequests } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
+    // Limit token-submission attempts per IP (10 / 15 min) to slow guessing.
+    const limit = rateLimit(
+      `reset:${getClientIp(req.headers)}`,
+      10,
+      15 * 60_000
+    );
+    if (!limit.success) return tooManyRequests(limit.retryAfterSec);
+
     const { token, password } = await req.json();
 
     if (!token) {

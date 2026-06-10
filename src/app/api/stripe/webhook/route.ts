@@ -44,13 +44,8 @@ export async function POST(req: NextRequest) {
           session.customer_email || session.customer_details?.email;
         const metadata = session.metadata;
 
-        console.log("Payment successful:", {
-          email,
-          userId: metadata?.userId,
-          productType: metadata?.productType,
-          lawnSqft: metadata?.lawnSqft,
-          sessionId: session.id,
-        });
+        // Log only a non-identifying correlation value — never PII (email/userId).
+        console.log("Payment received", { sessionId: session.id });
 
         // Find user: prefer metadata.userId, fall back to email lookup
         let user = metadata?.userId
@@ -88,12 +83,13 @@ export async function POST(req: NextRequest) {
             }),
           ]);
 
-          console.log("User marked as paid:", user.id);
+          console.log("User marked as paid", { sessionId: session.id });
         } else {
-          // User paid but no account yet — log for manual resolution
+          // User paid but no account yet — log for manual resolution.
+          // Reference only the Stripe session id; resolve PII from Stripe directly.
           console.warn(
-            "Payment received but no user found:",
-            { email, userId: metadata?.userId, sessionId: session.id }
+            "Payment received but no matching user found",
+            { sessionId: session.id }
           );
         }
       }

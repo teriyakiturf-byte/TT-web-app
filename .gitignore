@@ -2,7 +2,9 @@ node_modules/
 .next/
 dist/
 _backup/
+.env
 .env.local
+.env.production
 .env*.local
 
 /src/generated/prisma
