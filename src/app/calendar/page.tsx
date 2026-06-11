@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import { useUserState } from "@/hooks/useUserState";
+import { formatGrassType } from "@/lib/utils";
 
 const YEAR = 2026;
 
@@ -110,9 +111,7 @@ export default function CalendarPage() {
     else if (isFree) router.push("/plan");
   }
 
-  const displayGrass = grassType
-    ? grassType.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Tall Fescue";
+  const displayGrass = grassType ? formatGrassType(grassType) : "Tall Fescue";
 
   return (
     <>
