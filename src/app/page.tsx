@@ -43,6 +43,13 @@ export default function LandingPage() {
       <main className="mx-auto max-w-3xl px-4 py-8">
         {/* Hero — static, in initial HTML */}
         <section className="text-center">
+          {/* Geographic identity badge (F2) — left-aligned, above the fold */}
+          <div className="flex justify-start mb-3">
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-white bg-[#F4631E]">
+              📍 Built for Kansas City
+            </span>
+          </div>
+
           <h1 className="font-display text-hero text-forest">
             What&apos;s Your Kansas City Lawn Dealing With?
           </h1>
