@@ -6,6 +6,7 @@ import { AlertTriangle, Lock } from "lucide-react";
 import UnlockModal from "@/components/ui/UnlockModal";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
+import { formatGrassType } from "@/lib/utils";
 
 const KC_PREFIXES = [
   "640",
@@ -17,21 +18,6 @@ const KC_PREFIXES = [
   "665",
   "666",
 ];
-
-function formatGrassType(grass: string | null | undefined): string {
-  const map: Record<string, string> = {
-    "tall-fescue": "Tall Fescue",
-    "tall_fescue": "Tall Fescue",
-    "kentucky-bluegrass": "Kentucky Bluegrass",
-    "kentucky_bluegrass": "Kentucky Bluegrass",
-    "zoysia": "Zoysia",
-    "buffalo-grass": "Buffalo Grass",
-    "buffalo_grass": "Buffalo Grass",
-    "mixed": "Mixed",
-    "not-sure": "Tall Fescue",
-  };
-  return map[grass?.toLowerCase() ?? ""] ?? "Tall Fescue";
-}
 
 const PREVIEW_TASKS = [
   {
@@ -391,7 +377,7 @@ export default function PlanPage() {
             </div>
             <div style={CHIP_STYLE}>
               <span style={CHIP_LABEL_STYLE}>GRASS</span>
-              <span style={CHIP_VALUE_STYLE}>{formatGrassType(grassType)}</span>
+              <span style={CHIP_VALUE_STYLE}>{grassType ? formatGrassType(grassType) : "Tall Fescue"}</span>
             </div>
             <div style={CHIP_STYLE}>
               <span style={CHIP_LABEL_STYLE}>SIZE</span>

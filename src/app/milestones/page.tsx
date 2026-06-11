@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useUserState } from "@/hooks/useUserState";
+import { formatGrassType } from "@/lib/utils";
 
 /* ── Task name lookup (shared IDs with calendar) ── */
 
@@ -127,9 +128,7 @@ export default function MilestonesPage() {
     else if (isFree) router.push("/plan");
   }
 
-  const displayGrass = grassType
-    ? grassType.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Tall Fescue";
+  const displayGrass = grassType ? formatGrassType(grassType) : "Tall Fescue";
 
   return (
     <>

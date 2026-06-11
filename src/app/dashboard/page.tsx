@@ -16,6 +16,7 @@ import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask, ToastType } from "@/types";
 import { calculateSavings, calculateQuantity } from "@/types";
+import { formatGrassType } from "@/lib/utils";
 
 const STORAGE_KEY = "tt_task_completions";
 
@@ -186,9 +187,7 @@ export default function DashboardPage() {
     }
   }
 
-  const displayGrass = grassType
-    ? grassType.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Tall Fescue";
+  const displayGrass = grassType ? formatGrassType(grassType) : "Tall Fescue";
 
   const completedCount = tasks.filter((t) => t.isComplete).length;
   const totalCount = tasks.length;
