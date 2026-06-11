@@ -159,7 +159,7 @@ export default function HeroTaskCard({
               <Lock size={20} className="text-white" />
             </div>
             <p className="font-mono text-sm text-white/70 text-center">
-              Unlock to see your exact quantity
+              Unlock to see quantities →
             </p>
             {tier !== 4 && (
               <button
@@ -198,7 +198,7 @@ export default function HeroTaskCard({
               <Lock size={14} className="text-lime mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-white/80">
-                  Unlock to see exact amount
+                  Unlock to see quantities →
                 </p>
                 {lawnSqft && lawnSqft > 0 && (
                   <p className="text-xs text-white/50 mt-0.5">

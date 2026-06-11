@@ -31,7 +31,7 @@ export default function QuantityField({
         className="inline-flex items-center gap-1 rounded-full bg-lime-light px-2.5 py-0.5 font-mono text-xs text-muted hover:bg-lime/20 transition-colors cursor-pointer"
       >
         <Lock size={12} />
-        Unlock quantities
+        Unlock to see quantities →
       </button>
     );
   }

@@ -68,7 +68,7 @@ export default function TaskRow({
         <div className="flex items-center gap-2 mt-1 flex-wrap">
           {isLocked ? (
             <span className="inline-flex items-center gap-1 font-mono text-xs text-muted">
-              <Lock size={12} /> Unlock quantities
+              <Lock size={12} /> Unlock to see quantities →
             </span>
           ) : (
             <span className="font-mono text-xs text-lime font-medium">
