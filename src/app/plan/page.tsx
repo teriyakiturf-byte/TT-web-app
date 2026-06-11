@@ -563,7 +563,7 @@ export default function PlanPage() {
                     }}
                   >
                     <Lock size={10} color="#6B7B70" />
-                    Unlock quantity
+                    Unlock to see quantities →
                   </span>
                 </div>
               </div>
