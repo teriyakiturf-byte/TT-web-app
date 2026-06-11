@@ -41,3 +41,41 @@ export function formatGrassType(value: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+/**
+ * Map a KC-metro ZIP code to its city name for personalized plan headers.
+ *
+ * Only the 5-digit ZIP prefix is considered. Any ZIP we don't explicitly
+ * recognize falls back to the generic "Kansas City" so the header always
+ * reads naturally.
+ */
+const ZIP_TO_CITY: Record<string, string> = {
+  // Lenexa
+  "66215": "Lenexa",
+  "66223": "Lenexa",
+  "66213": "Lenexa",
+  // Olathe
+  "66061": "Olathe",
+  "66062": "Olathe",
+  // Overland Park
+  "66209": "Overland Park",
+  "66210": "Overland Park",
+  "66211": "Overland Park",
+  // Shawnee
+  "66216": "Shawnee",
+  "66217": "Shawnee",
+  "66218": "Shawnee",
+  // Stilwell / Spring Hill
+  "66013": "Stilwell / Spring Hill",
+  "66025": "Stilwell / Spring Hill",
+  // Kansas City, MO
+  "64114": "Kansas City, MO",
+  "64131": "Kansas City, MO",
+  "64113": "Kansas City, MO",
+};
+
+export function getCityFromZip(zip: string): string {
+  if (!zip) return "Kansas City";
+  const normalized = zip.trim().slice(0, 5);
+  return ZIP_TO_CITY[normalized] ?? "Kansas City";
+}

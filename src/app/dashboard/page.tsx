@@ -16,7 +16,7 @@ import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask, ToastType } from "@/types";
 import { calculateSavings, calculateQuantity } from "@/types";
-import { formatGrassType } from "@/lib/utils";
+import { formatGrassType, getCityFromZip } from "@/lib/utils";
 
 const STORAGE_KEY = "tt_task_completions";
 
@@ -162,7 +162,7 @@ function loadSavedCompletions(): Record<string, boolean> {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType } = useUserState();
+  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType, zip } = useUserState();
   const { weather } = useWeather();
 
   const [tasks, setTasks] = useState<LawnTask[]>(() => {
@@ -188,6 +188,7 @@ export default function DashboardPage() {
   }
 
   const displayGrass = grassType ? formatGrassType(grassType) : "Tall Fescue";
+  const cityName = getCityFromZip(zip ?? "");
 
   const completedCount = tasks.filter((t) => t.isComplete).length;
   const totalCount = tasks.length;
@@ -264,7 +265,7 @@ export default function DashboardPage() {
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="font-display text-hero text-forest text-center">
-          Your KC Lawn Plan
+          Your {cityName} Lawn Plan
         </h1>
         <div className="flex flex-wrap justify-center gap-2 mt-3">
           <LawnInfoChip type="zone" value="Zone 6a — KC" />
