@@ -41,7 +41,9 @@ export default function MultiPropertyTease() {
       if (!res.ok) throw new Error("request failed");
       setStatus("success");
     } catch {
-      setError("Something went wrong. Please try again.");
+      // Waitlist insert failed (e.g. table missing) — keep the form alive and
+      // give the user a manual fallback instead of crashing the dashboard.
+      setError("Something went wrong. You can email us to be added manually.");
       setStatus("form");
     }
   }
@@ -82,7 +84,9 @@ export default function MultiPropertyTease() {
             disabled={status === "submitting"}
             className="w-full rounded-xl border border-[#95D5B2] bg-white px-3 py-2.5 text-sm text-[#1B4332] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#52B788]/40 disabled:opacity-60"
           />
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && (
+            <p className="text-sm text-[#F4631E] text-center mt-2">{error}</p>
+          )}
           <button
             type="submit"
             disabled={status === "submitting"}
