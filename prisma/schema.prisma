@@ -22,6 +22,7 @@ model User {
   zip           String?
   lawnSqft      Int?
   grassType     String?
+  needsPlanRegen Boolean  @default(false)
   planPurchased Boolean   @default(false)
   purchasedAt   DateTime?
 

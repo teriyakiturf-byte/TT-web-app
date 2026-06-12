@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Settings } from "lucide-react";
 
 interface NavProps {
   userState?: "guest" | "free" | "paid";
@@ -93,6 +93,18 @@ export default function Nav({ userState: userStateProp }: NavProps) {
           )}
           {isLoggedIn ? (
             <>
+              <Link
+                href="/settings"
+                aria-label="Settings"
+                className={`flex items-center gap-1 text-sm transition-colors ${
+                  pathname === "/settings"
+                    ? "text-lime border-b-2 border-lime pb-0.5"
+                    : "text-white/80 hover:text-white"
+                }`}
+              >
+                <Settings size={16} />
+                Settings
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-sm text-white/80 hover:text-white transition-colors"
@@ -188,6 +200,15 @@ export default function Nav({ userState: userStateProp }: NavProps) {
           )}
           {isLoggedIn ? (
             <>
+              <Link
+                href="/settings"
+                className={`flex items-center gap-1.5 py-2 text-sm ${
+                  pathname === "/settings" ? "text-lime" : "text-white/80"
+                }`}
+              >
+                <Settings size={16} />
+                Settings
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="block py-2 text-sm text-white/80 text-left"
