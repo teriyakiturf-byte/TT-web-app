@@ -303,3 +303,57 @@ export function seasonToastMessage(
       : undefined,
   };
 }
+
+// ─── Task application windows ───────────────────────────────
+//
+// Plan tasks carry human-readable date strings ("Mar 15") rather than real
+// Date objects. The reminder cron needs concrete dates to decide which task
+// window opens in the coming week, so the helpers below parse those strings
+// (reusing parseDueDate) into a concrete open/close window for a given year.
+// They are pure and server-safe (no browser globals) so they run in the cron.
+
+export interface TaskWindow {
+  open: Date;
+  close: Date;
+}
+
+/**
+ * Resolve a task's application window for the given year. Prefers the date
+ * range in `dueRange` ("Mar 15 – Apr 1"); when that has no parseable dates
+ * (e.g. "When grass hits 4″"), falls back to the single `dueDate`.
+ */
+export function getTaskWindow(task: LawnTask, year: number): TaskWindow | null {
+  const parts = (task.dueRange ?? "").split(/\s*[–—-]\s*/).map((s) => s.trim());
+  let open = parts[0] ? parseDueDate(parts[0], year) : null;
+  let close = parts[1] ? parseDueDate(parts[1], year) : null;
+  if (!open) open = parseDueDate(task.dueDate, year);
+  if (!open) return null;
+  if (!close) close = open;
+  return { open, close };
+}
+
+export interface UpcomingTask {
+  task: LawnTask;
+  window: TaskWindow;
+}
+
+/**
+ * Return every plan task whose window OPENS within `withinDays` of `now`
+ * (inclusive of today), soonest first. Used by the reminder cron to decide
+ * which task to surface to paid users this week.
+ */
+export function findUpcomingTasks(now: Date, withinDays: number): UpcomingTask[] {
+  const year = now.getFullYear();
+  const today = new Date(year, now.getMonth(), now.getDate());
+  const horizon = new Date(today);
+  horizon.setDate(horizon.getDate() + withinDays);
+
+  return PLAN_TASKS.map((task) => ({ task, window: getTaskWindow(task, year) }))
+    .filter(
+      (t): t is UpcomingTask =>
+        t.window !== null &&
+        t.window.open >= today &&
+        t.window.open <= horizon
+    )
+    .sort((a, b) => a.window.open.getTime() - b.window.open.getTime());
+}

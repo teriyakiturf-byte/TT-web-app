@@ -91,3 +91,38 @@ export async function updateUserProfile(
     return { ok: false, error: "Something went wrong. Please try again." };
   }
 }
+
+export type UpdateEmailRemindersResult =
+  | { ok: true; emailReminders: boolean }
+  | { ok: false; error: string };
+
+/**
+ * Toggle the weekly task-reminder emails opt-out flag for the signed-in user.
+ * When off, the reminder cron skips this user.
+ */
+export async function updateEmailReminders(
+  enabled: boolean
+): Promise<UpdateEmailRemindersResult> {
+  const session = await getServerSession(authOptions);
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  if (!userId) {
+    return { ok: false, error: "You must be signed in to update notifications." };
+  }
+
+  if (typeof enabled !== "boolean") {
+    return { ok: false, error: "Invalid notification setting." };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { emailReminders: enabled },
+    });
+
+    revalidatePath("/settings");
+    return { ok: true, emailReminders: enabled };
+  } catch (err) {
+    console.error("updateEmailReminders error:", err);
+    return { ok: false, error: "Something went wrong. Please try again." };
+  }
+}
