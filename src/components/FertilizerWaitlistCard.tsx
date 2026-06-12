@@ -64,7 +64,7 @@ export default function FertilizerWaitlistCard({
         setError(
           data?.error === "INVALID_EMAIL"
             ? "Enter a valid email address."
-            : "Something went wrong. Please try again."
+            : "Something went wrong. Please try again or email us directly."
         );
         return;
       }
@@ -76,8 +76,10 @@ export default function FertilizerWaitlistCard({
         setCount((c) => (c === null ? c : c + 1));
       }
     } catch {
+      // Network/unexpected failure — never let the dashboard crash; surface a
+      // friendly, actionable message and leave the form usable.
       setStatus("idle");
-      setError("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again or email us directly.");
     }
   }
 
@@ -129,7 +131,7 @@ export default function FertilizerWaitlistCard({
               {status === "submitting" ? "Joining…" : "Join the Waitlist →"}
             </button>
             {error && (
-              <p className="text-xs text-orange-200 text-center mt-2">{error}</p>
+              <p className="text-sm text-red-400 text-center mt-2">{error}</p>
             )}
             <p className="text-xs text-[#95D5B2] text-center mt-2">
               You&apos;ll get early access + a founding member discount.
