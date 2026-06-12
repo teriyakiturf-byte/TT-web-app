@@ -6,6 +6,7 @@ import type { ComplianceBadgeType } from "@/types";
 
 interface TaskRowProps {
   taskName: string;
+  plainDescription?: string;
   productName: string;
   quantity: string;
   dueDate: string;
@@ -18,6 +19,7 @@ interface TaskRowProps {
 
 export default function TaskRow({
   taskName,
+  plainDescription,
   productName,
   quantity,
   dueDate,
@@ -63,6 +65,11 @@ export default function TaskRow({
         >
           {taskName}
         </p>
+        {plainDescription && (
+          <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
+            {plainDescription}
+          </p>
+        )}
         <p className="font-mono text-xs text-forest mt-0.5">{productName}</p>
 
         <div className="flex items-center gap-2 mt-1 flex-wrap">
