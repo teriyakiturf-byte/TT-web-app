@@ -10,6 +10,16 @@ Drop the onboarding grass-type quiz photos here. The onboarding photo quiz
 | `zoysia.jpg` | Zoysia | `#74C69D` |
 | `mixed.jpg` | Mixed / Not Sure | `#95D5B2` |
 
-Until a real photo exists, each card falls back to its colored placeholder box
-(the "Not Sure" card also shows a "?" glyph). Recommended: square (1:1) JPGs,
-~800×800, close-up macro shots of the blades.
+The committed `.jpg` files are **generated turf textures**, not photographs —
+produced by `scripts/gen_grass_textures.py` (Pillow) so each card reads as grass
+until real licensed photos are sourced. To swap in real photos, just replace the
+files with the same names (square 1:1 JPGs, ~800×800, close-up macro shots of the
+blades). If a file is ever missing, the card falls back to its colored
+placeholder box (the "Not Sure" card also shows a "?" glyph).
+
+Regenerate the textures with:
+
+```bash
+pip install Pillow
+python3 scripts/gen_grass_textures.py
+```
