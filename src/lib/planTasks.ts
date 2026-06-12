@@ -200,3 +200,71 @@ export function formatTaskQuantity(
   if (!lawnSqft) return "Add your lawn size →";
   return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
 }
+
+// ─── Task application windows ───────────────────────────────
+//
+// Plan tasks carry human-readable date strings ("Mar 15") rather than real
+// Date objects. The reminder cron needs concrete dates to decide which task
+// window opens in the coming week, so the helpers below parse those strings
+// into Dates for a given calendar year. They are pure and server-safe (no
+// browser globals), so they can run inside the cron route.
+
+const MONTHS: Record<string, number> = {
+  jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+  jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+};
+
+/** Parse a "Mon D" label (e.g. "Jun 15") into a local Date, or null. */
+export function parseMonthDay(label: string, year: number): Date | null {
+  const m = label.trim().match(/^([A-Za-z]{3})\s+(\d{1,2})$/);
+  if (!m) return null;
+  const month = MONTHS[m[1].toLowerCase()];
+  if (month === undefined) return null;
+  return new Date(year, month, Number(m[2]));
+}
+
+export interface TaskWindow {
+  open: Date;
+  close: Date;
+}
+
+/**
+ * Resolve a task's application window for the given year. Prefers the date
+ * range in `dueRange` ("Mar 15 – Apr 1"); when that has no parseable dates
+ * (e.g. "When grass hits 4″"), falls back to the single `dueDate`.
+ */
+export function getTaskWindow(task: LawnTask, year: number): TaskWindow | null {
+  const parts = (task.dueRange ?? "").split(/\s*[–—-]\s*/).map((s) => s.trim());
+  let open = parts[0] ? parseMonthDay(parts[0], year) : null;
+  let close = parts[1] ? parseMonthDay(parts[1], year) : null;
+  if (!open) open = parseMonthDay(task.dueDate, year);
+  if (!open) return null;
+  if (!close) close = open;
+  return { open, close };
+}
+
+export interface UpcomingTask {
+  task: LawnTask;
+  window: TaskWindow;
+}
+
+/**
+ * Return every plan task whose window OPENS within `withinDays` of `now`
+ * (inclusive of today), soonest first. Used by the reminder cron to decide
+ * which task to surface to paid users this week.
+ */
+export function findUpcomingTasks(now: Date, withinDays: number): UpcomingTask[] {
+  const year = now.getFullYear();
+  const today = new Date(year, now.getMonth(), now.getDate());
+  const horizon = new Date(today);
+  horizon.setDate(horizon.getDate() + withinDays);
+
+  return PLAN_TASKS.map((task) => ({ task, window: getTaskWindow(task, year) }))
+    .filter(
+      (t): t is UpcomingTask =>
+        t.window !== null &&
+        t.window.open >= today &&
+        t.window.open <= horizon
+    )
+    .sort((a, b) => a.window.open.getTime() - b.window.open.getTime());
+}

@@ -14,7 +14,7 @@ import {
   type GrassChoice,
   type LawnSize,
 } from "@/lib/lawnProfileOptions";
-import { updateUserProfile } from "@/app/settings/actions";
+import { updateUserProfile, updateEmailReminders } from "@/app/settings/actions";
 import type { ToastType } from "@/types";
 
 interface SettingsFormProps {
@@ -23,6 +23,7 @@ interface SettingsFormProps {
   lawnSqft: number | null;
   grassType: string | null;
   planPurchased: boolean;
+  emailReminders: boolean;
 }
 
 export default function SettingsForm({
@@ -31,6 +32,7 @@ export default function SettingsForm({
   lawnSqft: initialSqft,
   grassType: initialGrass,
   planPurchased,
+  emailReminders: initialEmailReminders,
 }: SettingsFormProps) {
   const [zip, setZip] = useState(initialZip);
   const [selectedSize, setSelectedSize] = useState<LawnSize | null>(
@@ -43,6 +45,29 @@ export default function SettingsForm({
     null
   );
   const [isPending, startTransition] = useTransition();
+
+  const [emailReminders, setEmailReminders] = useState(initialEmailReminders);
+  const [isReminderPending, startReminderTransition] = useTransition();
+
+  function handleToggleReminders() {
+    const next = !emailReminders;
+    // Optimistic update; revert on failure.
+    setEmailReminders(next);
+    startReminderTransition(async () => {
+      const result = await updateEmailReminders(next);
+      if (result.ok) {
+        setToast({
+          type: "success",
+          message: next
+            ? "Weekly task reminders turned on."
+            : "Weekly task reminders turned off.",
+        });
+      } else {
+        setEmailReminders(!next);
+        setToast({ type: "error", message: result.error });
+      }
+    });
+  }
 
   const zipValid = /^\d{5}$/.test(zip);
   const canSave = zipValid && !!selectedSize && !!grassChoice && !isPending;
@@ -267,25 +292,32 @@ export default function SettingsForm({
           Notifications
         </h2>
 
-        <div className="flex items-start justify-between gap-4 opacity-60">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-gray-500">
-              Soil temperature alerts
+            <p className="text-sm font-medium text-[#1B4332]">
+              Weekly task reminders
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Coming soon — we will notify you when your application windows open.
+            <p className="text-xs text-gray-500 mt-0.5">
+              Get an email when your next lawn task window opens — so you never
+              miss a soil-temp window.
             </p>
           </div>
-          {/* Disabled toggle */}
           <button
             type="button"
             role="switch"
-            aria-checked={false}
-            aria-disabled={true}
-            disabled
-            className="relative inline-flex h-6 w-11 shrink-0 cursor-not-allowed items-center rounded-full bg-gray-200"
+            aria-checked={emailReminders}
+            aria-label="Weekly task reminders"
+            onClick={handleToggleReminders}
+            disabled={isReminderPending}
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+              isReminderPending ? "cursor-wait" : "cursor-pointer"
+            } ${emailReminders ? "bg-[#52B788]" : "bg-gray-200"}`}
           >
-            <span className="inline-block h-5 w-5 translate-x-0.5 transform rounded-full bg-white shadow" />
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                emailReminders ? "translate-x-[22px]" : "translate-x-0.5"
+              }`}
+            />
           </button>
         </div>
       </section>

@@ -29,6 +29,7 @@ export default async function SettingsPage() {
       lawnSqft: true,
       grassType: true,
       planPurchased: true,
+      emailReminders: true,
     },
   });
 
@@ -46,6 +47,7 @@ export default async function SettingsPage() {
           lawnSqft={user.lawnSqft ?? null}
           grassType={user.grassType ?? null}
           planPurchased={user.planPurchased}
+          emailReminders={user.emailReminders}
         />
       </main>
     </>
