@@ -205,6 +205,7 @@ export default function PlanPage() {
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [zip, setZip] = useState("");
+  const [guestZip, setGuestZip] = useState<string | null>(null);
   const [zoneData, setZoneData] = useState<null | {
     zone: string;
     soil: string;
@@ -214,6 +215,19 @@ export default function PlanPage() {
   useEffect(() => {
     if (!isLoading && isPaid) router.replace("/dashboard");
   }, [isLoading, isPaid, router]);
+
+  // Guest ZIP confirmation / guard (#18): resolve the guest's ZIP from the
+  // URL (?zip=) or saved localStorage value. No ZIP → send back to landing.
+  useEffect(() => {
+    if (isLoading || !isGuest) return;
+    const paramZip = new URLSearchParams(window.location.search).get("zip");
+    const resolvedZip = paramZip || localStorage.getItem("tt_zip") || null;
+    if (!resolvedZip) {
+      router.replace("/?reason=zip-required");
+      return;
+    }
+    setGuestZip(resolvedZip);
+  }, [isLoading, isGuest, router]);
 
   function handleZipChange(value: string) {
     setZip(value);
@@ -282,6 +296,24 @@ export default function PlanPage() {
 
   return (
     <>
+      {/* Guest ZIP confirmation bar (#18) — guests only, not authed profiles */}
+      {isGuest && guestZip && (
+        <div className="mx-auto max-w-2xl px-4 pt-6">
+          <div className="bg-[#F5F1E8] border border-[#95D5B2] rounded-xl px-4 py-3 flex justify-between items-center mb-4">
+            <span className="text-sm font-medium text-[#1B4332]">
+              Showing plan for ZIP: {guestZip}
+            </span>
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="text-sm text-[#F4631E] underline"
+            >
+              Not your ZIP?
+            </button>
+          </div>
+        </div>
+      )}
+
       {isGuest && (
         <section
           style={{
