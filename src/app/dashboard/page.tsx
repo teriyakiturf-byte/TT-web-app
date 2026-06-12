@@ -284,6 +284,7 @@ export default function DashboardPage() {
               <TaskRow
                 key={task.id}
                 taskName={task.name}
+                plainDescription={task.plainDescription}
                 productName={task.productName}
                 quantity={formatQuantity(lawnSqft, task.labelRate)}
                 dueDate={task.dueRange ?? task.dueDate}

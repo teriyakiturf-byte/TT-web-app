@@ -26,6 +26,12 @@ export type TaskTier = 1 | 2 | 3 | 4 | 5;
 export interface LawnTask {
   id: string;
   name: string;
+  /**
+   * Plain-English, one-line explanation of the task: what it does, why it
+   * matters for KC clay, and when to do it. Rendered as a subtitle under the
+   * task name. Optional so cards without it still render cleanly.
+   */
+  plainDescription?: string;
   productName: string;
   labelRate: number; // lbs per 1,000 sqft
   applicationNotes: string;

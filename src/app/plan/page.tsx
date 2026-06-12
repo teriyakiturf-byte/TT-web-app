@@ -22,6 +22,8 @@ const KC_PREFIXES = [
 const PREVIEW_TASKS = [
   {
     name: "Apply Pre-Emergent (Split App #1)",
+    plainDescription:
+      "Stops crabgrass and weeds before they sprout. Miss this and you chase weeds all summer. Apply before soil hits 55°F.",
     product: "Prodiamine 65 WDG",
     quantity: "3.2 lbs",
     rate: "0.86 lb / 1,000 sq ft",
@@ -34,6 +36,8 @@ const PREVIEW_TASKS = [
   },
   {
     name: "Broadleaf Weed Spray",
+    plainDescription:
+      "Targets dandelions, clover, and other flat-leafed weeds without harming your grass. Apply when weeds are actively growing.",
     product: "Trimec Classic",
     quantity: "1.6 lbs",
     rate: "0.42 lb / 1,000 sq ft",
@@ -45,6 +49,8 @@ const PREVIEW_TASKS = [
   },
   {
     name: "Spring Fertilizer Application",
+    plainDescription:
+      "Wakes up your lawn after winter. Jumpstarts root growth and gives grass the nitrogen it needs to green up fast.",
     product: "Milorganite 6-4-0",
     quantity: "24 lbs",
     rate: "6.4 lb / 1,000 sq ft",
@@ -529,12 +535,18 @@ export default function PlanPage() {
                     </span>
                   </div>
 
+                  {task.plainDescription && (
+                    <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
+                      {task.plainDescription}
+                    </p>
+                  )}
+
                   <p
                     style={{
                       fontFamily: "DM Sans",
                       fontSize: "13px",
                       color: "#6B7B70",
-                      margin: "0 0 10px",
+                      margin: "10px 0 10px",
                       lineHeight: 1.5,
                     }}
                   >

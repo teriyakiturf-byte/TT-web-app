@@ -16,6 +16,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t1",
     name: "Apply Pre-Emergent (Split App #1)",
+    plainDescription:
+      "Stops crabgrass and weeds before they sprout. Miss this and you chase weeds all summer. Apply before soil hits 55°F.",
     productName: "Prodiamine 65 WDG",
     labelRate: 0.86,
     applicationNotes: "Apply when soil temps reach 50–55°F. Water in within 24 hours.",
@@ -32,6 +34,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t2",
     name: "First Mow — Set Height to 3.5″",
+    plainDescription:
+      "Your first cut wakes the lawn and clears winter debris. Cutting at 3.5″ shades KC clay so it holds moisture instead of baking. Mow once the grass reaches 4 inches.",
     productName: "Mower blade sharpened",
     labelRate: 0,
     applicationNotes: "Mow when grass reaches 4 inches. Never remove more than ⅓ of blade height.",
@@ -48,6 +52,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t3",
     name: "Broadleaf Weed Spray",
+    plainDescription:
+      "Targets dandelions, clover, and other flat-leafed weeds without harming your grass. Apply when weeds are actively growing.",
     productName: "Trimec Classic",
     labelRate: 0.42,
     applicationNotes: "Spot-spray or broadcast when daytime temps are 60–80°F. Avoid rain for 24h.",
@@ -64,6 +70,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t4",
     name: "Pre-Emergent Split App #2",
+    plainDescription:
+      "The second half of your pre-emergent barrier. Splitting the dose keeps crabgrass blocked as KC clay heats up through summer. Apply 6–8 weeks after the first application.",
     productName: "Prodiamine 65 WDG",
     labelRate: 0.86,
     applicationNotes: "Second split application extends barrier through summer. Water in.",
@@ -80,6 +88,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t5",
     name: "Spring Fertilizer Application",
+    plainDescription:
+      "Wakes up your lawn after winter. Jumpstarts root growth and gives grass the nitrogen it needs to green up fast.",
     productName: "Milorganite 6-4-0",
     labelRate: 6.4,
     applicationNotes: "Apply at 6.4 lbs per 1,000 sq ft. Safe on all grass types. No burn risk.",
@@ -95,6 +105,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t6",
     name: "Grub Preventative",
+    plainDescription:
+      "Stops grubs before they hatch and chew through your roots. KC lawns on clay are prime grub territory. Apply in late spring and water it in.",
     productName: "GrubEx (Chlorantraniliprole)",
     labelRate: 2.9,
     applicationNotes: "Apply preventative before grub eggs hatch. Water in well.",
@@ -111,6 +123,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t7",
     name: "Raise Mow Height to 4″",
+    plainDescription:
+      "Taller grass shades the soil so KC clay stays cooler and holds water through summer heat — and it crowds out weeds. Raise your deck to 4″ before June heat sets in.",
     productName: "Adjust mower deck",
     labelRate: 0,
     applicationNotes: "Taller grass shades soil, reducing weed germination and water loss.",
@@ -126,6 +140,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t8",
     name: "Summer Fertilizer (Slow-Release)",
+    plainDescription:
+      "Light feeding during heat stress. Too much nitrogen now burns grass. This application keeps color without causing damage.",
     productName: "Milorganite 6-4-0",
     labelRate: 6.4,
     applicationNotes: "Light summer feeding. Apply early morning to avoid heat stress.",
@@ -142,6 +158,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t9",
     name: "Fungicide Application (If Needed)",
+    plainDescription:
+      "Treats brown patch and dollar spot — fungal diseases that thrive in KC's humid summers. Clay holds the moisture that feeds fungus. Apply at the first sign of disease and water only in the morning.",
     productName: "Scotts DiseaseEx",
     labelRate: 2.87,
     applicationNotes: "Apply if brown patch or dollar spot appear. Irrigate morning only.",
@@ -158,6 +176,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t10",
     name: "Core Aerate Lawn",
+    plainDescription:
+      "Punches small holes in your clay soil so water and nutrients can actually reach the roots. KC clay compacts — aeration fixes it.",
     productName: "Rent core aerator",
     labelRate: 0,
     applicationNotes: "Best done when soil is moist. Make 2 passes in perpendicular directions.",
@@ -173,6 +193,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t11",
     name: "Overseed Thin Areas",
+    plainDescription:
+      "Fills in thin or bare spots by planting new grass seed. Only effective when soil temp is between 50°F and 65°F.",
     productName: "Tall Fescue Seed Blend",
     labelRate: 8,
     applicationNotes: "Overseed immediately after aeration. Keep seed moist for 2–3 weeks.",
@@ -189,6 +211,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t12",
     name: "Fall Fertilizer (Winterizer)",
+    plainDescription:
+      "The most important application of the year for cool-season grass. Builds root reserves for winter survival and spring green-up.",
     productName: "Milorganite 6-4-0",
     labelRate: 6.4,
     applicationNotes: "Final feeding builds root reserves for winter. Apply before first frost.",
@@ -205,6 +229,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t13",
     name: "Final Mow — Lower to 2.5″",
+    plainDescription:
+      "Your last cut of the year, dropped to 2.5″ to prevent snow mold over winter. Shorter grass on KC clay dries faster and resists matting. Do it right before the grass stops growing.",
     productName: "Adjust mower deck",
     labelRate: 0,
     applicationNotes: "Lower height for last mow to prevent snow mold.",
@@ -220,6 +246,8 @@ const FULL_PLAN: LawnTask[] = [
   {
     id: "t14",
     name: "Leaf Cleanup — Mulch or Remove",
+    plainDescription:
+      "Mulches or clears fallen leaves before they smother the lawn. Wet leaves trap moisture against KC clay and kill the grass underneath. Stay on top of it through late fall.",
     productName: "Mulching mower blade",
     labelRate: 0,
     applicationNotes: "Mulch thin layers. Remove heavy accumulations to prevent suffocation.",
@@ -402,6 +430,7 @@ export default function ChecklistPage() {
                     <TaskRow
                       key={task.id}
                       taskName={task.name}
+                      plainDescription={task.plainDescription}
                       productName={task.productName}
                       quantity={formatQuantity(lawnSqft, task.labelRate)}
                       dueDate={task.dueRange ?? task.dueDate}

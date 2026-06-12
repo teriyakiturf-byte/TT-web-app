@@ -14,6 +14,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t1",
     name: "Apply Pre-Emergent (Split App #1)",
+    plainDescription:
+      "Stops crabgrass and weeds before they sprout. Miss this and you chase weeds all summer. Apply before soil hits 55°F.",
     productName: "Prodiamine 65 WDG",
     labelRate: 0.86,
     applicationNotes: "Apply when soil temps reach 50–55°F. Water in within 24 hours.",
@@ -32,6 +34,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t2",
     name: "First Mow — Set Height to 3.5″",
+    plainDescription:
+      "Your first cut wakes the lawn and clears winter debris. Cutting at 3.5″ shades KC clay so it holds moisture instead of baking. Mow once the grass reaches 4 inches.",
     productName: "Mower blade sharpened",
     labelRate: 0,
     applicationNotes: "Mow when grass reaches 4 inches. Never remove more than ⅓ of blade height.",
@@ -49,6 +53,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t3",
     name: "Broadleaf Weed Spray",
+    plainDescription:
+      "Targets dandelions, clover, and other flat-leafed weeds without harming your grass. Apply when weeds are actively growing.",
     productName: "Trimec Classic",
     labelRate: 0.42,
     applicationNotes: "Spot-spray or broadcast when daytime temps are 60–80°F. Avoid rain for 24h.",
@@ -67,6 +73,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t4",
     name: "Pre-Emergent Split App #2",
+    plainDescription:
+      "The second half of your pre-emergent barrier. Splitting the dose keeps crabgrass blocked as KC clay heats up through summer. Apply 6–8 weeks after the first application.",
     productName: "Prodiamine 65 WDG",
     labelRate: 0.86,
     applicationNotes: "Second split application extends barrier through summer. Water in.",
@@ -84,6 +92,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t5",
     name: "Spring Fertilizer Application",
+    plainDescription:
+      "Wakes up your lawn after winter. Jumpstarts root growth and gives grass the nitrogen it needs to green up fast.",
     productName: "Milorganite 6-4-0",
     labelRate: 6.4,
     applicationNotes: "Apply at 6.4 lbs per 1,000 sq ft. Safe on all grass types. No burn risk.",
@@ -101,6 +111,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t6",
     name: "Grub Preventative",
+    plainDescription:
+      "Stops grubs before they hatch and chew through your roots. KC lawns on clay are prime grub territory. Apply in late spring and water it in.",
     productName: "GrubEx (Chlorantraniliprole)",
     labelRate: 2.9,
     applicationNotes: "Apply preventative before grub eggs hatch. Water in well.",
@@ -118,6 +130,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t7",
     name: "Raise Mow Height to 4″",
+    plainDescription:
+      "Taller grass shades the soil so KC clay stays cooler and holds water through summer heat — and it crowds out weeds. Raise your deck to 4″ before June heat sets in.",
     productName: "Adjust mower deck",
     labelRate: 0,
     applicationNotes: "Taller grass shades soil, reducing weed germination and water loss.",
@@ -135,6 +149,8 @@ export const PLAN_TASKS: LawnTask[] = [
   {
     id: "t8",
     name: "Summer Fertilizer (Slow-Release)",
+    plainDescription:
+      "Light feeding during heat stress. Too much nitrogen now burns grass. This application keeps color without causing damage.",
     productName: "Milorganite 6-4-0",
     labelRate: 6.4,
     applicationNotes: "Light summer feeding. Apply early morning to avoid heat stress.",
