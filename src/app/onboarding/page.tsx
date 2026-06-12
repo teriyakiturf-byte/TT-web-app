@@ -34,6 +34,30 @@ const GRASS_OPTIONS: {
   { value: "mixed-unsure", label: "Mixed / Not Sure", desc: "We'll use Tall Fescue as your base", fullWidth: true },
 ];
 
+type LawnSize = "small" | "medium" | "large" | "xl";
+
+const SIZE_OPTIONS: {
+  value: LawnSize;
+  label: string;
+  range: string;
+  hint: string;
+  sqft: number;
+}[] = [
+  { value: "small",  label: "Small",  range: "Under 3,000 sq ft",   hint: "(about the size of a 2-car garage x3)", sqft: 2000 },
+  { value: "medium", label: "Medium", range: "3,000–7,000 sq ft",   hint: "(most Johnson County lots)",           sqft: 5000 },
+  { value: "large",  label: "Large",  range: "7,000–12,000 sq ft",  hint: "(corner lots, newer builds)",          sqft: 9500 },
+  { value: "xl",     label: "XL",     range: "Over 12,000 sq ft",   hint: "(acreage, rural, large suburban)",     sqft: 15000 },
+];
+
+// Map a measured/saved sqft value back to the closest radio bucket so returning
+// users (and map measurements) keep a selection highlighted.
+function sqftToSize(n: number): LawnSize {
+  if (n < 3000) return "small";
+  if (n <= 7000) return "medium";
+  if (n <= 12000) return "large";
+  return "xl";
+}
+
 function OnboardingWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -47,7 +71,8 @@ function OnboardingWizard() {
   const [zip, setZip] = useState(zipFromUrl);
   const [grassType, setGrassType] = useState<GrassType>("tall-fescue");
   const [lawnSqft, setLawnSqft] = useState("");
-  const [sizeMethod, setSizeMethod] = useState<"draw" | "manual" | null>(null);
+  const [selectedSize, setSelectedSize] = useState<LawnSize | null>(null);
+  const [mapExpanded, setMapExpanded] = useState(false);
 
   useEffect(() => {
     if (!zipFromUrl) {
@@ -61,9 +86,16 @@ function OnboardingWizard() {
     const savedSqft = localStorage.getItem("tt_sqft");
     if (savedSqft && Number(savedSqft) > 0) {
       setLawnSqft(savedSqft);
-      setSizeMethod("manual");
+      setSelectedSize(sqftToSize(Number(savedSqft)));
     }
   }, [zipFromUrl]);
+
+  function handleSelectSize(opt: (typeof SIZE_OPTIONS)[number]) {
+    setSelectedSize(opt.value);
+    // Radio selection sets the midpoint sqft; an active map measurement may
+    // later override this value via onMeasurementComplete.
+    setLawnSqft(String(opt.sqft));
+  }
 
   const isKC = zip.length === 5 && KC_ZIPS.includes(zip);
   const zipValid = zip.length === 5;
@@ -260,70 +292,73 @@ function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 3: Lawn Size — inline measurement */}
+        {/* Step 3: Lawn Size — radio buttons + optional map */}
         {currentStep === 3 && (
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-display text-hero text-forest">
-                How Big Is Your Lawn?
+                How big is your lawn?
               </h1>
               <p className="text-sm text-muted mt-1">
-                We calculate exact product quantities from your lawn size.
+                Grass area only — not your full lot.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setSizeMethod("draw")}
-                className={`rounded-xl border-2 p-4 text-center transition-colors ${
-                  sizeMethod === "draw"
-                    ? "border-lime bg-lime-light"
-                    : "border-border bg-white hover:bg-cream"
-                }`}
-              >
-                <p className="font-display text-lg text-forest">Draw It</p>
-                <p className="text-xs text-muted mt-1">Use Google Maps</p>
-              </button>
-              <button
-                onClick={() => setSizeMethod("manual")}
-                className={`rounded-xl border-2 p-4 text-center transition-colors ${
-                  sizeMethod === "manual"
-                    ? "border-lime bg-lime-light"
-                    : "border-border bg-white hover:bg-cream"
-                }`}
-              >
-                <p className="font-display text-lg text-forest">
-                  I&apos;ll Type It
-                </p>
-                <p className="text-xs text-muted mt-1">Manual input</p>
-              </button>
+            {/* Radio button cards — full width on mobile, 2-col on desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {SIZE_OPTIONS.map((opt) => {
+                const isSelected = selectedSize === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => handleSelectSize(opt)}
+                    className={`w-full text-left rounded-xl p-4 cursor-pointer transition-colors ${
+                      isSelected
+                        ? "border-2 border-[#F4631E] bg-[#FFF3EC]"
+                        : "border-2 border-gray-200 bg-white hover:bg-cream"
+                    }`}
+                  >
+                    <p className="font-bold text-base text-[#1B4332]">
+                      {opt.label}
+                    </p>
+                    <p className="text-sm text-gray-600">{opt.range}</p>
+                    <p className="text-xs text-gray-400 italic mt-0.5">
+                      {opt.hint}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Draw It — inline map */}
-            {sizeMethod === "draw" && (
-              <LawnMeasurementMap
-                onMeasurementComplete={(val) => {
-                  setLawnSqft(String(val));
-                }}
-                initialSqft={lawnSqft ? Number(lawnSqft) : undefined}
-              />
-            )}
+            {/* Optional map expansion */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setMapExpanded((v) => !v)}
+                className="text-sm text-[#52B788] underline cursor-pointer"
+              >
+                {mapExpanded
+                  ? "Hide map ↑"
+                  : "Want exact product quantities? Measure my lawn on the map ↓"}
+              </button>
 
-            {/* Manual input */}
-            {sizeMethod === "manual" && (
-              <div className="rounded-xl border border-border bg-white p-4">
-                <label className="font-mono text-xs text-muted uppercase tracking-wide block mb-1">
-                  Lawn Size (sq ft)
-                </label>
-                <input
-                  type="number"
-                  value={lawnSqft}
-                  onChange={(e) => setLawnSqft(e.target.value)}
-                  placeholder="e.g. 5000"
-                  className="w-full rounded-lg border-2 border-border bg-cream px-4 py-2 font-mono text-lg text-center focus:border-lime focus:outline-none transition-colors"
-                />
-              </div>
-            )}
+              {mapExpanded && (
+                <div className="mt-3">
+                  <LawnMeasurementMap
+                    onMeasurementComplete={(val) => {
+                      // A completed measurement overrides the radio midpoint and
+                      // keeps the matching size bucket highlighted.
+                      setLawnSqft(String(val));
+                      setSelectedSize(sqftToSize(val));
+                    }}
+                    initialSqft={lawnSqft ? Number(lawnSqft) : undefined}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Savings preview — shows when sqft is valid */}
             {sqftValid && (
@@ -353,9 +388,9 @@ function OnboardingWizard() {
                 </button>
                 <button
                   onClick={handleFinish}
-                  disabled={!sqftValid}
+                  disabled={!selectedSize}
                   className={`flex-1 rounded-xl px-6 py-3 font-display text-lg text-white uppercase tracking-wider transition-colors ${
-                    sqftValid
+                    selectedSize
                       ? "bg-orange hover:bg-orange/90 cursor-pointer"
                       : "bg-orange/40 cursor-not-allowed"
                   }`}
@@ -363,9 +398,9 @@ function OnboardingWizard() {
                   Finish Setup →
                 </button>
               </div>
-              {!sqftValid && (
+              {!selectedSize && (
                 <p className="text-xs text-muted text-center mt-2">
-                  Select a method and enter your lawn size to continue
+                  Select your lawn size to continue
                 </p>
               )}
             </div>
