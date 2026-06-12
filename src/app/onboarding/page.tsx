@@ -8,6 +8,7 @@ import Nav from "@/components/Nav";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import LawnMeasurementMap from "@/components/LawnMeasurementMap";
 import GrassCardImage from "@/components/ui/GrassCardImage";
+import SavingsCounter from "@/components/SavingsCounter";
 import type { GrassType } from "@/types";
 import {
   GRASS_QUIZ,
@@ -370,6 +371,10 @@ function OnboardingWizard() {
                 );
               })}
             </div>
+
+            {/* Live personalized savings counter — recalculates as the user
+                taps a size. Defaults to Medium before any selection. */}
+            <SavingsCounter size={selectedSize ?? "medium"} />
 
             {/* Optional map expansion */}
             <div>

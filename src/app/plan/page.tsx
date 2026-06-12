@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import UnlockModal from "@/components/ui/UnlockModal";
+import SavingsCounter from "@/components/SavingsCounter";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
 import { formatGrassType } from "@/lib/utils";
+import { sqftToSize } from "@/lib/lawnProfileOptions";
 
 const KC_PREFIXES = [
   "640",
@@ -203,6 +205,9 @@ export default function PlanPage() {
     email,
   } = useUserState();
   const { weather } = useWeather();
+  // Personalized savings counter (#29) keyed to the user's saved lawn size,
+  // falling back to Medium when no size has been captured yet.
+  const planSize = lawnSqft ? sqftToSize(lawnSqft) : "medium";
   const soilTemp = weather?.soilTemp;
   const soilTempStatus = weather?.soilTempStatus;
   const showUrgency =
@@ -716,6 +721,11 @@ export default function PlanPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Personalized breakdown for the user's saved lawn size */}
+          <div style={{ maxWidth: "400px", margin: "0 auto 32px" }}>
+            <SavingsCounter size={planSize} />
           </div>
 
           <button
