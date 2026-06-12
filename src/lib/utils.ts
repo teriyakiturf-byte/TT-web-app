@@ -24,8 +24,8 @@ const GRASS_TYPE_LABELS: Record<string, string> = {
   "mixed-unsure": "Mixed / Not Sure",
 };
 
-export function formatGrassType(value: string): string {
-  if (!value) return "";
+export function formatGrassType(value: string | null | undefined): string {
+  if (!value) return "Not Set";
 
   // Normalize: lowercase and treat snake_case the same as kebab-case.
   const normalized = value.trim().toLowerCase().replace(/_/g, "-");
@@ -74,7 +74,7 @@ const ZIP_TO_CITY: Record<string, string> = {
   "64113": "Kansas City, MO",
 };
 
-export function getCityFromZip(zip: string): string {
+export function getCityFromZip(zip: string | null | undefined): string {
   if (!zip) return "Kansas City";
   const normalized = zip.trim().slice(0, 5);
   return ZIP_TO_CITY[normalized] ?? "Kansas City";
