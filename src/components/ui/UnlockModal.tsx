@@ -109,6 +109,12 @@ export default function UnlockModal({
             Not happy with your plan? Email us. We will make it right. This is
             Trever&apos;s personal system — we stand behind it.
           </p>
+          <a
+            href="/faq"
+            className="mt-1 inline-block text-xs font-medium text-[#52B788] underline hover:text-[#1B4332] transition-colors"
+          >
+            Still have questions? Read the FAQ
+          </a>
         </div>
 
         <button
