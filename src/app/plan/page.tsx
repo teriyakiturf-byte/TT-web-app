@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Lock } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import UnlockModal from "@/components/ui/UnlockModal";
 import { useUserState } from "@/hooks/useUserState";
 import { useWeather } from "@/hooks/useWeather";
@@ -23,30 +23,42 @@ const PREVIEW_TASKS = [
   {
     name: "Apply Pre-Emergent (Split App #1)",
     product: "Prodiamine 65 WDG",
+    quantity: "3.2 lbs",
+    rate: "0.86 lb / 1,000 sq ft",
     dateRange: "Mar 15 – Apr 1",
     context:
       "Soil temps in KC are crossing 55°F — your crabgrass pre-emergent window is closing.",
     badge: "Soil Temp Triggered",
     badgeColor: "#52B788",
+    isWindowActive: true,
   },
   {
     name: "Broadleaf Weed Spray",
     product: "Trimec Classic",
+    quantity: "1.6 lbs",
+    rate: "0.42 lb / 1,000 sq ft",
     dateRange: "Apr 15 – May 1",
     context: "Dandelions and clover are actively growing in KC clay right now.",
     badge: "Apply Before May 1",
     badgeColor: "#F4631E",
+    isWindowActive: true,
   },
   {
     name: "Spring Fertilizer Application",
     product: "Milorganite 6-4-0",
+    quantity: "24 lbs",
+    rate: "6.4 lb / 1,000 sq ft",
     dateRange: "May 1 – May 15",
     context:
       "Your tall fescue is hitting peak spring growth — feed it before summer heat stress arrives.",
     badge: "Slow Release ✓",
     badgeColor: "#52B788",
+    isWindowActive: false,
   },
 ];
+
+// Total tasks in the plan (the 3 previews above + 11 more through the year)
+const LOCKED_TASK_COUNT = 14;
 
 const PRIMARY_CTA_STYLE: React.CSSProperties = {
   padding: "16px 40px",
@@ -471,75 +483,82 @@ export default function PlanPage() {
                   background: "#F8F4E9",
                   border: "1px solid #D6E8DC",
                   borderRadius: "12px",
-                  padding: "16px 20px",
                   marginBottom: "10px",
+                  overflow: "hidden",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    gap: "12px",
-                    marginBottom: "4px",
-                  }}
-                >
+                {/* App-users-notified amber alert — free/guest only (F3) */}
+                {task.isWindowActive && (
+                  <div className="bg-[#E09B1A] text-white text-xs font-medium px-3 py-1.5 rounded-t-lg">
+                    🔔 Paid app users received a soil temp alert for this window
+                  </div>
+                )}
+
+                <div style={{ padding: "16px 20px" }}>
+                  {/* Visible: task name + timing */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: "12px",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "DM Sans",
+                        fontSize: "15px",
+                        fontWeight: 700,
+                        color: "#1B4332",
+                        margin: 0,
+                      }}
+                    >
+                      {task.name}
+                    </p>
+                    <span
+                      style={{
+                        fontFamily: "DM Mono",
+                        fontSize: "11px",
+                        color: "#6B7B70",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {task.dateRange}
+                    </span>
+                  </div>
+
                   <p
                     style={{
                       fontFamily: "DM Sans",
-                      fontSize: "15px",
-                      fontWeight: 700,
-                      color: "#1B4332",
-                      margin: 0,
-                    }}
-                  >
-                    {task.name}
-                  </p>
-                  <span
-                    style={{
-                      fontFamily: "DM Mono",
-                      fontSize: "11px",
+                      fontSize: "13px",
                       color: "#6B7B70",
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
+                      margin: "0 0 10px",
+                      lineHeight: 1.5,
                     }}
                   >
-                    {task.dateRange}
-                  </span>
-                </div>
+                    {task.context}
+                  </p>
 
-                <p
-                  style={{
-                    fontFamily: "DM Mono",
-                    fontSize: "12px",
-                    color: "#52B788",
-                    margin: "0 0 8px",
-                  }}
-                >
-                  {task.product}
-                </p>
+                  {/* Locked: product name, quantity, application rate — blurred */}
+                  <div className="relative overflow-hidden rounded-lg border border-[#D6E8DC] bg-white mb-2.5">
+                    <div className="px-3 py-2.5">
+                      <p className="font-mono text-xs text-[#52B788] mb-1">
+                        {task.product}
+                      </p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[11px] text-[#6B7B70]">
+                        <span>Qty: {task.quantity}</span>
+                        <span>Rate: {task.rate}</span>
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center">
+                      <span className="text-xs font-medium text-[#1B4332]">
+                        🔒 Unlock to see
+                      </span>
+                    </div>
+                  </div>
 
-                <p
-                  style={{
-                    fontFamily: "DM Sans",
-                    fontSize: "13px",
-                    color: "#6B7B70",
-                    margin: "0 0 10px",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {task.context}
-                </p>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
                   <span
                     style={{
                       fontFamily: "DM Mono",
@@ -548,22 +567,10 @@ export default function PlanPage() {
                       background: task.badgeColor + "18",
                       padding: "3px 8px",
                       borderRadius: "999px",
+                      display: "inline-block",
                     }}
                   >
                     {task.badge}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "DM Mono",
-                      fontSize: "11px",
-                      color: "#6B7B70",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    <Lock size={10} color="#6B7B70" />
-                    Unlock to see quantities →
                   </span>
                 </div>
               </div>
@@ -694,25 +701,25 @@ export default function PlanPage() {
         </section>
       )}
 
-      <div
-        id="sticky-unlock-bar"
-        className="fixed bottom-0 left-0 right-0 z-30 bg-forest/95 backdrop-blur-sm border-t border-white/10 px-4 py-3"
-      >
-        <div className="mx-auto max-w-3xl flex items-center justify-between">
-          <div>
-            <p className="font-display text-lg text-white">Unlock Your Full Plan</p>
-            <p className="font-mono text-xs text-white/60">
-              $67 one-time · Lifetime access
-            </p>
+      {/* Sticky locked-tasks bar — free/guest only (#19) */}
+      {(isGuest || isFree) && (
+        <div
+          id="sticky-unlock-bar"
+          className="sticky bottom-0 left-0 right-0 z-10"
+        >
+          <div className="bg-[#F4631E] text-white px-4 py-3 flex justify-between items-center">
+            <span className="text-sm font-medium">
+              {LOCKED_TASK_COUNT} tasks locked
+            </span>
+            <button
+              onClick={() => setUnlockModalOpen(true)}
+              className="bg-white text-[#F4631E] font-bold text-sm px-4 py-1.5 rounded-full"
+            >
+              Unlock Everything — $67 →
+            </button>
           </div>
-          <button
-            onClick={() => setUnlockModalOpen(true)}
-            className="rounded-xl bg-orange px-5 py-2.5 font-display text-sm text-white uppercase tracking-wider hover:bg-orange/90 transition-colors"
-          >
-            Unlock — $67 →
-          </button>
         </div>
-      </div>
+      )}
 
       <UnlockModal
         lawnSqft={lawnSqft ?? undefined}

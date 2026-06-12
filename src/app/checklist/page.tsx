@@ -27,6 +27,7 @@ const FULL_PLAN: LawnTask[] = [
     snoozeCount: 0,
     complianceBadges: ["soil-temp-triggered"],
     taskType: "weed-pest",
+    isWindowActive: true,
   },
   {
     id: "t2",
@@ -58,6 +59,7 @@ const FULL_PLAN: LawnTask[] = [
     snoozeCount: 0,
     complianceBadges: ["apply-before-may"],
     taskType: "weed-pest",
+    isWindowActive: true,
   },
   {
     id: "t4",
@@ -182,6 +184,7 @@ const FULL_PLAN: LawnTask[] = [
     snoozeCount: 0,
     complianceBadges: ["main-event"],
     taskType: "mechanical",
+    isWindowActive: true,
   },
   {
     id: "t12",
