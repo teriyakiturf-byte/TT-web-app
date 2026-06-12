@@ -32,6 +32,7 @@ model User {
   accounts  Account[]
   sessions  Session[]
   purchases Purchase[]
+  multiPropertyWaitlist MultiPropertyWaitlist[]
 }
 
 model Account {
@@ -98,4 +99,20 @@ model Purchase {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Custom: Multi-property waitlist (UI tease — feature not built yet) ──
+// Captures interest in a future multi-property dashboard. userId is optional
+// so the row survives if the account is ever removed (SetNull), and is null
+// for any future unauthenticated capture.
+
+model MultiPropertyWaitlist {
+  id        String   @id @default(cuid())
+  email     String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
 }

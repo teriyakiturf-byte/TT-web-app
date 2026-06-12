@@ -11,6 +11,7 @@ import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import WeatherWidget from "@/components/WeatherWidget";
+import MultiPropertyTease from "@/components/MultiPropertyTease";
 import { useWeather } from "@/hooks/useWeather";
 import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
@@ -356,6 +357,11 @@ export default function DashboardPage() {
             <p className="font-display text-lg text-forest">Calendar View</p>
             <p className="text-xs text-muted mt-1">Visual schedule</p>
           </Link>
+        </div>
+
+        {/* Multi-property waitlist tease (paid users — dashboard is paid-only) */}
+        <div className="mb-8">
+          <MultiPropertyTease />
         </div>
       </main>
 
