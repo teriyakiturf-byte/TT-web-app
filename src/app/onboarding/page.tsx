@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Suspense } from "react";
+import Image from "next/image";
 import Nav from "@/components/Nav";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import LawnMeasurementMap from "@/components/LawnMeasurementMap";
@@ -21,18 +22,109 @@ const KC_ZIPS = [
   "66220","66221","66223","66224","66226","66227",
 ];
 
-const GRASS_OPTIONS: {
-  value: GrassType;
+// Photo-quiz grass choices. "mixed" is a UI-only value: it resolves to
+// "tall-fescue" for plan generation (the most common KC grass), since the
+// rest of the app/API speaks the canonical GrassType vocabulary.
+type GrassChoice = "tall-fescue" | "kentucky-bluegrass" | "zoysia" | "mixed";
+
+const GRASS_QUIZ: {
+  value: GrassChoice;
   label: string;
   desc: string;
-  fullWidth?: boolean;
+  subNote?: string;
+  image: string;
+  placeholderBg: string;
+  isPlaceholderQuestion?: boolean;
 }[] = [
-  { value: "tall-fescue", label: "Tall Fescue", desc: "Most KC lawns" },
-  { value: "kentucky-bluegrass", label: "Kentucky Bluegrass", desc: "Full sun areas" },
-  { value: "zoysia", label: "Zoysia", desc: "Warm season patches" },
-  { value: "buffalo-grass", label: "Buffalo Grass", desc: "Low maintenance" },
-  { value: "mixed-unsure", label: "Mixed / Not Sure", desc: "We'll use Tall Fescue as your base", fullWidth: true },
+  {
+    value: "tall-fescue",
+    label: "Tall Fescue",
+    desc: "Broad, dark green blades. Stays green in KC winters.",
+    subNote: "Most common in Johnson County",
+    image: "/images/grass/tall-fescue.jpg",
+    placeholderBg: "#2D6A4F",
+  },
+  {
+    value: "kentucky-bluegrass",
+    label: "Kentucky Bluegrass",
+    desc: "Fine, boat-shaped blades. Bright green. Goes tan in summer heat.",
+    image: "/images/grass/kentucky-bluegrass.jpg",
+    placeholderBg: "#1B4332",
+  },
+  {
+    value: "zoysia",
+    label: "Zoysia",
+    desc: "Dense, carpet-like. Turns tan in fall. Slow to green up in spring.",
+    image: "/images/grass/zoysia.jpg",
+    placeholderBg: "#74C69D",
+  },
+  {
+    value: "mixed",
+    label: "Not Sure",
+    desc: "No problem — we will build your plan around the most common KC grass.",
+    image: "/images/grass/mixed.jpg",
+    placeholderBg: "#95D5B2",
+    isPlaceholderQuestion: true,
+  },
 ];
+
+// "mixed" / "Not Sure" maps to tall-fescue for plan generation; the other
+// quiz values are already canonical GrassType values.
+function resolveGrassType(choice: GrassChoice): GrassType {
+  return choice === "mixed" ? "tall-fescue" : choice;
+}
+
+// Re-highlight the matching card for returning users from a saved value.
+function savedGrassToChoice(saved: string): GrassChoice | null {
+  if (
+    saved === "tall-fescue" ||
+    saved === "kentucky-bluegrass" ||
+    saved === "zoysia"
+  ) {
+    return saved;
+  }
+  if (saved === "mixed" || saved === "mixed-unsure") return "mixed";
+  return null;
+}
+
+// Card image: Next.js Image with a colored placeholder box behind it. If the
+// photo doesn't exist yet (404), onError reveals the colored box.
+function GrassCardImage({
+  src,
+  alt,
+  bg,
+  showQuestion,
+}: {
+  src: string;
+  alt: string;
+  bg: string;
+  showQuestion?: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div
+      className="relative aspect-square w-full"
+      style={{ backgroundColor: bg }}
+    >
+      {!failed ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 640px) 45vw, 220px"
+          className="object-cover"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        showQuestion && (
+          <span className="absolute inset-0 flex items-center justify-center text-white/80 text-3xl font-bold">
+            ?
+          </span>
+        )
+      )}
+    </div>
+  );
+}
 
 type LawnSize = "small" | "medium" | "large" | "xl";
 
@@ -69,7 +161,7 @@ function OnboardingWizard() {
 
   const [currentStep, setCurrentStep] = useState(clampedStep);
   const [zip, setZip] = useState(zipFromUrl);
-  const [grassType, setGrassType] = useState<GrassType>("tall-fescue");
+  const [grassChoice, setGrassChoice] = useState<GrassChoice | null>(null);
   const [lawnSqft, setLawnSqft] = useState("");
   const [selectedSize, setSelectedSize] = useState<LawnSize | null>(null);
   const [mapExpanded, setMapExpanded] = useState(false);
@@ -80,8 +172,11 @@ function OnboardingWizard() {
       if (savedZip) setZip(savedZip);
     }
 
-    const savedGrass = localStorage.getItem("tt_grass") as GrassType | null;
-    if (savedGrass) setGrassType(savedGrass);
+    const savedGrass = localStorage.getItem("tt_grass");
+    if (savedGrass) {
+      const choice = savedGrassToChoice(savedGrass);
+      if (choice) setGrassChoice(choice);
+    }
 
     const savedSqft = localStorage.getItem("tt_sqft");
     if (savedSqft && Number(savedSqft) > 0) {
@@ -110,8 +205,8 @@ function OnboardingWizard() {
     if (currentStep === 1 && zip) {
       localStorage.setItem("tt_zip", zip);
     }
-    if (currentStep === 2) {
-      localStorage.setItem("tt_grass", grassType);
+    if (currentStep === 2 && grassChoice) {
+      localStorage.setItem("tt_grass", resolveGrassType(grassChoice));
     }
     setCurrentStep((s) => Math.min(s + 1, 3));
   }
@@ -133,8 +228,19 @@ function OnboardingWizard() {
     }
   }
 
+  // Resolve the grass value to persist: the selected card, falling back to a
+  // previously saved value (e.g. for users who deep-link straight to step 3).
+  function persistedGrassType(): GrassType {
+    if (grassChoice) return resolveGrassType(grassChoice);
+    const saved = localStorage.getItem("tt_grass");
+    return (saved && savedGrassToChoice(saved)
+      ? resolveGrassType(savedGrassToChoice(saved)!)
+      : "tall-fescue");
+  }
+
   async function handleFinish() {
     if (zip) localStorage.setItem("tt_zip", zip);
+    const grassType = persistedGrassType();
     localStorage.setItem("tt_grass", grassType);
     if (sqftValid) {
       localStorage.setItem("tt_sqft", lawnSqft);
@@ -145,6 +251,7 @@ function OnboardingWizard() {
 
   async function handleSkipSize() {
     if (zip) localStorage.setItem("tt_zip", zip);
+    const grassType = persistedGrassType();
     localStorage.setItem("tt_grass", grassType);
     await saveProfileToDB({ zip, grassType });
     router.push("/plan");
@@ -242,52 +349,102 @@ function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 2: Grass Type Selection — 2x2 grid */}
+        {/* Step 2: Grass Type Photo Quiz — 2x2 grid of tappable image cards */}
         {currentStep === 2 && (
           <div className="space-y-6">
             <div className="text-center">
               <h1 className="font-display text-hero text-forest">
-                What Grass Do You Have?
+                Which looks most like your lawn right now?
               </h1>
               <p className="text-sm text-muted mt-1">
-                This determines seed rates, mow heights, and seasonal timing.
+                Don&apos;t stress it — most KC lawns are one of these four.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {GRASS_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setGrassType(opt.value)}
-                  className={`rounded-xl border-2 px-4 py-3 text-left transition-colors ${
-                    opt.fullWidth ? "col-span-2" : ""
-                  } ${
-                    grassType === opt.value
-                      ? "border-lime bg-lime-light"
-                      : "border-border bg-white hover:bg-cream"
-                  }`}
-                >
-                  <p className="text-sm font-medium text-charcoal">
-                    {opt.label}
-                  </p>
-                  <p className="text-xs text-muted mt-0.5">{opt.desc}</p>
-                </button>
-              ))}
+            <div>
+              <div
+                role="radiogroup"
+                aria-label="Grass type"
+                className="grid grid-cols-2 gap-3 md:gap-4"
+              >
+                {GRASS_QUIZ.map((opt) => {
+                  const isSelected = grassChoice === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => setGrassChoice(opt.value)}
+                      className={`relative rounded-xl overflow-hidden text-left cursor-pointer transition-all ${
+                        isSelected
+                          ? "border-2 border-[#F4631E] ring-2 ring-[#F4631E] ring-offset-1"
+                          : "border-2 border-gray-200"
+                      }`}
+                    >
+                      <GrassCardImage
+                        src={opt.image}
+                        alt={opt.label}
+                        bg={opt.placeholderBg}
+                        showQuestion={opt.isPlaceholderQuestion}
+                      />
+
+                      {isSelected && (
+                        <span className="absolute top-2 right-2 rounded-full bg-[#F4631E] text-white w-5 h-5 flex items-center justify-center text-xs font-bold">
+                          ✓
+                        </span>
+                      )}
+
+                      <p className="font-bold text-sm text-[#1B4332] px-3 pt-2">
+                        {opt.label}
+                      </p>
+                      <p
+                        className={`text-xs text-gray-500 px-3 ${
+                          opt.subNote ? "" : "pb-2"
+                        }`}
+                      >
+                        {opt.desc}
+                      </p>
+                      {opt.subNote && (
+                        <p className="text-[11px] font-semibold text-[#2D6A4F] px-3 pt-1 pb-2">
+                          {opt.subNote}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mt-3">
+                You can update this in Settings after you see your plan.
+              </p>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleBack}
-                className="rounded-xl border-2 border-border px-4 py-3 font-display text-sm text-muted uppercase tracking-wider hover:bg-cream transition-colors"
-              >
-                ← Back
-              </button>
-              <button
-                onClick={handleNext}
-                className="flex-1 rounded-xl bg-lime px-6 py-3 font-display text-lg text-white uppercase tracking-wider hover:bg-lime/90 transition-colors"
-              >
-                Next →
-              </button>
+            <div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBack}
+                  className="rounded-xl border-2 border-border px-4 py-3 font-display text-sm text-muted uppercase tracking-wider hover:bg-cream transition-colors"
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={!grassChoice}
+                  className={`flex-1 rounded-xl px-6 py-3 font-display text-lg text-white uppercase tracking-wider transition-colors ${
+                    grassChoice
+                      ? "bg-lime hover:bg-lime/90 cursor-pointer"
+                      : "bg-lime/40 cursor-not-allowed"
+                  }`}
+                >
+                  Next →
+                </button>
+              </div>
+              {!grassChoice && (
+                <p className="text-xs text-muted text-center mt-2">
+                  Tap the photo that looks most like your lawn to continue
+                </p>
+              )}
             </div>
           </div>
         )}
