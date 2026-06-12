@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         productType: "lawn_plan_lifetime",
         lawnSqft: lawnSqft ? String(lawnSqft) : "",
       },
-      success_url: `${baseUrl}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/plan`,
       // Only pass customer_email if it's a real email string
       // Passing undefined/null/empty locks Stripe's email field

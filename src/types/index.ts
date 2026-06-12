@@ -38,6 +38,10 @@ export interface LawnTask {
   whyContext?: string;
   complianceBadges?: ComplianceBadgeType[];
   taskType: "fertilizer" | "weed-pest" | "mechanical";
+  /** Rough time-on-task estimate, in minutes. */
+  estTimeMin?: number;
+  /** Rough product cost estimate for the task, in whole dollars. */
+  estCost?: number;
 }
 
 /* ── Compliance ── */
