@@ -200,3 +200,106 @@ export function formatTaskQuantity(
   if (!lawnSqft) return "Add your lawn size →";
   return `${calculateQuantity(lawnSqft, labelRate)} lbs`;
 }
+
+/* ── Season progress ──────────────────────────────────────────────────────
+ * Measures how far through the seasonal task window the user is: of the tasks
+ * whose due date has already arrived ("due so far"), how many are complete.
+ * Powers the post-completion toast and the dashboard season-progress bar.
+ */
+
+const MONTH_ABBR_INDEX: Record<string, number> = {
+  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+};
+
+/**
+ * Parse a task `dueDate` like `"Mar 15"` into a Date in the given year.
+ * Returns null for anything that isn't a recognizable "Mon DD" string.
+ */
+export function parseDueDate(dueDate: string, year: number): Date | null {
+  const match = dueDate.trim().match(/^([A-Za-z]{3})\s+(\d{1,2})$/);
+  if (!match) return null;
+  const month = MONTH_ABBR_INDEX[match[1]];
+  if (month === undefined) return null;
+  return new Date(year, month, parseInt(match[2], 10));
+}
+
+export type SeasonStatusLevel = "ahead" | "on-track" | "behind";
+
+export interface SeasonProgress {
+  /** Tasks whose due date is on or before today. */
+  totalDueTasks: number;
+  /** Of those due tasks, how many are marked complete. */
+  completedCount: number;
+  /** completedCount / totalDueTasks, rounded and capped at 100. */
+  percentage: number;
+  /** Due tasks that are still incomplete (overdue). */
+  overdueCount: number;
+  /** ahead ≥ 80%, on-track 50–79%, behind < 50%. */
+  status: SeasonStatusLevel;
+  /** Highest-priority incomplete task to surface as "do this next". */
+  nextTaskName: string | null;
+}
+
+/**
+ * Compute season progress from the task list. A task counts toward the
+ * denominator once its `dueDate` has arrived (≤ `now`); the numerator is those
+ * due tasks that are complete.
+ */
+export function computeSeasonProgress(
+  tasks: LawnTask[],
+  now: Date = new Date()
+): SeasonProgress {
+  const year = now.getFullYear();
+  const dueTasks = tasks.filter((t) => {
+    const due = parseDueDate(t.dueDate, year);
+    return due !== null && due.getTime() <= now.getTime();
+  });
+
+  const totalDueTasks = dueTasks.length;
+  const completedCount = dueTasks.filter((t) => t.isComplete).length;
+  const overdueCount = totalDueTasks - completedCount;
+  const percentage =
+    totalDueTasks > 0
+      ? Math.min(100, Math.round((completedCount / totalDueTasks) * 100))
+      : 100; // nothing due yet → not behind
+
+  const status: SeasonStatusLevel =
+    percentage >= 80 ? "ahead" : percentage >= 50 ? "on-track" : "behind";
+
+  return {
+    totalDueTasks,
+    completedCount,
+    percentage,
+    overdueCount,
+    status,
+    nextTaskName: selectHeroTask(tasks)?.name ?? null,
+  };
+}
+
+/**
+ * The toast copy shown right after a task is completed, keyed off how far the
+ * user is through the season. The "behind" case carries a sub-message naming
+ * the next task to prioritize.
+ */
+export function seasonToastMessage(
+  progress: SeasonProgress
+): { message: string; subMessage?: string } {
+  if (progress.percentage >= 80) {
+    return {
+      message:
+        "You're ahead of schedule. Your lawn is on track for a strong season.",
+    };
+  }
+  if (progress.percentage >= 50) {
+    return {
+      message: "Good progress. You're keeping up with the KC lawn calendar.",
+    };
+  }
+  return {
+    message: "You're behind the seasonal window.",
+    subMessage: progress.nextTaskName
+      ? `Prioritize next: ${progress.nextTaskName}`
+      : undefined,
+  };
+}
