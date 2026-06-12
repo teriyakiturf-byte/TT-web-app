@@ -11,8 +11,12 @@ import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import WeatherWidget from "@/components/WeatherWidget";
+import MultiPropertyTease from "@/components/MultiPropertyTease";
+import FertilizerWaitlistCard from "@/components/FertilizerWaitlistCard";
 import { useWeather } from "@/hooks/useWeather";
 import ToastNotification from "@/components/ui/ToastNotification";
+import TaskCompletionToast from "@/components/ui/TaskCompletionToast";
+import SeasonProgressBar from "@/components/ui/SeasonProgressBar";
 import { useUserState } from "@/hooks/useUserState";
 import type { LawnTask, ToastType } from "@/types";
 import { calculateSavings } from "@/types";
@@ -22,12 +26,14 @@ import {
   TASK_COMPLETIONS_KEY,
   loadTaskCompletions,
   selectHeroTask,
+  computeSeasonProgress,
+  seasonToastMessage,
   formatTaskQuantity as formatQuantity,
 } from "@/lib/planTasks";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType, zip } = useUserState();
+  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType, zip, email } = useUserState();
   const { weather } = useWeather();
 
   const [tasks, setTasks] = useState<LawnTask[]>(() => {
@@ -35,6 +41,10 @@ export default function DashboardPage() {
     return PLAN_TASKS.map((t) => ({ ...t, isComplete: saved[t.id] ?? false }));
   });
   const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
+  const [completionToast, setCompletionToast] = useState<{
+    message: string;
+    subMessage?: string;
+  } | null>(null);
 
   // Persist completions to localStorage
   useEffect(() => {
@@ -61,6 +71,7 @@ export default function DashboardPage() {
   const savings = lawnSqft ? calculateSavings(lawnSqft) : null;
 
   const heroTask = selectHeroTask(tasks);
+  const seasonProgress = computeSeasonProgress(tasks);
 
   const upcomingTasks = tasks
     .filter((t) => !t.isComplete && t.id !== heroTask?.id)
@@ -72,19 +83,23 @@ export default function DashboardPage() {
   ).size;
 
   function toggleTask(taskId: string) {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id !== taskId) return t;
-        const next = { ...t, isComplete: !t.isComplete };
-        if (next.isComplete) {
-          setToast({ type: "success", message: `✓ ${t.name} — marked complete` });
-        }
-        return next;
-      })
+    const updated = tasks.map((t) =>
+      t.id === taskId ? { ...t, isComplete: !t.isComplete } : t
     );
+    setTasks(updated);
+
+    // Fire the season-progress feedback toast only when marking complete.
+    const toggled = updated.find((t) => t.id === taskId);
+    if (toggled?.isComplete) {
+      setCompletionToast(seasonToastMessage(computeSeasonProgress(updated)));
+    }
   }
 
   const handleDismissToast = useCallback(() => setToast(null), []);
+  const handleDismissCompletionToast = useCallback(
+    () => setCompletionToast(null),
+    []
+  );
 
   function handleMarkComplete() {
     if (heroTask) toggleTask(heroTask.id);
@@ -279,6 +294,18 @@ export default function DashboardPage() {
               View All →
             </a>
           </div>
+
+          {/* Season Progress — % of tasks due so far that are complete */}
+          <div className="mb-4">
+            <SeasonProgressBar
+              completedCount={seasonProgress.completedCount}
+              totalDueTasks={seasonProgress.totalDueTasks}
+              percentage={seasonProgress.percentage}
+              status={seasonProgress.status}
+              overdueCount={seasonProgress.overdueCount}
+            />
+          </div>
+
           <div className="space-y-2">
             {upcomingTasks.map((task) => (
               <TaskRow
@@ -357,6 +384,16 @@ export default function DashboardPage() {
             <p className="text-xs text-muted mt-1">Visual schedule</p>
           </Link>
         </div>
+
+        {/* Fertilizer waitlist CTA — paid users only (Year 2 pre-sell) */}
+        {isPaid && <FertilizerWaitlistCard userEmail={email} />}
+
+        {/* Multi-property waitlist tease — paid users only */}
+        {isPaid && (
+          <div className="mb-8">
+            <MultiPropertyTease />
+          </div>
+        )}
       </main>
 
       {toast && (
@@ -364,6 +401,15 @@ export default function DashboardPage() {
           type={toast.type}
           message={toast.message}
           onDismiss={handleDismissToast}
+        />
+      )}
+
+      {completionToast && (
+        <TaskCompletionToast
+          key={`${completionToast.message}-${completionToast.subMessage ?? ""}`}
+          message={completionToast.message}
+          subMessage={completionToast.subMessage}
+          onDismiss={handleDismissCompletionToast}
         />
       )}
     </>
