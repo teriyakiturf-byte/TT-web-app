@@ -91,6 +91,20 @@ export default function Nav({ userState: userStateProp }: NavProps) {
               Products
             </Link>
           )}
+          {/* Shopping List: visible to every signed-in user (free + paid) so
+              free users discover it and hit the locked upgrade state. */}
+          {isLoggedIn && (
+            <Link
+              href="/shopping-list"
+              className={`text-sm transition-colors ${
+                pathname === "/shopping-list"
+                  ? "text-lime border-b-2 border-lime pb-0.5"
+                  : "text-white/80 hover:text-white"
+              }`}
+            >
+              Shopping List
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
               <Link
@@ -196,6 +210,16 @@ export default function Nav({ userState: userStateProp }: NavProps) {
               }`}
             >
               Products
+            </Link>
+          )}
+          {isLoggedIn && (
+            <Link
+              href="/shopping-list"
+              className={`block py-2 text-sm ${
+                pathname === "/shopping-list" ? "text-lime" : "text-white/80"
+              }`}
+            >
+              Shopping List
             </Link>
           )}
           {isLoggedIn ? (
