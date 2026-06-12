@@ -11,6 +11,7 @@ import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import WeatherWidget from "@/components/WeatherWidget";
+import FertilizerWaitlistCard from "@/components/FertilizerWaitlistCard";
 import { useWeather } from "@/hooks/useWeather";
 import ToastNotification from "@/components/ui/ToastNotification";
 import { useUserState } from "@/hooks/useUserState";
@@ -27,7 +28,7 @@ import {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType, zip } = useUserState();
+  const { isPaid, isFree, isGuest, loading, lawnSqft, grassType, zip, email } = useUserState();
   const { weather } = useWeather();
 
   const [tasks, setTasks] = useState<LawnTask[]>(() => {
@@ -357,6 +358,9 @@ export default function DashboardPage() {
             <p className="text-xs text-muted mt-1">Visual schedule</p>
           </Link>
         </div>
+
+        {/* Fertilizer waitlist CTA — paid users only (Year 2 pre-sell) */}
+        {isPaid && <FertilizerWaitlistCard userEmail={email} />}
       </main>
 
       {toast && (

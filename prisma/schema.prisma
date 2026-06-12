@@ -32,6 +32,7 @@ model User {
   accounts  Account[]
   sessions  Session[]
   purchases Purchase[]
+  fertilizerWaitlist FertilizerWaitlist[]
 }
 
 model Account {
@@ -82,6 +83,21 @@ model PasswordResetToken {
 
   @@index([email])
   @@index([token])
+}
+
+// ─── Custom: Fertilizer waitlist (Year 2 private-label pre-sell) ──
+
+model FertilizerWaitlist {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  userId    String?
+  zip       String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("fertilizer_waitlist")
 }
 
 // ─── Custom: Stripe purchase records ────────────────────────
