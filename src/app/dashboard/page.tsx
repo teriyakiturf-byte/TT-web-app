@@ -11,6 +11,7 @@ import SeasonPill from "@/components/ui/SeasonPill";
 import AlertBanner from "@/components/ui/AlertBanner";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import WeatherWidget from "@/components/WeatherWidget";
+import MultiPropertyTease from "@/components/MultiPropertyTease";
 import FertilizerWaitlistCard from "@/components/FertilizerWaitlistCard";
 import { useWeather } from "@/hooks/useWeather";
 import ToastNotification from "@/components/ui/ToastNotification";
@@ -386,6 +387,13 @@ export default function DashboardPage() {
 
         {/* Fertilizer waitlist CTA — paid users only (Year 2 pre-sell) */}
         {isPaid && <FertilizerWaitlistCard userEmail={email} />}
+
+        {/* Multi-property waitlist tease — paid users only */}
+        {isPaid && (
+          <div className="mb-8">
+            <MultiPropertyTease />
+          </div>
+        )}
       </main>
 
       {toast && (
