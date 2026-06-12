@@ -109,6 +109,66 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Competitive differentiation — static HTML */}
+        <section className="mt-16">
+          <h2 className="text-xl font-bold text-[#1B4332] mb-2">
+            Why not just use a free lawn app?
+          </h2>
+          <p className="text-sm text-gray-500 mb-5">
+            Fair question. Here is the honest difference.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Card 1 — Free Generic Apps */}
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <div className="bg-gray-100 text-gray-600 font-bold px-4 py-3 text-sm">
+                Free Lawn Apps
+              </div>
+              <div className="text-gray-500 text-sm px-4 py-2 border-t border-gray-100">
+                ✗&nbsp;&nbsp;Built for national averages — not KC clay soil
+              </div>
+              <div className="text-gray-500 text-sm px-4 py-2 border-t border-gray-100">
+                ✗&nbsp;&nbsp;Timing based on climate zone, not your ZIP code
+              </div>
+              <div className="text-gray-500 text-sm px-4 py-2 border-t border-gray-100">
+                ✗&nbsp;&nbsp;Product amounts not calibrated for your lawn size
+              </div>
+              <div className="text-gray-500 text-sm px-4 py-2 border-t border-gray-100">
+                ✗&nbsp;&nbsp;No local competitor pricing context
+              </div>
+              <div className="text-gray-500 text-sm px-4 py-2 border-t border-gray-100">
+                ✗&nbsp;&nbsp;Free because they sell services or your data
+              </div>
+            </div>
+
+            {/* Card 2 — Teriyaki Turf */}
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <div className="bg-[#1B4332] text-white font-bold px-4 py-3 text-sm">
+                Teriyaki Turf
+              </div>
+              <div className="text-[#1B4332] font-medium text-sm px-4 py-2 border-t border-gray-100">
+                ✓&nbsp;&nbsp;Built specifically for Zone 6a KC clay soil
+              </div>
+              <div className="text-[#1B4332] font-medium text-sm px-4 py-2 border-t border-gray-100">
+                ✓&nbsp;&nbsp;Timing calibrated to real KC soil temperature data
+              </div>
+              <div className="text-[#1B4332] font-medium text-sm px-4 py-2 border-t border-gray-100">
+                ✓&nbsp;&nbsp;Exact quantities for your specific lawn size
+              </div>
+              <div className="text-[#1B4332] font-medium text-sm px-4 py-2 border-t border-gray-100">
+                ✓&nbsp;&nbsp;DIY savings vs. actual KC lawn care company pricing
+              </div>
+              <div className="text-[#1B4332] font-medium text-sm px-4 py-2 border-t border-gray-100">
+                ✓&nbsp;&nbsp;One-time $67 — no subscription, no service upsell, ever
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-center text-[#52B788] font-medium mt-4">
+            Free apps are built for everywhere. This one is built for here.
+          </p>
+        </section>
+
         {/* FAQ preview — static HTML */}
         <section className="mt-16 mb-16">
           <h2 className="font-display text-2xl text-forest text-center">
