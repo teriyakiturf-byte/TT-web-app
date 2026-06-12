@@ -2,6 +2,8 @@
 
 import { Check, Lock } from "lucide-react";
 import KCComplianceBadge from "./KCComplianceBadge";
+import BudgetOption from "./BudgetOption";
+import { getBudgetAlternative } from "@/lib/budgetAlternatives";
 import type { ComplianceBadgeType } from "@/types";
 
 interface TaskRowProps {
@@ -29,6 +31,8 @@ export default function TaskRow({
   complianceBadges,
   onToggle,
 }: TaskRowProps) {
+  const budgetAlt = getBudgetAlternative(productName);
+
   return (
     <div
       className={`flex items-start gap-3 rounded-lg border border-border bg-white px-4 py-3 transition-opacity ${
@@ -70,7 +74,14 @@ export default function TaskRow({
             {plainDescription}
           </p>
         )}
-        <p className="font-mono text-xs text-forest mt-0.5">{productName}</p>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <p className="font-mono text-xs text-forest">{productName}</p>
+          {budgetAlt && (
+            <span className="bg-[#F4631E] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              RECOMMENDED
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-2 mt-1 flex-wrap">
           {isLocked ? (
@@ -84,6 +95,8 @@ export default function TaskRow({
           )}
           <span className="font-mono text-[10px] text-muted">{dueDate}</span>
         </div>
+
+        {budgetAlt && <BudgetOption alt={budgetAlt} />}
 
         {complianceBadges && complianceBadges.length > 0 && (
           <div className="flex gap-1 mt-1.5 flex-wrap">
