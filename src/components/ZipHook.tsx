@@ -7,6 +7,7 @@ import { AlertTriangle, ArrowRight } from "lucide-react";
 import LawnInfoChip from "@/components/ui/LawnInfoChip";
 import SoilTempChip from "@/components/SoilTempChip";
 import CreateAccountModal from "@/components/CreateAccountModal";
+import UserCounter from "@/components/UserCounter";
 import { useUserState } from "@/hooks/useUserState";
 
 const KC_ZIPS = [
@@ -163,6 +164,9 @@ export default function ZipHook() {
           className="w-full rounded-xl border-2 border-border bg-white px-4 py-3 text-center font-mono text-lg text-charcoal placeholder:text-muted/50 focus:border-lime focus:outline-none transition-colors"
         />
       </div>
+
+      {/* Live KC user count (F1) — below the ZIP input */}
+      <UserCounter />
 
       {submitted && (
         <div className="mt-6 space-y-4 animate-in fade-in duration-300">
