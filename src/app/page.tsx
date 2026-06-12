@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Leaf, MapPin, Thermometer, ArrowRight } from "lucide-react";
 import Nav from "@/components/Nav";
 import ZipHook from "@/components/ZipHook";
+import SavingsCounter from "@/components/SavingsCounter";
 
 export const metadata: Metadata = {
   title: "Kansas City Lawn Care — Zone 6a Schedule & KC Soil Temperature Guide | Teriyaki Turf",
@@ -51,14 +52,22 @@ export default function LandingPage() {
           </div>
 
           <h1 className="font-display text-hero text-forest">
-            What&apos;s Your Kansas City Lawn Dealing With?
+            Your neighbor&apos;s lawn isn&apos;t better than yours because they work harder.
+            <br />
+            It&apos;s because they know something about Zone 6a clay soil that you don&apos;t. Yet.
           </h1>
           <p className="text-sm text-muted mt-2 max-w-lg mx-auto">
-            Zone 6a timing. KC clay soil. Soil temp triggers. Built for KC homeowners.
+            TruGreen charges KC homeowners $623–$847/year to apply the same plan
+            you&apos;re about to build in 60 seconds. For free.
           </p>
 
+          {/* Savings counter (#2) — above the fold, above the ZIP input */}
+          <div className="mt-6 max-w-md mx-auto">
+            <SavingsCounter />
+          </div>
+
           {/* Interactive ZIP hook — client island */}
-          <div className="mt-6">
+          <div className="mt-2">
             <ZipHook />
           </div>
         </section>
