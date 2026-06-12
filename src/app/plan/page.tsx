@@ -215,6 +215,9 @@ export default function PlanPage() {
     (soilTempStatus === "closing" || soilTempStatus === "pre-emergent");
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  // Contextual banner when the user lands here after being bounced off a
+  // paid-only route (e.g. /success) by the server guard with ?reason=payment-required.
+  const [showPaymentBanner, setShowPaymentBanner] = useState(false);
   const [zip, setZip] = useState("");
   const [guestZip, setGuestZip] = useState<string | null>(null);
   const [zoneData, setZoneData] = useState<null | {
@@ -226,6 +229,12 @@ export default function PlanPage() {
   useEffect(() => {
     if (!isLoading && isPaid) router.replace("/dashboard");
   }, [isLoading, isPaid, router]);
+
+  // Show the payment-required banner when redirected from a paid-only route.
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get("reason");
+    setShowPaymentBanner(reason === "payment-required");
+  }, []);
 
   // Guest ZIP confirmation / guard (#18): resolve the guest's ZIP from the
   // URL (?zip=) or saved localStorage value. No ZIP → send back to landing.
@@ -307,6 +316,15 @@ export default function PlanPage() {
 
   return (
     <>
+      {/* Payment-required banner — shown when bounced off a paid-only route */}
+      {showPaymentBanner && (
+        <div className="mx-auto max-w-2xl px-4 pt-6">
+          <div className="bg-[#FEF9E7] border border-[#E09B1A] rounded-xl px-4 py-3 text-sm text-[#7D4E00] mb-4">
+            Complete your plan unlock to access your full dashboard.
+          </div>
+        </div>
+      )}
+
       {/* Guest ZIP confirmation bar (#18) — guests only, not authed profiles */}
       {isGuest && guestZip && (
         <div className="mx-auto max-w-2xl px-4 pt-6">
