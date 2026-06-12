@@ -42,6 +42,12 @@ export interface LawnTask {
   estTimeMin?: number;
   /** Rough product cost estimate for the task, in whole dollars. */
   estCost?: number;
+  /**
+   * Placeholder for seasonal-window status. True when the task's window has
+   * opened or is closing soon — used to surface the "app users notified"
+   * amber alert to free/guest users. (Stand-in until windowStatus exists.)
+   */
+  isWindowActive?: boolean;
 }
 
 /* ── Compliance ── */
