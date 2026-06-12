@@ -1,45 +1,53 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
-import { ArrowRight } from "lucide-react";
+import FaqAccordion, { type FaqItem } from "@/components/ui/FaqAccordion";
 
 export const metadata: Metadata = {
-  title: "KC Lawn Care FAQ — Zone 6a, Clay Soil, Soil Temps | Teriyaki Turf",
+  title: "Frequently Asked Questions — KC Lawn Plan | Teriyaki Turf",
   description:
-    "Answers to common Kansas City lawn care questions. Pre-emergent timing, clay soil tips, soil temperature triggers, and more for Zone 6a homeowners.",
+    "Real questions from Kansas City homeowners about the Teriyaki Turf lawn plan — one-time pricing, grass types, lawn measurement, overseeding timing, and KC clay soil.",
 };
 
-const FAQ_ITEMS = [
+const FAQ_ITEMS: FaqItem[] = [
   {
-    q: "When should I apply pre-emergent in Kansas City?",
-    a: "When soil temperatures consistently reach 50–55°F, typically mid-March to early April in the KC metro. Watch forsythia blooms as your natural indicator — when they start blooming, it's time. Use a split application (half rate in March, half in April) for extended protection through summer.",
+    q: "Is this really just a one-time payment?",
+    a: "Yes. $67 once and your plan is unlocked forever. No subscription, no annual renewal, no hidden fees. We think lawn care subscriptions are a racket — that's literally the whole point of this app.",
   },
   {
-    q: "How do I deal with Kansas City's heavy clay soil?",
-    a: "Core aerate every fall (September is ideal). Don't add sand — it creates concrete-like conditions in clay. Use gypsum to improve drainage over time. Mow high (3.5–4 inches) to encourage deeper root growth that breaks through compacted soil. Milorganite is a great fertilizer choice for clay because it won't burn.",
+    q: "What makes this different from a free lawn app?",
+    a: "Free lawn apps are built for national averages. Your lawn is in Kansas City, on Zone 6a heavy clay soil, with KC weather patterns. Generic timing and generic product rates don't work here. Every recommendation in your plan is calibrated to your specific ZIP code, your lawn size, and real KC soil temperature data.",
   },
   {
-    q: "When should I overseed my KC lawn?",
-    a: "Fall overseeding is the single most important task for KC Tall Fescue lawns. Target September 1\u201320 when soil temps drop below 65\u00B0F and nights cool down. Core aerate first, overseed within 48 hours, apply starter fertilizer immediately, and water twice daily for 3 weeks. This is why we track KC soil temperatures all summer.",
+    q: "I don't know what kind of grass I have. Will this still work?",
+    a: "Yes. Select 'Not Sure' in the grass type step and we'll build your plan around the most common KC grass type for your ZIP code — which is Tall Fescue in most of Johnson County. You can update your grass type in Settings anytime.",
   },
   {
-    q: "Why does soil temperature matter more than the calendar date?",
-    a: "National lawn care apps use calendar dates. KC soil temps don\u2019t follow national averages. Pre-emergent needs to go down when your soil hits 50\u00B0F \u2014 not when a generic app says March 15. Overseeding needs soil below 65\u00B0F \u2014 not when Labor Day hits. Teriyaki Turf tracks KC-specific soil temps so your timing is always right for your actual conditions.",
+    q: "How do I measure my lawn size?",
+    a: "You don't have to be exact. Choose the closest size range in onboarding (Small / Medium / Large / XL) — that's accurate enough for the plan. If you want precise product quantities, use the optional map measurement tool in onboarding step 2.",
   },
   {
-    q: "What type of grass do most KC lawns have?",
-    a: "Most Kansas City lawns are Tall Fescue — a cool-season grass well-suited to Zone 6a's hot summers and cold winters. Some lawns have Kentucky Bluegrass or a Zoysia/Bermuda mix. If you're unsure, Tall Fescue is the safe assumption for product rates and timing.",
+    q: "My lawn has a bare or patchy section. Does the plan cover that?",
+    a: "Yes. Overseeding and renovation tasks are included in your plan with the correct timing window for KC — soil temp between 50–65°F, typically mid-September to mid-October. Follow the plan timing. Do not overseed in March in KC clay. The soil is too cold and seed won't germinate.",
   },
   {
-    q: "When should I overseed my KC lawn?",
-    a: "September 1–20 is the prime window for overseeding Tall Fescue in Kansas City. Soil temps are still warm enough for germination, but air temps are cooling down. Core aerate immediately before overseeding for best seed-to-soil contact. Keep the seed moist for 2–3 weeks.",
+    q: "I tried a lawn program before and it didn't work. Why will this be different?",
+    a: "Most failed programs use the wrong timing for KC clay soil. KC clay stays cold longer than national averages suggest — pre-emergent applied too early gets washed out before it activates. Fertilizer applied when grass is stressed burns instead of feeds. This plan uses real KC soil temperature data to tell you when — not just what.",
   },
   {
-    q: "How often should I water my lawn in Kansas City?",
-    a: "Water deeply and infrequently — 1 to 1.5 inches per week total, including rain. In summer, this usually means 2–3 deep waterings per week rather than daily light sprinkles. Water early morning (before 10 AM) to reduce fungal disease risk. KC's clay soil holds moisture longer than sandy soils.",
+    q: "What if I'm not happy with my plan?",
+    a: "Email us and we'll make it right. This is Trever's personal lawn system — we stand behind it. We'd rather fix a plan than have you unhappy with it.",
   },
   {
-    q: "What's the best mowing height for KC lawns?",
-    a: "For Tall Fescue in KC: mow at 3.5 inches in spring and fall, raise to 4 inches in summer. Never remove more than one-third of the blade height at once. Taller grass shades the soil, reducing weed germination and water evaporation — critical during KC's hot July/August.",
+    q: "Can I use this for a rental property or Airbnb?",
+    a: "Yes. The plan works for any KC metro lawn. Enter the property's ZIP code during onboarding. If you manage multiple properties, you'll need a separate account per property for now. Multi-property dashboard is coming — join the waitlist from your dashboard.",
+  },
+  {
+    q: "Will this work for Zoysia or Bermuda grass?",
+    a: "The app is optimized for cool-season grasses — Tall Fescue, Kentucky Bluegrass, and Perennial Ryegrass — which cover the vast majority of KC metro lawns. Zoysia support is included. Bermuda (warm-season) has different timing and is on our roadmap.",
+  },
+  {
+    q: "When will my plan update for the new season?",
+    a: "Your plan updates automatically based on the current date and your ZIP code's soil temperature data. You don't need to do anything — just open the app and your current tasks will reflect the season you're in.",
   },
 ];
 
@@ -49,40 +57,22 @@ export default function FAQPage() {
       <Nav userState="guest" />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="font-display text-hero text-forest text-center">
-          KC Lawn Questions — Answered
+        <h1 className="font-body normal-case tracking-normal text-2xl font-bold text-[#1B4332] mb-2">
+          Frequently Asked Questions
         </h1>
-        <p className="text-sm text-muted text-center mt-2">
-          Real answers for Kansas City Zone 6a homeowners. No generic advice.
+        <p className="text-sm text-gray-500 mb-8">
+          Real questions from KC homeowners. Real answers.
         </p>
 
-        <div className="mt-8 space-y-4">
-          {FAQ_ITEMS.map((item, i) => (
-            <details
-              key={i}
-              className="group rounded-xl border border-border bg-white overflow-hidden"
-              open={i < 3}
-            >
-              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-medium text-charcoal hover:bg-cream transition-colors list-none">
-                {item.q}
-                <ArrowRight
-                  size={14}
-                  className="flex-shrink-0 ml-3 text-muted transition-transform group-open:rotate-90"
-                />
-              </summary>
-              <div className="px-5 pb-4">
-                <p className="text-sm text-muted leading-relaxed">{item.a}</p>
-              </div>
-            </details>
-          ))}
-        </div>
+        <FaqAccordion items={FAQ_ITEMS} />
 
         <div className="mt-8 rounded-xl bg-forest p-6 text-center text-white">
           <p className="font-display text-2xl">
             Get Your Personalized KC Lawn Plan
           </p>
           <p className="text-sm text-white/70 mt-2">
-            Every task timed to Zone 6a. Product quantities calculated for your lawn size.
+            Every task timed to Zone 6a. Product quantities calculated for your
+            lawn size.
           </p>
           <a
             href="/plan"

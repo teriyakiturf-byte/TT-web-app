@@ -196,7 +196,7 @@ export default function LandingPage() {
               href="/faq"
               className="inline-flex items-center gap-1 text-sm text-lime hover:text-forest transition-colors"
             >
-              See all 17+ answers <ArrowRight size={14} />
+              See all answers <ArrowRight size={14} />
             </a>
           </div>
         </section>
