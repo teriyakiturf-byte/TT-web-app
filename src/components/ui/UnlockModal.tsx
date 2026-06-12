@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, Check, Loader2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 interface UnlockModalProps {
   lawnSqft?: number;
@@ -11,7 +11,6 @@ interface UnlockModalProps {
 }
 
 export default function UnlockModal({
-  lawnSqft,
   isOpen,
   onClose,
   onStripeCheckout,
@@ -47,35 +46,70 @@ export default function UnlockModal({
           <X size={20} />
         </button>
 
-        <h2 className="font-display text-3xl text-forest uppercase">
-          {lawnSqft
-            ? `Your ${lawnSqft.toLocaleString()} Sq Ft KC Lawn Plan`
-            : "Your KC Lawn Plan"}
-        </h2>
-
-        <p className="font-display text-[72px] leading-none text-forest mt-4">
-          $67
+        {/* Savings delta headline (#5) */}
+        <p className="text-lg font-semibold text-[#2C3E50]">
+          You just built a lawn plan that TruGreen would charge you $780/year to
+          execute.
         </p>
-        <p className="font-mono text-xs text-muted mt-1">
-          One-time payment. Lifetime access.
+        <p className="text-2xl font-bold text-[#F4631E]">
+          Unlock it for $67. Once. Never again.
         </p>
 
-        <ul className="mt-5 space-y-3">
+        {/* One-time payment badge (#6) */}
+        <div className="flex items-center justify-center gap-2 bg-[#EAFAF1] border border-[#52B788] rounded-full px-4 py-2 my-3 w-full md:w-auto md:mx-auto">
+          <span className="text-sm font-bold text-[#1B4332] text-center">
+            ✅  ONE-TIME PAYMENT. NOT A SUBSCRIPTION. NOT EVER.
+          </span>
+        </div>
+
+        {/* What unlocks feature list */}
+        <div className="space-y-3 my-4">
           {[
-            "Week-by-week schedule built for Zone 6a",
-            "Product quantities calculated for your exact lawn size",
-            "Fall overseeding window calculated from KC soil temps",
+            {
+              emoji: "🌿",
+              title: "Exact product names",
+              sub: "The specific fertilizers, pre-emergents & amendments for KC clay soil. No guessing at Home Depot.",
+            },
+            {
+              emoji: "⚖️",
+              title: "Precise quantities",
+              sub: "Calibrated to your exact lawn size. Over-apply = burned grass. Under-apply = weeds win.",
+            },
+            {
+              emoji: "📅",
+              title: "Week-by-week timing",
+              sub: "Not early spring. The actual dates for your ZIP based on real KC soil temperature data.",
+            },
           ].map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <Check
-                size={18}
-                className="mt-0.5 flex-shrink-0 text-lime"
-                strokeWidth={3}
-              />
-              <span className="text-sm text-charcoal">{item}</span>
-            </li>
+            <div key={item.title} className="flex gap-3 items-start">
+              <span className="text-xl mt-0.5">{item.emoji}</span>
+              <div>
+                <p className="font-bold text-sm text-[#1B4332]">{item.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{item.sub}</p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
+
+        {/* Testimonial (#7) */}
+        <div className="bg-[#F5F1E8] rounded-xl p-4 border-l-4 border-[#F4631E] my-3">
+          <p className="text-sm italic text-[#2C3E50]">
+            &ldquo;I cancelled Ryan Lawn after my second month. My lawn has never
+            looked this good — and I actually understand why it looks this
+            good.&rdquo;
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            — Marcus T., Overland Park, KS
+          </p>
+        </div>
+
+        {/* Risk reversal (#27) */}
+        <div className="text-center my-2">
+          <p className="text-xs text-gray-400">
+            Not happy with your plan? Email us. We will make it right. This is
+            Trever&apos;s personal system — we stand behind it.
+          </p>
+        </div>
 
         <button
           onClick={() => {
@@ -91,12 +125,13 @@ export default function UnlockModal({
               Redirecting to Checkout…
             </span>
           ) : (
-            "Unlock My KC Lawn Plan — $67 →"
+            "Unlock My Full Plan — $67"
           )}
         </button>
 
-        <p className="font-mono text-[10px] text-muted text-center mt-3">
-          One-time payment. No subscription. No renewals.
+        {/* Button micro-copy */}
+        <p className="text-xs text-gray-400 text-center mt-2">
+          Secure checkout via Stripe. One-time. No subscription. Instant access.
         </p>
       </div>
     </div>
