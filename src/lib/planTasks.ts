@@ -1,6 +1,36 @@
 import type { LawnTask } from "@/types";
 import { calculateQuantity } from "@/types";
 
+/* ── Shopping list ─────────────────────────────────────────────────────────
+ * The shopping list aggregates the products a user still needs to buy across
+ * their incomplete plan tasks. Product names + per-lawn quantities are paid
+ * content, so the builder gates on `isPaid`: free users get an empty, locked
+ * result and never receive the product data. Paid users get the deduped buy
+ * list. This is the access-control boundary for the shopping list (B12).
+ */
+
+export interface ShoppingListItem {
+  /** Deduped product to buy (e.g. "Prodiamine 65 WDG"). */
+  productName: string;
+  taskType: LawnTask["taskType"];
+  /** Per-1,000-sqft label rate (lbs). */
+  labelRate: number;
+  /** Total quantity needed across every task using this product, formatted. */
+  quantity: string;
+  /** How many applications across the season use this product. */
+  applications: number;
+  /** Soonest due window across the tasks using this product. */
+  dueDate: string;
+  dueRange?: string;
+  applicationNotes: string;
+}
+
+export interface ShoppingList {
+  products: ShoppingListItem[];
+  /** True for free/guest users — the UI renders the upgrade teaser instead. */
+  isLocked: boolean;
+}
+
 /**
  * Shared lawn-plan task source.
  *
@@ -356,4 +386,76 @@ export function findUpcomingTasks(now: Date, withinDays: number): UpcomingTask[]
         t.window.open <= horizon
     )
     .sort((a, b) => a.window.open.getTime() - b.window.open.getTime());
+}
+
+/**
+ * Build the access-controlled shopping list.
+ *
+ * Free + guest users (`isPaid === false`) get `{ products: [], isLocked: true }`
+ * — no product names or quantities ever leave this function for them, so the UI
+ * can only render the upgrade teaser. Paid users get the deduped list of
+ * products still needed across their incomplete, buyable tasks (`labelRate > 0`
+ * excludes mechanical tasks like mowing), with quantities totaled for their
+ * lawn and the soonest due window surfaced. Sorted soonest-due first.
+ */
+export function buildShoppingList(
+  tasks: LawnTask[],
+  lawnSqft: number | null,
+  isPaid: boolean,
+  now: Date = new Date()
+): ShoppingList {
+  if (!isPaid) return { products: [], isLocked: true };
+
+  const year = now.getFullYear();
+  const byProduct = new Map<
+    string,
+    { item: ShoppingListItem; totalLbs: number; dueTime: number }
+  >();
+
+  for (const task of tasks) {
+    if (task.isComplete || task.labelRate <= 0) continue;
+
+    const due = parseDueDate(task.dueDate, year);
+    const dueTime = due ? due.getTime() : Number.MAX_SAFE_INTEGER;
+    const lbs = lawnSqft ? calculateQuantity(lawnSqft, task.labelRate) : 0;
+
+    const existing = byProduct.get(task.productName);
+    if (!existing) {
+      byProduct.set(task.productName, {
+        item: {
+          productName: task.productName,
+          taskType: task.taskType,
+          labelRate: task.labelRate,
+          quantity: "",
+          applications: 1,
+          dueDate: task.dueDate,
+          dueRange: task.dueRange,
+          applicationNotes: task.applicationNotes,
+        },
+        totalLbs: lbs,
+        dueTime,
+      });
+    } else {
+      existing.item.applications += 1;
+      existing.totalLbs += lbs;
+      // Keep the soonest-due window's date/range and notes for the card.
+      if (dueTime < existing.dueTime) {
+        existing.dueTime = dueTime;
+        existing.item.dueDate = task.dueDate;
+        existing.item.dueRange = task.dueRange;
+        existing.item.applicationNotes = task.applicationNotes;
+      }
+    }
+  }
+
+  const products = [...byProduct.values()]
+    .sort((a, b) => a.dueTime - b.dueTime)
+    .map(({ item, totalLbs }) => ({
+      ...item,
+      quantity: lawnSqft
+        ? `${Math.round(totalLbs * 10) / 10} lbs`
+        : "Add lawn size →",
+    }));
+
+  return { products, isLocked: false };
 }
