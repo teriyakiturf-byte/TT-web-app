@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import MetricsBar from "@/components/MetricsBar";
 import HeroTaskCard from "@/components/ui/HeroTaskCard";
 import StatCard from "@/components/ui/StatCard";
 import TaskRow from "@/components/ui/TaskRow";
@@ -64,6 +65,14 @@ export default function DashboardPage() {
 
   const displayGrass = grassType ? formatGrassType(grassType) : "Tall Fescue";
   const cityName = getCityFromZip(zip ?? "");
+
+  // Friendly first name derived from the email already on the page (no fetch).
+  const userName = email
+    ? (() => {
+        const first = email.split("@")[0].split(/[._-]/)[0];
+        return first ? first.charAt(0).toUpperCase() + first.slice(1) : null;
+      })()
+    : null;
 
   const completedCount = tasks.filter((t) => t.isComplete).length;
   const totalCount = tasks.length;
@@ -142,6 +151,17 @@ export default function DashboardPage() {
       <Nav userState="paid" />
 
       <main className="mx-auto max-w-3xl px-4 py-8">
+        {/* Persistent Field Console metrics bar — display-only, derives from
+            data already on the page. Sits flush at the top of the content. */}
+        <div className="-mx-4 -mt-8 mb-6">
+          <MetricsBar
+            soilTemp={weather?.soilTemp ?? null}
+            sqFt={lawnSqft}
+            grassType={grassType}
+            userName={userName}
+          />
+        </div>
+
         <h1 className="font-display text-hero text-forest text-center">
           Your {cityName} Lawn Plan
         </h1>

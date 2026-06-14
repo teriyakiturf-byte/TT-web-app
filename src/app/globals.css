@@ -5,14 +5,21 @@
 :root {
   /* Colors */
   --forest:       #1B4332;
+  --forest-mid:   #143626;
+  --forest-deep:  #0F2A1E;
   --lime:         #52B788;
   --lime-light:   #D8F3DC;
+  --lime-soft:    #B7E4C7;
   --orange:       #F4631E;
   --orange-light: #FFF0EB;
   --cream:        #F8F4E9;
   --charcoal:     #1C2B1E;
   --muted:        #6B7B70;
   --border:       #D6E8DC;
+
+  /* Dark-surface tokens (Field Console / MetricsBar) */
+  --border-dark:  rgba(255, 255, 255, 0.12);
+  --text-muted:   rgba(255, 255, 255, 0.55);
 
   /* Typography */
   --font-display: 'Bebas Neue', sans-serif;
