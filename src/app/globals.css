@@ -3,21 +3,36 @@
 @tailwind utilities;
 
 :root {
-  /* Colors */
+  /* ── Field Console design tokens ── */
   --forest:       #1B4332;
+  --forest-deep:  #0f2a1f;
+  --forest-mid:   #13261d;
+  --panel:        #1b3327;
+  --panel-lite:   #223d2f;
   --lime:         #52B788;
-  --lime-light:   #D8F3DC;
+  --lime-soft:    #95D5B2;
+  --lime-glow:    rgba(82,183,136,0.18);
   --orange:       #F4631E;
+  --orange-dim:   rgba(244,99,30,0.15);
+  --charcoal:     #2C3E50;
+  --cream:        #F5F1E8;
+  --amber:        #E09B1A;
+  --text-dark:    #e8f2ec;
+  --text-muted:   #8aad96;
+  --border-dark:  rgba(149,213,178,0.13);
+  --border-cream: rgba(27,67,50,0.12);
+
+  /* ── Legacy light-theme aliases (kept for guest/public pages) ── */
+  --lime-light:   #D8F3DC;
   --orange-light: #FFF0EB;
-  --cream:        #F8F4E9;
-  --charcoal:     #1C2B1E;
   --muted:        #6B7B70;
   --border:       #D6E8DC;
 
   /* Typography */
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'DM Mono', monospace;
+  --font-display:    'Bebas Neue', sans-serif;
+  --font-body:       'DM Sans', sans-serif;
+  --font-mono:       'DM Mono', monospace;
+  --font-montserrat: 'Montserrat', sans-serif;
 }
 
 body {
@@ -156,4 +171,95 @@ h1, h2, h3, h4, h5, h6 {
 
 .font-mono {
   font-family: var(--font-mono);
+}
+
+/* ── Field Console typography scale (global utility classes) ── */
+.display-num {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.heading-900 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+}
+
+.heading-800 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+}
+
+.body-dm {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── Field Console dark shell ──
+   Reusable building blocks for the authenticated app. These never apply to
+   guest/public pages (/, /faq, /signin, /signup), which keep their existing
+   light styles. The dark shell is opt-in via the `.app-shell` wrapper. */
+.app-shell {
+  min-height: 100vh;
+  background: var(--forest-deep);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+}
+
+/* Sticky top bar / page header surface */
+.app-shell .app-header {
+  background: var(--forest-mid);
+}
+
+/* Primary raised card surface */
+.app-shell .panel {
+  background: var(--panel);
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Secondary / lighter card surface */
+.app-shell .panel-lite {
+  background: var(--panel-lite);
+  border: 1px solid var(--border-dark);
+}
+
+/* Nested inset block inside a panel */
+.app-shell .panel-inset {
+  background: var(--forest-mid);
+  border: 1px solid var(--border-dark);
+}
+
+/* Recessed well (deepest surface) */
+.app-shell .panel-well {
+  background: var(--forest-deep);
+  border: 1px solid var(--border-dark);
+}
+
+/* Form controls on the dark shell */
+.app-shell input,
+.app-shell select,
+.app-shell textarea {
+  background: var(--forest-mid);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+/* Footer band on the dark shell */
+.app-shell .app-footer {
+  background: var(--forest-mid);
+}
+
+/* Scrollbar theming inside the shell */
+.app-shell ::-webkit-scrollbar-track {
+  background: var(--forest-deep);
+}
+
+.app-shell ::-webkit-scrollbar-thumb {
+  background: var(--forest-mid);
 }
